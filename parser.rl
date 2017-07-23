@@ -1,7 +1,7 @@
 package RON
 
 import "fmt"
-const trace = true
+const trace = false
 
 type parser struct {
     data []byte
@@ -34,6 +34,8 @@ func XParseOp(data []byte, op *Op, context *Op) int {
     var length = -1
     _ = length
 
+    op.AtomCount = 0
+
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int
     _ = eof
@@ -47,6 +49,13 @@ func XParseOp(data []byte, op *Op, context *Op) int {
 	    write init;
 	    write exec;
 	}%%
+
+    if ret>0 {
+        op.Atoms = data[op.AtomOffsets[0]:ret]
+        if trace {
+            fmt.Printf("ATOMS: %d..%d\n", op.AtomOffsets[0], ret);
+        }
+    }
 
     return ret
 }

@@ -16,6 +16,8 @@
         if trace {
             fmt.Printf("TOEL %c\n", fc);
         }
+        i = 0
+        digits = 0
         switch fc {
             case '.': {
                           n = 0
@@ -49,17 +51,21 @@
 
     action atom_start {
         op.AtomTypes[op.AtomCount] = fc
-        op.AtomOffsets[op.AtomCount] = ts
+        op.AtomOffsets[op.AtomCount] = p
         op.AtomCount++
-        ////fmt.Printf("ATOM_START %c\n", fc);
+        if trace {
+            fmt.Printf("ATOM_START %c at %d\n", fc, p);
+        }
     }
     action atom {
-        ////fmt.Printf("ATOM\n");
+        if trace {
+            fmt.Printf("ATOM at %d\n", p);
+        }
     }
 
     action atoms {
         if trace {
-            fmt.Print("ATOMS\n")
+            fmt.Printf("ATOMS at %d\n", p)
         }
         ret = p
     }
@@ -85,7 +91,7 @@
     OP = (
             ( [\.#@:] @toel_start REDEF? UUID %toel_uuid )+
             (ATOM+ %atoms ) 
-         ) "\n";
+         ) ;
 
     # main := OP;
 

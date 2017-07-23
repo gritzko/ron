@@ -20,9 +20,10 @@ func TestOp_Event(t *testing.T) {
 
 func TestParseOp (t *testing.T) {
     t.Log("Parser")
-	var frame = ".lww#test-author@(time-origin:loc=1''>test\n"
+	var frame = ".lww#test-author@(time-origin:loc=1''>test"
 	var op Op
-    if len(frame)-1 != XParseOp ( []byte(frame), &op, &ZERO_OP ) {
+	pl := XParseOp ( []byte(frame), &op, &ZERO_OP )
+    if len(frame) != pl {
 		t.Fail()
 	}
 	if op.Type.String() != "lww" {
@@ -42,11 +43,12 @@ func BenchmarkParseOp(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		frames = append(frames, []byte(frame)...)
 	}
+	origin, _ := ParseUUID([]byte("1-origin"), ZERO_UUID)
 	var off int
 	var op Op
 	for i := 0; i < b.N; i++ {
 		l := XParseOp(frames[off:], &op, &ZERO_OP)
-		if l!=len(frame)-1 {
+		if l != len(frame)-1 || op.Event.Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
 			b.Logf("off %d len %d", off, l)
 			b.Fail()
 		}

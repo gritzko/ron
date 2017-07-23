@@ -199,30 +199,35 @@ func FormatOp(output []byte, op *Op, context *Op) int {
 		context = &ZERO_OP
 	}
 	// expand to 88+values
-	if op.Type == context.Type {
+	if op.Type != context.Type {
 		output[off] = TYPE_UUID_SEP
 		off++
-		off += FormatUUID(output, op.Type, context.Type)
+		off += FormatUUID(output[off:], op.Type, context.Type)
 	}
-	if op.Object == context.Object {
+	if op.Object != context.Object {
 		output[off] = OBJECT_UUID_SEP
 		off++
-		off += FormatUUID(output, op.Object, context.Object)
+		off += FormatUUID(output[off:], op.Object, context.Object)
 	}
-	if op.Event == context.Event {
+	if op.Event != context.Event {
 		output[off] = EVENT_UUID_SEP
 		off++
-		off += FormatUUID(output, op.Event, context.Event)
+		off += FormatUUID(output[off:], op.Event, context.Event)
 	}
-	if op.Location == context.Location {
+	if op.Location != context.Location {
 		output[off] = LOCATION_UUID_SEP
 		off++
-		off += FormatUUID(output, op.Location, context.Location)
+		off += FormatUUID(output[off:], op.Location, context.Location)
 	}
-	atoms_off := op.AtomOffsets[0]
-	copy(op.Body[atoms_off:], output[off:])
-	off += len(op.Body) - atoms_off
+	copy(output[off:], op.Atoms)
+	off += len(op.Atoms)
 	return off
+}
+
+func (op *Op) String () string {
+	buf := make([]byte, op.AtomOffsets[op.AtomCount-1]+100) // FIXME!!!
+	l := FormatOp(buf, op, &ZERO_OP)
+	return string(buf[:l])
 }
 
 var ZERO_UUID = UUID{0, '$', 0}

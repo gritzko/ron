@@ -48,7 +48,7 @@ type Op struct {
 	Type, Object, Event, Location UUID
 	AtomCount                     int
 	AtomTypes                     [8]byte
-	Body                          []byte
+	Atoms                         []byte
 	AtomOffsets                   [8]int
 }
 
@@ -93,6 +93,8 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 var ZERO_OP Op
 
 func init () {
+    ZERO_OP.AtomCount = 1
+    ZERO_OP.AtomTypes[0] = '?'
     ZERO_OP.Type = ZERO_UUID
     ZERO_OP.Object = ZERO_UUID
     ZERO_OP.Event = ZERO_UUID

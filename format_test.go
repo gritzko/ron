@@ -27,7 +27,7 @@ func TestUUIDPrimitives(t *testing.T) {
 }
 
 
-func TestZip(t *testing.T) {
+func TestUUID_String(t *testing.T) {
 	tests := [][]string{
 		{"0", "1", "1"},
 		{"0", "0000000001-orig", ")1-orig"},
@@ -152,6 +152,48 @@ func BenchmarkUnzip(b *testing.B) {
 	//b.Logf("%d bytes parsed\n", ro)
 }
 
+func TestOp_String(t *testing.T) {
+	str := ".lww#object@time-origin:loc=1"
+	op, _ := ParseOp([]byte(str), ZERO_OP)
+	context := op
+	op.Event.Value ++
+	op.Location.Value ++
+	buf := make([]byte, 100)
+	l := FormatOp(buf, &op, &context)
+	if l<=0 {
+		t.Fail()
+		return
+	}
+	opstr := string(buf[:l])
+	if opstr != "@)1:)1=1" {
+		t.Logf("incorrect: '%s'", opstr)
+		t.Fail()
+	}
+}
+
+func BenchmarkFormatOp(b *testing.B) {
+	str := ".lww#object@time-origin:loc=1"
+	op, _ := ParseOp([]byte(str), ZERO_OP)
+	var context Op = op
+	//b.Logf(op.String())
+	buf := make([]byte, b.N*len(str)*2+100)
+	op.Event.Value ++
+	op.Location.Value ++
+	//opstr := op.String()
+	//if opstr != "@)1:)1=1" {
+	//	b.Logf("incorrect: '%s'", opstr)
+	//	b.Fail()
+	//}
+	off := FormatOp(buf, &op, &context)
+	for i:=0; i<b.N; i++ {
+		context = op
+		op.Event.Value ++
+		op.Location.Value ++
+		off += FormatOp(buf[off:], &op, &context)
+	}
+	b.Log(string(buf[:100]))
+}
+
 // TODO
 // [x] bench
 // [x] prettify
@@ -160,4 +202,4 @@ func BenchmarkUnzip(b *testing.B) {
 // [x] hashes
 // [x] names
 // [x] order
-// [ ] clock
+// [x] clock
