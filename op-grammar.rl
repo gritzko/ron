@@ -5,7 +5,7 @@
 
 # TODO  REDEF_UUID
 
-    INT_ATOM = [\-+]? [0-9]+ $dgt;
+    INT_ATOM = [\-+]? [0-9]+ ;
 
     STRING_ATOM = /[^']*/;
 
