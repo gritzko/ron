@@ -1,5 +1,7 @@
 package RON
 
+import "fmt"
+const trace = true
 
 type parser struct {
     data []byte
@@ -7,21 +9,28 @@ type parser struct {
     ts, te, act int
 }
 
-//func ParseOp(data []byte, op *Op) int {
-//    return -1
-//}
+func ParseOp(data []byte, context Op) (op Op, length int) {
+    op = context
+    length = XParseOp(data, &op, &context)
+    return
+}
 
-func ParseOp(data []byte, op *Op) int {
+func XParseOp(data []byte, op *Op, context *Op) int {
+
+    if context==nil {
+        context = &ZERO_OP
+    }
 
     %% machine RON;
     %% write data;
 
-    var uuid UUID
+    var prev_uuid *UUID = &ZERO_UUID
     var ret int
-    var context UUID
-    uuid = context
-    var i uint64 = context.Value
+    var uuid *UUID
+    var i uint64
     var digits uint
+    var n int
+    var prev_uuid_ind int
     var length = -1
     _ = length
 
@@ -30,43 +39,7 @@ func ParseOp(data []byte, op *Op) int {
     _ = eof
     _,_,_ = ts,te,act
 
-	%%{ 
-
-        action uuid_redef {
-        }
-
-        action type_start {
-            //uuid = zero
-        }
-        action object_start {
-            //uuid = zero
-        }
-        action event_start {
-            //uuid = zero
-        }
-        action location_start {
-            //uuid = zero
-        }
-        action type {
-        }
-        action object {
-        }
-        action event {
-        }
-        action location {
-        }
-
-        action atom_start {
-            ////fmt.Printf("ATOM_START %c\n", fc);
-        }
-        action atom {
-            ////fmt.Printf("ATOM\n");
-        }
-
-        action atoms {
-            ////fmt.Printf("VALUE\n");
-            ret = p
-        }
+	%%{
 
         include OP "./op-grammar.rl";
         main := OP ;
@@ -75,19 +48,22 @@ func ParseOp(data []byte, op *Op) int {
 	    write exec;
 	}%%
 
-        return ret
+    return ret
 }
 
-
+func ParseUUID(data []byte, context UUID) (uuid UUID, length int) {
+    uuid = context
+    length = XParseUUID(data, &uuid)
+    return
+}
 
 // BIG FIXME  ERROR HANDLING, TESTS
-func ParseUUID(data []byte, context UUID) (uuid UUID, length int) {
+func XParseUUID(data []byte, uuid* UUID) (length int) {
 
     %% machine UUID;
     %% write data;
 
-    uuid = context
-    var i uint64 = context.Value
+    var i uint64 = uuid.Value
     var digits uint
     length = -1
 

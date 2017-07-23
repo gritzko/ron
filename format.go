@@ -219,8 +219,10 @@ func FormatOp(output []byte, op *Op, context *Op) int {
 		off++
 		off += FormatUUID(output, op.Location, context.Location)
 	}
-	copy(op.Values, output[off:])
-	return off + len(op.Values)
+	atoms_off := op.AtomOffsets[0]
+	copy(op.Body[atoms_off:], output[off:])
+	off += len(op.Body) - atoms_off
+	return off
 }
 
 var ZERO_UUID = UUID{0, '$', 0}

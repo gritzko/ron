@@ -127,8 +127,10 @@ func BenchmarkUnzip(b *testing.B) {
 	var ro int = 0
 	for j := 0; j < b.N; j++ {
 		ind := lens[j] //bytes.IndexByte(zipped[ro:], ' ')
-		unzip, l := ParseUUID(zipped[ro:ro+ind], context)
-		if l==-1 {
+		//unzip, l := ParseUUID(zipped[ro:ro+ind], context)
+		unzip := context
+		l := XParseUUID(zipped[ro:ro+ind], &unzip)
+		if l<0 {
 			b.Logf("parse fail at %d: %s should be %s context %s text '%s'",
 				j, unzip.String(), uuids[j].String(), context.String(), string(zipped[ro:]))
 			b.Fail()
@@ -147,7 +149,7 @@ func BenchmarkUnzip(b *testing.B) {
 		context = unzip
 	}
 	//fmt.Println("compressed")
-	b.Logf("%d bytes parsed\n", ro)
+	//b.Logf("%d bytes parsed\n", ro)
 }
 
 // TODO

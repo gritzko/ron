@@ -22,7 +22,7 @@
             uuid.Value = i << (60-digits)
             digits = 0
         }
-        i = context.Origin
+        i = uuid.Origin
     }
 
     action origin {
@@ -33,7 +33,7 @@
 
     action uuid_sep {
         uuid.Sign = fc
-        i = context.Origin
+        i = uuid.Origin
     }
 
     action uuid {
@@ -51,6 +51,8 @@
     UUID =  VALUE? ORIGIN?
             %uuid
            ;
+
+# main := UUID;
 
 }%%
 

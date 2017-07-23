@@ -9,7 +9,7 @@ const (
 )
 
 const (
-	PREFIX10 = (1<<60-1) - (1<<(iota*6)-1)
+	PREFIX10 = (1<<60 - 1) - (1<<(iota*6) - 1)
 	PREFIX9
 	PREFIX8
 	PREFIX7
@@ -27,11 +27,11 @@ type UUID struct {
 	Origin uint64
 }
 
-func (a *UUID) Compare (b UUID) int {
+func (a *UUID) Compare(b UUID) int {
 	diff := a.Value - b.Value
-	if diff==0 {
+	if diff == 0 {
 		diff = uint64(a.Sign) - uint64(b.Sign)
-		if diff==0 {
+		if diff == 0 {
 			diff = a.Origin - b.Origin
 		}
 	}
@@ -46,10 +46,10 @@ func (a *UUID) Compare (b UUID) int {
 
 type Op struct {
 	Type, Object, Event, Location UUID
-	ValueCount                    int
-	ValueTypes                    [8]byte
-	Values                        []byte
-	ValueOffsets                  [8]int
+	AtomCount                     int
+	AtomTypes                     [8]byte
+	Body                          []byte
+	AtomOffsets                   [8]int
 }
 
 type Frame struct {
@@ -68,7 +68,7 @@ type Reducer func(a Iterator, b Iterator) Frame
 type RawUUID []byte
 
 func (op *Op) Empty() bool {
-	return op.ValueCount == 0
+	return op.AtomCount == 0
 }
 
 func (a *Op) Same(b *Op) bool {
@@ -77,7 +77,7 @@ func (a *Op) Same(b *Op) bool {
 }
 
 func (op *Op) IsHeader() bool {
-	return op.ValueTypes[0] == '!'
+	return op.AtomTypes[0] == '!'
 }
 
 func CreateOp(rdtype, object, event, location, value string) Op {
@@ -91,6 +91,13 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 }
 
 var ZERO_OP Op
+
+func init () {
+    ZERO_OP.Type = ZERO_UUID
+    ZERO_OP.Object = ZERO_UUID
+    ZERO_OP.Event = ZERO_UUID
+    ZERO_OP.Location = ZERO_UUID
+}
 
 func readUIUD(input []byte, uuid []byte) int {
 	return 0

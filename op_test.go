@@ -10,14 +10,30 @@ func TestOp_Event(t *testing.T) {
 	}
 }
 
-//
-//func TestParseOp (t *testing.T) {
-//    t.Log("Parser")
-//	var frame = ".lww#test-author@(time-origin:loc=1''>test\n"
-//    if len(frame)-1 != ParseOp ( []byte(frame), nil ) {
-//		t.Fail()
-//	}
-//}
+// Op parser TODO
+// [ ] pointer based sigs
+// [ ] term (next op, eof exit)  +length
+// [ ] error handling  -length
+// [x] pointer shifting (.#@:)
+// [x] values/atoms
+// [ ] strconv -- value parsing methods
+
+func TestParseOp (t *testing.T) {
+    t.Log("Parser")
+	var frame = ".lww#test-author@(time-origin:loc=1''>test\n"
+	var op Op
+    if len(frame)-1 != XParseOp ( []byte(frame), &op, &ZERO_OP ) {
+		t.Fail()
+	}
+	if op.Type.String() != "lww" {
+		t.Logf("'%s' %v != '%s'\n", op.Type.String(), []byte(op.Type.String()), "lww")
+		t.Fail()
+	}
+	if op.Object.String() != "test-author" {
+		t.Logf("'%s' %v != '%s'\n", op.Type.String(), []byte(op.Object.String()), "test-author")
+		t.Fail()
+	}
+}
 
 func BenchmarkParseOp(b *testing.B) {
 	//var frame= ".lww#test-author@(time-origin:loc=1''>test\n"
@@ -27,8 +43,9 @@ func BenchmarkParseOp(b *testing.B) {
 		frames = append(frames, []byte(frame)...)
 	}
 	var off int
+	var op Op
 	for i := 0; i < b.N; i++ {
-		l := ParseOp(frames[off:], nil)
+		l := XParseOp(frames[off:], &op, &ZERO_OP)
 		if l!=len(frame)-1 {
 			b.Logf("off %d len %d", off, l)
 			b.Fail()
