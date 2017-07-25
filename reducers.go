@@ -10,6 +10,9 @@ func Reduce (a Iterator, b Iterator) Frame {
 	return Frame{}
 }
 
+
+var LWW_UUID, _ = ParseUUIDString("lww")
+
 func ReduceLWW (a Iterator, b Iterator) Frame {
 	if a.IsHeader() {
 		a.Next()

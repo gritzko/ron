@@ -1,26 +1,5 @@
 package RON
 
-import (
-	"bytes"
-)
-
-
-
-// serializer file
-// FormatXXX
-// String()
-
-var REDEFS = []byte("`\\|/")
-
-func unzipRedefaultSeparator(input []byte) (redef int8, length int) {
-	if ABC[input[0]] == -2 {
-		redef = int8(bytes.IndexByte(REDEFS, input[0]))
-		length = 1
-	}
-	return
-}
-
-var PREFIXES = []byte("([{}])")
 
 func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	var i = ABC[input[0]]
@@ -30,11 +9,6 @@ func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	}
 	return
 }
-
-const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~"
-
-var base64 = []byte(BASE64)
-var ABC [256]int8
 
 func UnzipBase64(input []byte, number *uint64) int {
 
@@ -59,13 +33,6 @@ func UnzipBase64(input []byte, number *uint64) int {
 	}
 	return i
 }
-
-const SIGNS = "-+$%"
-const NAME_UUID = byte('$')
-const EVENT_UUID = byte('+')
-const REF_UUID = byte('-')
-const HASH_UUID = byte('%')
-
 
 func (t *UUID) Equal(b UUID) bool {
 	return t.Value == b.Value && t.Origin == b.Origin
@@ -143,7 +110,6 @@ func (a *UUID) LessThan(b UUID) bool {
 	}
 }
 
-const INT60_ERROR uint64 = 1<<60 - 1
 
 func FormatInt(slice []byte, value, context uint64) (off int) {
 
@@ -157,7 +123,7 @@ func FormatInt(slice []byte, value, context uint64) (off int) {
 		if prefix == 10 {
 			return 0
 		}
-		slice[0] = PREFIXES[prefix-4]
+		slice[0] = PREFIX_PUNCT[prefix-4]
 		off++
 		shift -= prefix * 6
 		mask = (1 << shift) - 1
@@ -181,7 +147,7 @@ func FormatUUID(output []byte, uuid UUID, context UUID) int {
 		return 0
 	}
 	off := FormatInt(output, uuid.Value, context.Value)
-	if uuid.Sign == NAME_UUID && uuid.Origin == 0 {
+	if uuid.Sign == NAME_UUID_SEP && uuid.Origin == 0 {
 		return off
 	}
 	if uuid.Value == context.Value || uuid.Sign != context.Sign ||
@@ -193,6 +159,7 @@ func FormatUUID(output []byte, uuid UUID, context UUID) int {
 	return off + l
 }
 
+// optimize for close values
 func FormatOp(output []byte, op *Op, context *Op) int {
 	var off int
 	if context == nil {
@@ -200,27 +167,28 @@ func FormatOp(output []byte, op *Op, context *Op) int {
 	}
 	// expand to 88+values
 	if op.Type != context.Type {
-		output[off] = TYPE_UUID_SEP
+		output[off] = SPEC_TYPE_SEP
 		off++
 		off += FormatUUID(output[off:], op.Type, context.Type)
 	}
 	if op.Object != context.Object {
-		output[off] = OBJECT_UUID_SEP
+		output[off] = SPEC_OBJECT_SEP
 		off++
 		off += FormatUUID(output[off:], op.Object, context.Object)
 	}
 	if op.Event != context.Event {
-		output[off] = EVENT_UUID_SEP
+		output[off] = SPEC_EVENT_SEP
 		off++
 		off += FormatUUID(output[off:], op.Event, context.Event)
 	}
 	if op.Location != context.Location {
-		output[off] = LOCATION_UUID_SEP
+		output[off] = SPEC_LOCATION_SEP
 		off++
 		off += FormatUUID(output[off:], op.Location, context.Location)
 	}
-	copy(output[off:], op.Atoms)
-	off += len(op.Atoms)
+	from := op.AtomOffsets[0]
+	copy(output[off:], op.Body[from:])
+	off += len(op.Body) - from
 	return off
 }
 
@@ -230,24 +198,31 @@ func (op *Op) String () string {
 	return string(buf[:l])
 }
 
-var ZERO_UUID = UUID{0, '$', 0}
 
-func init() {
-	for i := 0; i < len(ABC); i++ {
-		ABC[i] = -1
-	}
-	// optimize for close values
-	// TODO -2 -3 -4
-	for i := 0; i < len(REDEFS); i++ {
-		ABC[REDEFS[i]] = -2
-	}
-	for i := 0; i < len(PREFIXES); i++ {
-		ABC[PREFIXES[i]] = -10 - int8(i)
-	}
-	for i := 0; i < len(SIGNS); i++ {
-		ABC[SIGNS[i]] = -4
-	}
-	for i := 0; i < len(BASE64); i++ {
-		ABC[BASE64[i]] = int8(i)
-	}
+func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) Frame {
+	return Frame{}
 }
+
+func (frame *Frame) AppendFrame(second Frame) Frame {
+	// bigger frames: skip compression
+	// if frame is small || have last => parse, peek
+	// else append()
+	// if second is small => remember last
+	// logairthmic event => repack
+	return EMPTY_FRAME
+}
+
+func (frame *Frame) AppendOp(i Iterator) Frame {
+	// last==0 => either parse or skip abbrev
+	// future TODO
+	// end-op  .lww#id@ev:loc!!! - optional
+	//         either implicit or explicit (retain explicit)
+	return Frame{}
+}
+
+func (frame *Frame) AppendAll(i Iterator) Frame {
+	frame.AppendOp(i)
+	// add the rest as a chunk, last=0
+	return Frame{}
+}
+

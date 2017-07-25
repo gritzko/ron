@@ -11,12 +11,13 @@ func TestOp_Event(t *testing.T) {
 }
 
 // Op parser TODO
-// [ ] pointer based sigs
+// [x] pointer based sigs
 // [ ] term (next op, eof exit)  +length
 // [ ] error handling  -length
 // [x] pointer shifting (.#@:)
 // [x] values/atoms
 // [ ] strconv -- value parsing methods
+// [ ] Iterator!!!
 
 func TestParseOp (t *testing.T) {
     t.Log("Parser")
@@ -34,11 +35,16 @@ func TestParseOp (t *testing.T) {
 		t.Logf("'%s' %v != '%s'\n", op.Type.String(), []byte(op.Object.String()), "test-author")
 		t.Fail()
 	}
+	i, e := op.ParseInt(0)
+	if e!=nil || i!=1 {
+		t.Logf("int parse fails: %d", i)
+		t.Fail()
+	}
 }
 
 func BenchmarkParseOp(b *testing.B) {
 	//var frame= ".lww#test-author@(time-origin:loc=1''>test\n"
-	var frame= "@(time-origin:loc=1\n"
+	var frame= "@(time-origin:loc=1"
 	var frames []byte = make([]byte, 0, len(frame)*b.N+10)
 	for i := 0; i < b.N; i++ {
 		frames = append(frames, []byte(frame)...)
@@ -48,32 +54,34 @@ func BenchmarkParseOp(b *testing.B) {
 	var op Op
 	for i := 0; i < b.N; i++ {
 		l := XParseOp(frames[off:], &op, &ZERO_OP)
-		if l != len(frame)-1 || op.Event.Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
-			b.Logf("off %d len %d", off, l)
+		if l != len(frame) || op.Event.Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
+			b.Logf("parse fail: off %d len %d(%d) '%s'", off, l, len(frame), string(frames[off:]))
 			b.Fail()
+			break
 		}
-		off+=l+1
+		off+=l
 	}
 }
 
-/*
+
 func BenchmarkIterator_Next(b *testing.B) {
 	var clock = Clock{}
-	var buf = make([]byte, 100*b.N)
-	var frame = Frame{buf}
-	var ops = make([]Op, b.N)
+	var frame = MakeFrame(100*b.N)
+	var times = make([]UUID, b.N)
+	var test_uuid, _ = ParseUUIDString("test")
+	var field_uuid, _ = ParseUUIDString("field")
 	for i := 0; i < b.N; i++ {
-		ops[i] = CreateOp("lww", "test", clock.Time(), "field", "=1")
+		time := clock.Time()
+		times[i] = time
+		frame.Append(LWW_UUID, test_uuid, time, field_uuid, []byte("=1"))
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		frame.Append(ops[i])
-	}
+	b.Logf("'%s'", string(frame.Body))
 	iter := frame.First()
 	for i := 0; i < b.N; i++ {
-		if !iter.Op.Same(ops[i]) {
+		if !iter.Event.Equal(times[i]) {
+			b.Logf("parse fail at %d, %s != %s", i, iter.Event.String(), times[i].String())
 			b.Fail()
 		}
 	}
 }
-*/
+

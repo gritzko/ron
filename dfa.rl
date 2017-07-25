@@ -25,6 +25,7 @@ func XParseOp(data []byte, op *Op, context *Op) int {
     %% write data;
 
     var prev_uuid *UUID = &ZERO_UUID
+    _ = prev_uuid
     var ret int
     var uuid *UUID
     var i uint64
@@ -51,7 +52,7 @@ func XParseOp(data []byte, op *Op, context *Op) int {
 	}%%
 
     if ret>0 {
-        op.Atoms = data[op.AtomOffsets[0]:ret]
+        op.Body = data[:ret]
         if trace {
             fmt.Printf("ATOMS: %d..%d\n", op.AtomOffsets[0], ret);
         }

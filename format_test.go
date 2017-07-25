@@ -171,35 +171,17 @@ func TestOp_String(t *testing.T) {
 	}
 }
 
+
 func BenchmarkFormatOp(b *testing.B) {
 	str := ".lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	var context Op = op
-	//b.Logf(op.String())
 	buf := make([]byte, b.N*len(str)*2+100)
-	op.Event.Value ++
-	op.Location.Value ++
-	//opstr := op.String()
-	//if opstr != "@)1:)1=1" {
-	//	b.Logf("incorrect: '%s'", opstr)
-	//	b.Fail()
-	//}
-	off := FormatOp(buf, &op, &context)
+	off := FormatOp(buf, &op, &ZERO_OP)
 	for i:=0; i<b.N; i++ {
 		context = op
 		op.Event.Value ++
 		op.Location.Value ++
 		off += FormatOp(buf[off:], &op, &context)
 	}
-	b.Log(string(buf[:100]))
 }
-
-// TODO
-// [x] bench
-// [x] prettify
-// [x] coverage
-// [x] table tests
-// [x] hashes
-// [x] names
-// [x] order
-// [x] clock

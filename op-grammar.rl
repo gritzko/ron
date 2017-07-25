@@ -70,30 +70,48 @@
         ret = p
     }
 
+    action int_atom {
+    }
+    action float_atom {
+    }
+    action string_atom1 {
+    }
+    action string_atom2 {
+    }
 
-    INT_ATOM = [\-+]? [0-9]+ ;
-    FLOAT_ATOM = [\-+]? [0-9]+ ;
-    STRING_ATOM1 = /[^']*/;
-    STRING_ATOM2 = /[^"]*/;
+    action next {
+        if trace {
+            fmt.Printf("NEXT at %d\n", p)
+        }
+        ret = p
+        fbreak;
+    }
+
+
+    INT_ATOM = [\-+]? [0-9]+ %int_atom ;
+    FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
+    STRING_ATOM1 = /[^']*/ %string_atom1;
+    STRING_ATOM2 = /[^"]*/ %string_atom2;
 
     ATOM = (
             "?" |
             "!" |
-            "=" INT_ATOM |
+            "=" INT_ATOM  |
             "^" FLOAT_ATOM |
             "'" STRING_ATOM1 "'" |
             '"' STRING_ATOM2 '"' |
             ">" UUID
             ) >atom_start %atom;
 
-    REDEF = [`\\|/] @redef_uuid;
+    REDEF = ([`\\|/]|"") @redef_uuid;
 
     OP = (
-            ( [\.#@:] @toel_start REDEF? UUID %toel_uuid )+
+            ( [\.#@:] @toel_start REDEF UUID %toel_uuid )*
             (ATOM+ %atoms ) 
+            ( [\.#@:] @next ) ?
          ) ;
 
     # main := OP;
 
 }%%
-
+// TODO exact value syntax and case-cov tests
