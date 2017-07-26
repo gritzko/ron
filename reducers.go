@@ -21,7 +21,7 @@ func ReduceLWW (a Iterator, b Iterator) Frame {
 		b.Next()
 	}
 	var ret Frame
-	for !a.End() && !b.End() {
+	for !a.AtEnd() && !b.AtEnd() {
 		loc_cmp := a.Location.Compare(b.Location)
 		if loc_cmp == 0 {
 			ev_cmp := a.Event.Compare(b.Event)
@@ -40,10 +40,10 @@ func ReduceLWW (a Iterator, b Iterator) Frame {
 			b.Next()
 		}
 	}
-	if !a.End() {
+	if !a.AtEnd() {
 		ret.AppendAll(a)
 	}
-	if !b.End() {
+	if !b.AtEnd() {
 		ret.AppendAll(b)
 	}
 	return ret

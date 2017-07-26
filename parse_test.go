@@ -1,6 +1,9 @@
 package RON
 
-import "testing"
+import (
+	"testing"
+	"math/rand"
+)
 
 func TestParseUUID(t *testing.T) {
 	uuidA, _ := ParseUUID([]byte("1"), ZERO_UUID)
@@ -49,7 +52,7 @@ func TestParseFormatUUID(t *testing.T) {
 			t.Fail()
 		}
 		var fmt [21]byte
-		l := FormatUUID(fmt[:], uuid, context)
+		l := FormatZippedUUID(fmt[:], uuid, context)
 		zip := string(fmt[:l])
 		if zip != tri[1] {
 			t.Logf("format %d: %s must be %s", i, zip, tri[1])
@@ -111,5 +114,75 @@ func TestParseUUID2(t *testing.T) {
 			t.Fail()
 			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s", i, next.String(), test32[i][1], defstr)
 		}
+	}
+}
+
+func random_close_int (base uint64, prefix uint) uint64 {
+	if prefix == 10 {
+		return base
+	}
+	var shift uint = (10-prefix)*6
+	base >>= shift
+	base <<= shift
+	rnd := rand.Int()&63
+	base |= uint64(rnd<<(shift-6))
+	return base
+}
+
+func TestParseFrame(t *testing.T) {
+	defstr := "0123456789-abcdefghi"
+	def, _ := ParseUUIDString(defstr)
+	var at int
+	// 64 random uuids - 8 brackets
+	var uuids [64]UUID
+	for bv:=0; bv<8; bv++ {
+		for bo:=0; bo<8; bo++ {
+			v := random_close_int(def.Value, uint(bv))
+			o := random_close_int(def.Origin, uint(bo))
+			uuids[bv<<3+bo] = UUID{v, '-', o}
+		}
+	}
+	// shuffle to 16 ops
+	for i:=0; i<1000; i++ {
+		var f,t int = rand.Int()&63, rand.Int()&63
+		uuids[f], uuids[t] = uuids[t], uuids[f]
+	}
+	// pack into a frame
+	frame := MakeFrame(64*4*22+640)
+	for j:=0; j<16; j++ {
+		at = j<<2
+		frame.Append(uuids[at], uuids[at+1], uuids[at+2], uuids[at+3], []byte("!"))
+	}
+	// recover, compare
+	t.Logf(frame.String())
+	iter := frame.Begin()
+	for k :=0; k <16; k++ {
+		if iter.AtEnd() {
+			t.Fail()
+			t.Log("Premature end")
+			break
+		}
+		at = k << 2
+		if iter.Type!=uuids[at] {
+			t.Fail()
+			t.Logf("type decoding failed at %d, '%s' should be '%s'", at, iter.Type.String(), uuids[at].String())
+		}
+		if iter.Object!=uuids[at+1] {
+			t.Fail()
+			t.Logf("object decoding failed at %d, '%s' should be '%s'", at+1, iter.Object.String(), uuids[at+1].String())
+		}
+		if iter.Event!=uuids[at+2] {
+			t.Fail()
+			t.Logf("event decoding failed at %d, '%s' should be '%s'", at+2, iter.Event.String(), uuids[at+2].String())
+		}
+		if iter.Location!=uuids[at+3] {
+			t.Fail()
+			t.Logf("location decoding failed at %d, '%s' should be '%s'", at+3, iter.Location.String(), uuids[at+3].String())
+		}
+		iter.Next()
+	}
+	if !iter.AtEnd() {
+		t.Fail()
+		t.Log("No end")
 	}
 }

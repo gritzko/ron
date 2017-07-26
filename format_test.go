@@ -34,12 +34,12 @@ func TestUUID_String(t *testing.T) {
 		{"1time01-src", "1time02+src", "{2+"},
 		{"0$author", "name$author2", "name{2"},
 		{"hash%here", "hash%there", "%there"},
-		{"1", ")1", "0000000001"},
+		{"1", ")1", "0000000001"},  //5
 		{"0", "name$0", "name"},
 		{"time+orig", "time1+orig2", "(1(2"},
 		{"time-orig", "time1+orig2", "(1+(2"},
 		{"[1s9L3-[Wj8oO", "[1s9L3-(2Biejq", "-(2Biejq"},
-		{"}DcR-}L8w", "}IYI-", "}IYI}"},
+		{"}DcR-}L8w", "}IYI-", "}IYI}"}, //10
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
 	}
 	for i, tri := range tests {
@@ -109,12 +109,12 @@ func BenchmarkUnzip(b *testing.B) {
 	zipped := make([]byte, b.N*22+22)
 	lens := make([]int, b.N*2)
 
-	off := FormatUUID(zipped, uuids[0], ZERO_UUID)
+	off := FormatZippedUUID(zipped, uuids[0], ZERO_UUID)
 	lens[0] = off
 	zipped[off] = ' '
 	off++
 	for i := 1; i < b.N; i++ {
-		l := FormatUUID(zipped[off:], uuids[i], uuids[i-1])
+		l := FormatZippedUUID(zipped[off:], uuids[i], uuids[i-1])
 		off += l
 		lens[i] = l
 		zipped[off] = ' '

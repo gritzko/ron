@@ -1,6 +1,5 @@
 package RON
 
-
 func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	var i = ABC[input[0]]
 	if i <= -10 {
@@ -90,7 +89,7 @@ const prefix_mask uint64 = 0xffffff << 36
 
 func ZipUUIDString(uuid, context UUID) string {
 	var ret = make([]byte, 21, 21)
-	len := FormatUUID(ret, uuid, context)
+	len := FormatZippedUUID(ret, uuid, context)
 	return string(ret[0:len])
 }
 
@@ -110,43 +109,71 @@ func (a *UUID) LessThan(b UUID) bool {
 	}
 }
 
-
-func FormatInt(slice []byte, value, context uint64) (off int) {
-
-	var prefix uint = CommonPrefix(value, context)
-	if context==INT60_ERROR {
-		prefix = 0 // FIXME
+func FormatTrimmedInt(output []byte, value uint64) int {
+	if value == 0 {
+		output[0] = '0'
+		return 1
 	}
-	var shift uint = 60
-	var mask uint64 = (1 << 60) - 1
-	if prefix != 0 {
+	l := 10
+	if value&((1<<24)-1) == 0 {
+		value >>= 24
+		l -= 4
+	}
+	for value&63 == 0 {
+		value >>= 6
+		l--
+	}
+	k := l
+	for k > 0 {
+		k--
+		output[k] = base64[value&63]
+		value >>= 6
+	}
+	return l
+}
+
+func FormatInt(output []byte, value uint64) int {
+	l := FormatTrimmedInt(output, value)
+	for l < 10 {
+		output[l] = '0'
+		l++
+	}
+	return l
+}
+
+func FormatZippedInt(output []byte, value, context uint64) int {
+	var prefix uint = CommonPrefix(value, context)
+	var off int
+	if prefix <4 {
+		off += FormatTrimmedInt(output[off:], value)
+	} else {
 		if prefix == 10 {
 			return 0
 		}
-		slice[0] = PREFIX_PUNCT[prefix-4]
+		output[0] = PREFIX_PUNCT[prefix-4]
 		off++
-		shift -= prefix * 6
-		mask = (1 << shift) - 1
+		value = (value << (prefix * 6)) & PREFIX10
+		if value!=0 {
+			off += FormatTrimmedInt(output[off:], value)
+		}
 	}
-	for 0 != value&mask && shift < 64 {
-		shift -= 6
-		slice[off] = base64[(value>>shift)&63]
-		mask >>= 6
-		off++
-	}
-	if off == 0 {
-		slice[0] = '0'
-		off++
-	}
-	return
+	return off
 }
 
-func FormatUUID(output []byte, uuid UUID, context UUID) int {
+func FormatUUID(output []byte, uuid UUID) int {
+	l := FormatTrimmedInt(output, uuid.Value)
+	output[l] = uuid.Sign
+	l++
+	l += FormatTrimmedInt(output[l:], uuid.Origin)
+	return l
+}
 
-	if uuid==context && uuid!=ZERO_UUID { // FIXME options
+func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
+
+	if uuid == context && uuid != ZERO_UUID { // FIXME options
 		return 0
 	}
-	off := FormatInt(output, uuid.Value, context.Value)
+	off := FormatZippedInt(output, uuid.Value, context.Value)
 	if uuid.Sign == NAME_UUID_SEP && uuid.Origin == 0 {
 		return off
 	}
@@ -155,67 +182,67 @@ func FormatUUID(output []byte, uuid UUID, context UUID) int {
 		output[off] = uuid.Sign
 		off++
 	}
-	l := FormatInt(output[off:], uuid.Origin, context.Origin)
-	return off + l
+	if uuid.Origin != context.Origin {
+		off += FormatZippedInt(output[off:], uuid.Origin, context.Origin)
+	}
+	return off
+}
+
+func FormatSpec(output []byte, op *Op, context *Op) int {
+	var off int
+	// expand to 88+values
+	// FIXME cycle
+	if context == nil {
+		for t := 0; t < 4; t++ {
+			output[off] = SPEC_PUNCT[t]
+			off++
+			off += FormatUUID(output[off:], op.GetUUID(t))
+		}
+	} else {
+		for t := 0; t < 4; t++ {
+			if op.GetUUID(t)==context.GetUUID(t) {
+				continue
+			}
+			output[off] = SPEC_PUNCT[t]
+			off++
+			off += FormatZippedUUID(output[off:], op.GetUUID(t), context.GetUUID(t))
+		}
+	}
+	return off
 }
 
 // optimize for close values
 // context==nil is valid
 func FormatOp(output []byte, op *Op, context *Op) int {
-	var off int
-	if context == nil {
-		context = &ZERO_OP
-	}
-	// expand to 88+values
-	if op.Type != context.Type {
-		output[off] = SPEC_TYPE_SEP
-		off++
-		off += FormatUUID(output[off:], op.Type, context.Type)
-	}
-	if op.Object != context.Object {
-		output[off] = SPEC_OBJECT_SEP
-		off++
-		off += FormatUUID(output[off:], op.Object, context.Object)
-	}
-	if op.Event != context.Event {
-		output[off] = SPEC_EVENT_SEP
-		off++
-		off += FormatUUID(output[off:], op.Event, context.Event)
-	}
-	if op.Location != context.Location {
-		output[off] = SPEC_LOCATION_SEP
-		off++
-		off += FormatUUID(output[off:], op.Location, context.Location)
-	}
+	off := FormatSpec(output, op, context)
 	from := op.AtomOffsets[0]
 	copy(output[off:], op.Body[from:])
 	off += len(op.Body) - from
 	return off
 }
 
-func (op *Op) String () string {
+func (op *Op) String() string {
 	buf := make([]byte, op.AtomOffsets[op.AtomCount-1]+100) // FIXME!!!
 	l := FormatOp(buf, op, &ZERO_OP)
 	return string(buf[:l])
 }
 
-func (frame *Frame) String () string {
+func (frame *Frame) String() string {
 	return string(frame.Body)
 }
 
 func (frame *Frame) AppendOp(op *Op) {
-	var tail []byte
-	// extend the buffer
-	//var off int
 	var end Iterator = frame.End()
 	var context *Op = nil
-	if len(end.Body)!=0 {
+	if len(end.Body) != 0 {
 		context = &end.Op
 	}
-	FormatOp(tail, op, context)
-	// same buffer?
+	var uuids [11 * 2 * 4]byte
+	l := FormatSpec(uuids[:], op, context)
+	frame.Body = append(frame.Body, uuids[:l]...)
+	frame.Body = append(frame.Body, op.Body[op.AtomOffsets[0]:]...)
 	// explicit end?
-	 // set end!!!
+	// TODO set end!!!
 }
 
 func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
@@ -233,7 +260,7 @@ func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
-	if i.frame!=j.frame {
+	if i.frame != j.frame {
 		return
 	}
 	frame.AppendOp(&i.Op)
@@ -259,6 +286,6 @@ func (frame *Frame) AppendError(comment string) {
 
 }
 
-func (frame *Frame) Clone () Frame { // TODO size hint
+func (frame *Frame) Clone() Frame { // TODO size hint
 	return Frame{}
 }

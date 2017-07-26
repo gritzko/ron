@@ -54,7 +54,7 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 
 func (i *Iterator) Next() bool {
 
-	if i.End() {
+	if i.AtEnd() {
 		return false
 	}
 	if i.offset == len(i.frame.Body) {
@@ -64,11 +64,11 @@ func (i *Iterator) Next() bool {
 		return false
 	}
 	var prev Op = i.Op
-	l := XParseOp(i.frame.Body, &i.Op, &prev)
+	l := XParseOp(i.frame.Body[i.offset:], &i.Op, &prev)
 	// FIXME errors
 	i.offset += l
 
-	return i.End()
+	return i.AtEnd()
 }
 
 func (i *Iterator) Rest () [] byte {
@@ -92,11 +92,21 @@ func (frame *Frame) End() Iterator {
 // the last valid op (zeroes for an empty frame).
 // The end op may be explicit, i.e. actually exist in the frame.
 // An explicit end op can not be abbreviated.
-func (i *Iterator) End() bool {
+func (i *Iterator) AtEnd() bool {
 	return i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
 }
 
 func MakeFrame(prealloc_bytes int) Frame {
-	var buf = make([]byte, prealloc_bytes)
+	var buf = make([]byte, 0, prealloc_bytes)
 	return Frame{buf, Iterator{}, Iterator{}}
+}
+
+func (op *Op) GetUUID (i int) UUID {
+	switch i {
+	case 0: return op.Type
+	case 1: return op.Object
+	case 2: return op.Event
+	case 3: return op.Location
+	default: panic("uuid index outside 0..3")
+	}
 }
