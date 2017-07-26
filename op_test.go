@@ -76,7 +76,7 @@ func BenchmarkIterator_Next(b *testing.B) {
 		frame.Append(LWW_UUID, test_uuid, time, field_uuid, []byte("=1"))
 	}
 	b.Logf("'%s'", string(frame.Body))
-	iter := frame.First()
+	iter := frame.Begin()
 	for i := 0; i < b.N; i++ {
 		if !iter.Event.Equal(times[i]) {
 			b.Logf("parse fail at %d, %s != %s", i, iter.Event.String(), times[i].String())

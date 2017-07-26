@@ -26,17 +26,17 @@ func ReduceLWW (a Iterator, b Iterator) Frame {
 		if loc_cmp == 0 {
 			ev_cmp := a.Event.Compare(b.Event)
 			if ev_cmp < 0 {
-				ret.AppendOp(b)
+				ret.AppendOp(&b.Op)
 			} else {
-				ret.AppendOp(a)
+				ret.AppendOp(&a.Op)
 			}
 			a.Next()
 			b.Next()
 		} else if loc_cmp < 0 {
-			ret.AppendOp(a)
+			ret.AppendOp(&a.Op)
 			a.Next()
 		} else {
-			ret.AppendOp(b)
+			ret.AppendOp(&b.Op)
 			b.Next()
 		}
 	}

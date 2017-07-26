@@ -160,6 +160,7 @@ func FormatUUID(output []byte, uuid UUID, context UUID) int {
 }
 
 // optimize for close values
+// context==nil is valid
 func FormatOp(output []byte, op *Op, context *Op) int {
 	var off int
 	if context == nil {
@@ -198,31 +199,66 @@ func (op *Op) String () string {
 	return string(buf[:l])
 }
 
+func (frame *Frame) String () string {
+	return string(frame.Body)
+}
 
-func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) Frame {
+func (frame *Frame) AppendOp(op *Op) {
+	var tail []byte
+	// extend the buffer
+	//var off int
+	var end Iterator = frame.End()
+	var context *Op = nil
+	if len(end.Body)!=0 {
+		context = &end.Op
+	}
+	FormatOp(tail, op, context)
+	// same buffer?
+	// explicit end?
+	 // set end!!!
+}
+
+func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
+	// use frame.Body.capacity
+	var parsed Op
+	off := XParseOp(atoms, &parsed, &ZERO_OP)
+	if off <= 0 {
+		off = XParseOp([]byte("=-1'parse error'"), &parsed, &ZERO_OP)
+	}
+	parsed.Type = t
+	parsed.Object = o
+	parsed.Event = e
+	parsed.Location = l
+	frame.AppendOp(&parsed)
+}
+
+func (frame *Frame) AppendRange(i, j Iterator) {
+	if i.frame!=j.frame {
+		return
+	}
+	frame.AppendOp(&i.Op)
+	// if error => plus1 is closed
+	var end Iterator
+	frame.Body = append(frame.Body, j.Rest()...)
+	frame.end = end
+}
+
+func (frame *Frame) AppendAll(i Iterator) {
+	frame.AppendRange(i, i.frame.End())
+}
+
+func (frame *Frame) AppendFrame(second Frame) {
+	frame.AppendRange(second.Begin(), second.End())
+}
+
+func (frame *Frame) AppendEnd() {
+
+}
+
+func (frame *Frame) AppendError(comment string) {
+
+}
+
+func (frame *Frame) Clone () Frame { // TODO size hint
 	return Frame{}
 }
-
-func (frame *Frame) AppendFrame(second Frame) Frame {
-	// bigger frames: skip compression
-	// if frame is small || have last => parse, peek
-	// else append()
-	// if second is small => remember last
-	// logairthmic event => repack
-	return EMPTY_FRAME
-}
-
-func (frame *Frame) AppendOp(i Iterator) Frame {
-	// last==0 => either parse or skip abbrev
-	// future TODO
-	// end-op  .lww#id@ev:loc!!! - optional
-	//         either implicit or explicit (retain explicit)
-	return Frame{}
-}
-
-func (frame *Frame) AppendAll(i Iterator) Frame {
-	frame.AppendOp(i)
-	// add the rest as a chunk, last=0
-	return Frame{}
-}
-

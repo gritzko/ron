@@ -40,6 +40,7 @@
                           *uuid = context.Location
                       }
         }
+        // FIXME   op.SetUUID(i, uuid),  ABC[fc]-10
         if n < prev_uuid_ind {
             // error
         }

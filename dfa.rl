@@ -3,16 +3,10 @@ package RON
 import "fmt"
 const trace = false
 
-type parser struct {
+type parser struct { // TODO
     data []byte
     p, pe, cs int
     ts, te, act int
-}
-
-func ParseOp(data []byte, context Op) (op Op, length int) {
-    op = context
-    length = XParseOp(data, &op, &context)
-    return
 }
 
 func XParseOp(data []byte, op *Op, context *Op) int {
@@ -41,6 +35,7 @@ func XParseOp(data []byte, op *Op, context *Op) int {
 	var ts, te, act int
     _ = eof
     _,_,_ = ts,te,act
+    var bare, full bool
 
 	%%{
 
@@ -61,11 +56,6 @@ func XParseOp(data []byte, op *Op, context *Op) int {
     return ret
 }
 
-func ParseUUID(data []byte, context UUID) (uuid UUID, length int) {
-    uuid = context
-    length = XParseUUID(data, &uuid)
-    return
-}
 
 // BIG FIXME  ERROR HANDLING, TESTS
 func XParseUUID(data []byte, uuid* UUID) (length int) {
@@ -81,6 +71,7 @@ func XParseUUID(data []byte, uuid* UUID) (length int) {
 	var ts, te, act int
     _ = eof
     _,_,_ = ts,te,act
+    var bare, full bool
 
 
 	%%{ 

@@ -4,7 +4,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-
 func (a *UUID) Compare(b UUID) int {
 	diff := a.Value - b.Value
 	if diff == 0 {
@@ -38,7 +37,7 @@ func (op *Op) IsHeader() bool {
 // not good - op is detached from a frame here
 func CreateOp(rdtype, object, event, location UUID, value string) (ret Op, err error) {
 	l := XParseOp([]byte(value), &ret, &ZERO_OP)
-	if l<=0 {
+	if l <= 0 {
 		err = errors.New("invalid atom string")
 		return
 	}
@@ -53,29 +52,51 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 	return Frame{}
 }
 
+func (i *Iterator) Next() bool {
 
-func (i *Iterator) Next() (op *Op, ok bool) {
-	//input := i.frame.Body[i.pos:]
-	//readOp(input, &i.Op)
-	return
+	if i.End() {
+		return false
+	}
+	if i.offset == len(i.frame.Body) {
+		i.Op.AtomTypes = [8]byte{'!', '!', '!'}
+		i.Op.AtomCount = 0
+		i.Op.AtomOffsets = [8]int{}
+		return false
+	}
+	var prev Op = i.Op
+	l := XParseOp(i.frame.Body, &i.Op, &prev)
+	// FIXME errors
+	i.offset += l
+
+	return i.End()
 }
 
-func (i *Iterator) Clone() Iterator {
+func (i *Iterator) Rest () [] byte {
+	return []byte{}
+}
+
+func (frame *Frame) Begin() Iterator {
+	if frame.begin.frame == nil {
+		frame.begin.frame = frame
+		frame.begin.Op = ZERO_OP // TODO  ZERO_OP is exactly Op{}
+		frame.begin.Next()
+	}
+	return frame.begin
+}
+
+func (frame *Frame) End() Iterator {
 	return Iterator{}
 }
 
-func (frame *Frame) First() Iterator {
-	return Iterator{}
-}
-
-func (frame *Frame) Last() Iterator {
-	return Iterator{}
-}
+// A frame's end position is an op having a value of !!! and UUIDs from
+// the last valid op (zeroes for an empty frame).
+// The end op may be explicit, i.e. actually exist in the frame.
+// An explicit end op can not be abbreviated.
 func (i *Iterator) End() bool {
-	return true
+	return i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
 }
 
-func MakeFrame (prealloc_bytes int) Frame {
+func MakeFrame(prealloc_bytes int) Frame {
 	var buf = make([]byte, prealloc_bytes)
-	return Frame{buf, Iterator{}}
+	return Frame{buf, Iterator{}, Iterator{}}
 }
