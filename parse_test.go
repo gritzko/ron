@@ -19,41 +19,6 @@ func TestParseUUID(t *testing.T) {
 	}
 }
 
-var test32 = [32][3]string{ // context: 0123456789-abcdefghi
-	{"", "0123456789-abcdefghi"},     // 00000
-	{"B", "B"},                       // 00001
-	{"(", "0123-abcdefghi"},          // 00010
-	{"(B", "0123B-abcdefghi"},        // 00011
-	{"+", "0123456789+abcdefghi"},    // 00100
-	{"+B", "0123456789+B"},           // 00101
-	{"+(", "0123456789+abcdefghi"},   // 00110
-	{"+(B", "0123456789+abcdefghiB"}, // 00111
-	{"A", "A"},                       // 01000
-	{"AB", "AB"},                     // 01001
-	{"A(", "A-abcd"},                 // 01010
-	{"A(B", "0123456789-abcdB"},      // 01011
-	{"A+", "A+abcdefghi"},            // 01100
-	{"A+B", "A+B"},                   // 01101
-	{"A+(", "A+abcd"},                // 01110
-	{"A+(B", "A+abcdB"},              // 01111
-	{")", "012345678-abcdefghi"},     // 10000
-	{")B", "012345678B-abcdefghi"},   // 10001
-	{")(", "012345678-abcd"},         // 10010
-	{")(B", "012345678-abcdB"},       // 10011
-	{")+", "0123456789+abcdefghi"},   // 10100
-	{")+B", "0123456789+B"},          // 10101
-	{")+(", "012345678+abcd"},        // 10110
-	{")+(B", "012345678+abcdB"},      // 10111
-	{")A", "012345678A-abcdefghi"},   // 11000
-	{")AB", ""},                      // 11001 error - length
-	{")A(", "012345678A-abcd"},       // 11010
-	{")A(B", "012345678A-abcdB"},     // 11011
-	{")A+", "012345678A+abcdefghi"},  // 11100
-	{")A+B", "012345678A+B"},         // 11101
-	{")A+(", "012345678A+abcd"},      // 11110
-	{")A+(B", "012345678A+abcdB"},    // 11111
-}
-
 func TestParseFormatUUID(t *testing.T) {
 	tests := [][]string{
 		{"0", "1", "1"}, // 0
@@ -95,4 +60,56 @@ func TestParseFormatUUID(t *testing.T) {
 
 func TestParseUUIDErrors(t *testing.T) {
 
+}
+
+var test32 = [32][3]string{ // context: 0123456789-abcdefghi
+	{"", "0123456789-abcdefghi"},    // 00000
+	{"B", "B"},                      // 00001
+	{"(", "0123-abcdefghi"},         // 00010
+	{"(B", "0123B-abcdefghi"},       // 00011
+	{"+", "0123456789+abcdefghi"},   // 00100
+	{"+B", "0123456789+B"},          // 00101
+	{"+(", "0123456789+abcd"},       // 00110
+	{"+(B", "0123456789+abcdB"},     // 00111
+	{"A", "A"},                      // 01000
+	{"AB", "AB"},                    // 01001
+	{"A(", "A-abcd"},                // 01010
+	{"A(B", "A-abcdB"},              // 01011
+	{"A+", "A+abcdefghi"},           // 01100
+	{"A+B", "A+B"},                  // 01101
+	{"A+(", "A+abcd"},               // 01110
+	{"A+(B", "A+abcdB"},             // 01111
+	{")", "012345678-abcdefghi"},    // 10000
+	{")B", "012345678B-abcdefghi"},  // 10001
+	{")(", "012345678-abcd"},        // 10010
+	{")(B", "012345678-abcdB"},      // 10011
+	{")+", "012345678+abcdefghi"},   // 10100
+	{")+B", "012345678+B"},          // 10101
+	{")+(", "012345678+abcd"},       // 10110
+	{")+(B", "012345678+abcdB"},     // 10111
+	{")A", "012345678A-abcdefghi"},  // 11000
+	{")AB", ""},                     // 11001 error - length
+	{")A(", "012345678A-abcd"},      // 11010
+	{")A(B", "012345678A-abcdB"},    // 11011
+	{")A+", "012345678A+abcdefghi"}, // 11100
+	{")A+B", "012345678A+B"},        // 11101
+	{")A+(", "012345678A+abcd"},     // 11110
+	{")A+(B", "012345678A+abcdB"},   // 11111
+}
+
+func TestParseUUID2(t *testing.T) {
+	defstr := "0123456789-abcdefghi"
+	def, _ := ParseUUIDString(defstr)
+	for i := 0; i < len(test32); i++ {
+		zipped := test32[i][0]
+		unzipped, _ := ParseUUIDString(test32[i][1])
+		next, l := ParseUUID([]byte(zipped), def)
+		if l<0 && test32[i][1]=="" {
+			continue
+		}
+		if l != len(zipped) || next != unzipped {
+			t.Fail()
+			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s", i, next.String(), test32[i][1], defstr)
+		}
+	}
 }

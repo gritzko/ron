@@ -11,6 +11,10 @@
     action int60_digit {
         if digits==0 {
             i = 0
+            full = true
+        } else if digits>=60 {
+            length = -p
+            fbreak;
         }
         digits+=6
         i <<= 6
@@ -29,6 +33,7 @@
         if digits>0 {
             uuid.Origin = i << (60-digits)
         }
+        bare = false
     }
 
     action uuid_sep {
@@ -38,6 +43,14 @@
 
     action uuid {
         length = pe
+        if bare && full {
+            uuid.Origin = 0
+            uuid.Sign = '$'
+        }
+    }
+
+    action start_uuid {
+        bare, full = true, false
     }
 
 
@@ -48,8 +61,8 @@
     VALUE = ( PREFIX | BASE | PREFIX BASE ) %value ;
     ORIGIN = ( ( SIGN | PREFIX | SIGN PREFIX )  BASE? ) %origin ;
 
-    UUID =  VALUE? ORIGIN?
-            %uuid
+    UUID =  (VALUE? ORIGIN?)
+            >start_uuid %uuid
            ;
 
 # main := UUID;
