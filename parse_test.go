@@ -37,6 +37,7 @@ func TestParseFormatUUID(t *testing.T) {
 		{"[1s9L3-[Wj8oO", "-(2Biejq", "[1s9L3-(2Biejq"}, // 9
 		{"0123456789-abcdefghij", ")~)~", "012345678~-abcdefghi~"},
 		{"(2-[1jHH~", "-[00yAl", "(2-}yAl"},
+		{"0123G-abcdb", "(4566(efF", "01234566-abcdefF"},
 	}
 	for i, tri := range tests {
 		context, _ := ParseUUID([]byte(tri[0]), ZERO_UUID)
@@ -154,7 +155,6 @@ func TestParseFrame(t *testing.T) {
 		frame.Append(uuids[at], uuids[at+1], uuids[at+2], uuids[at+3], []byte("!"))
 	}
 	// recover, compare
-	t.Logf(frame.String())
 	iter := frame.Begin()
 	for k :=0; k <16; k++ {
 		if iter.AtEnd() {
@@ -165,19 +165,20 @@ func TestParseFrame(t *testing.T) {
 		at = k << 2
 		if iter.Type!=uuids[at] {
 			t.Fail()
-			t.Logf("type decoding failed at %d, '%s' should be '%s'", at, iter.Type.String(), uuids[at].String())
+			t.Logf("type decoding failed at %d, '%s' should be '%s' op: '%s'", k, iter.Type.String(), uuids[at].String(), string(iter.Op.Body))
+			break
 		}
 		if iter.Object!=uuids[at+1] {
 			t.Fail()
-			t.Logf("object decoding failed at %d, '%s' should be '%s'", at+1, iter.Object.String(), uuids[at+1].String())
+			t.Logf("object decoding failed at %d, '%s' should be '%s'", k, iter.Object.String(), uuids[at+1].String())
 		}
 		if iter.Event!=uuids[at+2] {
 			t.Fail()
-			t.Logf("event decoding failed at %d, '%s' should be '%s'", at+2, iter.Event.String(), uuids[at+2].String())
+			t.Logf("event decoding failed at %d, '%s' should be '%s'", k, iter.Event.String(), uuids[at+2].String())
 		}
 		if iter.Location!=uuids[at+3] {
 			t.Fail()
-			t.Logf("location decoding failed at %d, '%s' should be '%s'", at+3, iter.Location.String(), uuids[at+3].String())
+			t.Logf("location decoding failed at %d, '%s' should be '%s'", k, iter.Location.String(), uuids[at+3].String())
 		}
 		iter.Next()
 	}

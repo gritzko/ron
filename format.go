@@ -144,7 +144,7 @@ func FormatInt(output []byte, value uint64) int {
 func FormatZippedInt(output []byte, value, context uint64) int {
 	var prefix uint = CommonPrefix(value, context)
 	var off int
-	if prefix <4 {
+	if prefix < 4 {
 		off += FormatTrimmedInt(output[off:], value)
 	} else {
 		if prefix == 10 {
@@ -153,7 +153,7 @@ func FormatZippedInt(output []byte, value, context uint64) int {
 		output[0] = PREFIX_PUNCT[prefix-4]
 		off++
 		value = (value << (prefix * 6)) & PREFIX10
-		if value!=0 {
+		if value != 0 {
 			off += FormatTrimmedInt(output[off:], value)
 		}
 	}
@@ -188,25 +188,27 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
 	return off
 }
 
-func FormatSpec(output []byte, op *Op, context *Op) int {
+func FormatSpec(output []byte, op *Op) int {
 	var off int
 	// expand to 88+values
-	// FIXME cycle
-	if context == nil {
-		for t := 0; t < 4; t++ {
-			output[off] = SPEC_PUNCT[t]
-			off++
-			off += FormatUUID(output[off:], op.GetUUID(t))
+	for t := 0; t < 4; t++ {
+		output[off] = SPEC_PUNCT[t]
+		off++
+		off += FormatUUID(output[off:], op.GetUUID(t))
+	}
+	return off
+}
+
+func FormatZippedSpec(output []byte, op *Op, context *Op) int {
+	var off int
+	// expand to 88+values
+	for t := 0; t < 4; t++ {
+		if op.GetUUID(t) == context.GetUUID(t) {
+			continue
 		}
-	} else {
-		for t := 0; t < 4; t++ {
-			if op.GetUUID(t)==context.GetUUID(t) {
-				continue
-			}
-			output[off] = SPEC_PUNCT[t]
-			off++
-			off += FormatZippedUUID(output[off:], op.GetUUID(t), context.GetUUID(t))
-		}
+		output[off] = SPEC_PUNCT[t]
+		off++
+		off += FormatZippedUUID(output[off:], op.GetUUID(t), context.GetUUID(t))
 	}
 	return off
 }
@@ -214,7 +216,7 @@ func FormatSpec(output []byte, op *Op, context *Op) int {
 // optimize for close values
 // context==nil is valid
 func FormatOp(output []byte, op *Op, context *Op) int {
-	off := FormatSpec(output, op, context)
+	off := FormatZippedSpec(output, op, context)
 	from := op.AtomOffsets[0]
 	copy(output[off:], op.Body[from:])
 	off += len(op.Body) - from
@@ -232,25 +234,23 @@ func (frame *Frame) String() string {
 }
 
 func (frame *Frame) AppendOp(op *Op) {
-	var end Iterator = frame.End()
-	var context *Op = nil
-	if len(end.Body) != 0 {
-		context = &end.Op
-	}
+	var l int
 	var uuids [11 * 2 * 4]byte
-	l := FormatSpec(uuids[:], op, context)
+	if !frame.last.isZero() {
+		l = FormatZippedSpec(uuids[:], op, &frame.last)
+	} else {
+		l = FormatSpec(uuids[:], op)
+	}
 	frame.Body = append(frame.Body, uuids[:l]...)
 	frame.Body = append(frame.Body, op.Body[op.AtomOffsets[0]:]...)
-	// explicit end?
-	// TODO set end!!!
+	frame.last = *op
 }
 
 func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
-	// use frame.Body.capacity
 	var parsed Op
 	off := XParseOp(atoms, &parsed, &ZERO_OP)
 	if off <= 0 {
-		off = XParseOp([]byte("=-1'parse error'"), &parsed, &ZERO_OP)
+		off = XParseOp([]byte("'parse error'"), &parsed, &ZERO_OP)
 	}
 	parsed.Type = t
 	parsed.Object = o
@@ -260,14 +260,13 @@ func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
-	if i.frame != j.frame {
+	if i.offset >= j.offset {
 		return
 	}
 	frame.AppendOp(&i.Op)
 	// if error => plus1 is closed
-	var end Iterator
 	frame.Body = append(frame.Body, j.Rest()...)
-	frame.end = end
+	frame.last = j.Op
 }
 
 func (frame *Frame) AppendAll(i Iterator) {
@@ -278,9 +277,9 @@ func (frame *Frame) AppendFrame(second Frame) {
 	frame.AppendRange(second.Begin(), second.End())
 }
 
-func (frame *Frame) AppendEnd() {
-
-}
+//func (frame *Frame) AppendEnd() {
+// no explicit end marker for now
+//}
 
 func (frame *Frame) AppendError(comment string) {
 

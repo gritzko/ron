@@ -63,7 +63,7 @@ func XParseUUID(data []byte, uuid* UUID) (length int) {
     %% machine UUID;
     %% write data;
 
-    var i uint64 = uuid.Value
+    var i uint64
     var digits uint
     length = -1
 

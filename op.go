@@ -65,7 +65,6 @@ func (i *Iterator) Next() bool {
 	}
 	var prev Op = i.Op
 	l := XParseOp(i.frame.Body[i.offset:], &i.Op, &prev)
-	// FIXME errors
 	i.offset += l
 
 	return i.AtEnd()
@@ -75,17 +74,17 @@ func (i *Iterator) Rest () [] byte {
 	return []byte{}
 }
 
-func (frame *Frame) Begin() Iterator {
-	if frame.begin.frame == nil {
-		frame.begin.frame = frame
-		frame.begin.Op = ZERO_OP // TODO  ZERO_OP is exactly Op{}
-		frame.begin.Next()
-	}
-	return frame.begin
+func (frame *Frame) Begin() (i Iterator) {
+	i.frame = frame
+	i.Op = ZERO_OP // TODO  ZERO_OP is exactly Op{}
+	i.Next()
+	return
 }
 
-func (frame *Frame) End() Iterator {
-	return Iterator{}
+func (frame *Frame) End() (i Iterator) {
+	i.frame = frame
+	i.offset = len(frame.Body)
+	return
 }
 
 // A frame's end position is an op having a value of !!! and UUIDs from
@@ -98,7 +97,7 @@ func (i *Iterator) AtEnd() bool {
 
 func MakeFrame(prealloc_bytes int) Frame {
 	var buf = make([]byte, 0, prealloc_bytes)
-	return Frame{buf, Iterator{}, Iterator{}}
+	return Frame{buf, ZERO_OP}
 }
 
 func (op *Op) GetUUID (i int) UUID {
@@ -109,4 +108,12 @@ func (op *Op) GetUUID (i int) UUID {
 	case 3: return op.Location
 	default: panic("uuid index outside 0..3")
 	}
+}
+
+func (uuid *UUID) isZero () bool {
+	return uuid.Value==0 && uuid.Origin==0
+}
+
+func (spec *Op) isZero () bool {
+	return spec.Type.isZero() && spec.Object.isZero() && spec.Event.isZero() && spec.Location.isZero()
 }

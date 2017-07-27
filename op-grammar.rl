@@ -23,6 +23,9 @@
                           n = 0
                           uuid = & (op.Type)
                           *uuid = context.Type
+                          if trace {
+                              fmt.Printf("TYPE DEF %s\n", context.Type.String());
+                          }
                       }
             case '#': {
                           n = 1

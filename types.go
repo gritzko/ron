@@ -19,25 +19,26 @@ type UUID struct {
 	Origin uint64
 }
 
-type Op struct {
+// treat as an immutable object? - allocations
+type Op struct { // ~128 bytes
 	Type, Object, Event, Location UUID
-	AtomCount                     int
-	AtomTypes                     [8]byte
-	AtomOffsets                   [8]int
-	Body                          []byte
+	AtomCount   int
+	AtomTypes   [8]byte
+	AtomOffsets [8]int
+	Body        []byte
 }
 
 // Frame... mutable, but append-only
 type Frame struct {
-	Body       []byte
-	begin, end Iterator
+	Body []byte
+	last Op
 }
 
 // Iterator is a mutable iterator over a frame; each position is an op.
 type Iterator struct {
 	Op
-	offset int // remove
 	frame  *Frame
+	offset int
 }
 
 // Frame Open Q
@@ -50,6 +51,14 @@ type Iterator struct {
 //	   cause the end op can be displaced!!!
 
 type Reducer func(a Iterator, b Iterator) Frame
+
+type zip int8
+
+const ZIP_SKIP zip = -1
+const ZIP_KEEP zip = 1
+const ZIP_WAIT zip = 0
+
+type Zipper func(a Iterator, b Iterator) (left, right zip)
 
 type RawUUID []byte
 
@@ -68,6 +77,7 @@ const (
 
 var REDEF_PUNCT = "`\\|/"
 
+// FIXME bracket order to match the numeric order!!!!   }{][)(
 var PREFIX_PUNCT = "([{}])"
 
 const UUID_PUNCT = "-+$%"

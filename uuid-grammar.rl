@@ -6,6 +6,9 @@
     action int60_prefix {
         digits = uint(-ABC[fc]-10+4) * 6
         i >>= (60-digits)  // FIXME
+        if trace {
+            fmt.Printf("PREFIX %c %d %d\n", fc, i, digits)
+        }
     }
 
     action int60_digit {
@@ -19,6 +22,9 @@
         digits+=6
         i <<= 6
         i |= uint64(ABC[fc])
+        if trace {
+            fmt.Printf("DIGIT %c\n", fc)
+        }
     }
 
     action value {
@@ -27,6 +33,9 @@
             digits = 0
         }
         i = uuid.Origin
+        if trace {
+            fmt.Printf("VALUE\n")
+        }
     }
 
     action origin {
@@ -34,6 +43,9 @@
             uuid.Origin = i << (60-digits)
         }
         bare = false
+        if trace {
+            fmt.Printf("ORIGIN\n")
+        }
     }
 
     action uuid_sep {
@@ -47,10 +59,17 @@
             uuid.Origin = 0
             uuid.Sign = '$'
         }
+        if trace {
+            fmt.Printf("UUID\n")
+        }
     }
 
     action start_uuid {
         bare, full = true, false
+        if trace {
+            fmt.Printf("START_UUID\n")
+        }
+        i = uuid.Value
     }
 
 
