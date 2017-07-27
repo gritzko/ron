@@ -46,16 +46,17 @@ type Iterator struct {
 // Frame Open Q
 // [ ] ERRORS   !!!=code"text"
 // [ ]  including length limits!!!
-// [ ] ron CLI
+// [x] ron CLI
 // [ ] whitespace
 // [ ] sign = 0 1 2 3   UUID{} ~ ZERO_UUID
+//			Origin() vs Replica(), 128 bits
 // [ ] end -- test
-// [ ] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
-// [ ] Format - nil context
+// [x] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
+// [x] Format - nil context
 // [ ] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
 
-type Reducer func(a Iterator, b Iterator) Frame
+type Reducer func(a, b Iterator, to *Frame) UUID
 
 type zip int8
 
@@ -113,9 +114,12 @@ var ZERO_UUID = UUID{0, '$', 0}
 
 var ERROR_UUID = UUID{INT60_ERROR, '$', 0}
 
-var ZERO_OP Op
+var ZERO_OP = Op{uuids:[4]UUID{ZERO_UUID,ZERO_UUID,ZERO_UUID,ZERO_UUID}}
 
 var EMPTY_FRAME Frame
+
+var TYPE_MISMATCH_ERROR_UUID UUID
+var UNKNOWN_TYPE_ERROR_UUID UUID
 
 func init() {
 	for i := 0; i < len(ABC); i++ {
@@ -136,4 +140,6 @@ func init() {
 	for i:=0; i<len(SPEC_PUNCT); i++ {
 		ABC[SPEC_PUNCT[i]] = -30 -int8(i)
 	}
+	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
+	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")
 }

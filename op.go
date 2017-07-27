@@ -104,13 +104,13 @@ func (op *Op) GetUUID (i int) UUID {
 	return op.uuids[i]
 }
 
-func (uuid *UUID) isZero () bool {
+func (uuid *UUID) IsZero() bool {
 	return uuid.Value==0 && uuid.Origin==0
 }
 
 func (spec *Op) isZero () bool {
 	for t:=0; t<4; t++ {
-		if !spec.uuids[t].isZero() {
+		if !spec.uuids[t].IsZero() {
 			return false
 		}
 	}

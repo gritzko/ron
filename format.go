@@ -237,7 +237,7 @@ func (frame *Frame) String() string {
 func (frame *Frame) AppendOp(op *Op) {
 	var l int
 	var uuids [11 * 2 * 4]byte
-	if !frame.last.isZero() {
+	if !frame.last.isZero() || len(frame.Body)==0 {
 		l = FormatZippedSpec(uuids[:], op, &frame.last)
 	} else {
 		l = FormatSpec(uuids[:], op)

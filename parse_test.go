@@ -21,6 +21,11 @@ func TestParseUUID(t *testing.T) {
 	if !world.Equal(helloworld) {
 		t.Fail()
 	}
+	err_str := "erro_error$~~~~~~~~~~"
+	error_uid, err := ParseUUIDString(err_str)
+	if err!=nil || error_uid.IsZero() {
+		t.Fail()
+	}
 }
 
 func TestParseFormatUUID(t *testing.T) {

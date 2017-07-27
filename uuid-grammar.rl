@@ -23,7 +23,7 @@
         i <<= 6
         i |= uint64(ABC[fc])
         if trace {
-            fmt.Printf("DIGIT %c\n", fc)
+            fmt.Printf("DIGIT %c -> %d\n", fc, i)
         }
     }
 
@@ -34,7 +34,7 @@
         }
         i = uuid.Origin
         if trace {
-            fmt.Printf("VALUE\n")
+            fmt.Printf("VALUE %s\n", uuid.String())
         }
     }
 
@@ -44,7 +44,7 @@
         }
         bare = false
         if trace {
-            fmt.Printf("ORIGIN\n")
+            fmt.Printf("ORIGIN %s\n", uuid.String())
         }
     }
 
@@ -60,7 +60,7 @@
             uuid.Sign = '$'
         }
         if trace {
-            fmt.Printf("UUID\n")
+            fmt.Printf("UUID %s\n", uuid.String())
         }
     }
 
@@ -75,7 +75,7 @@
 
     BASE = ( [0-9a-zA-Z~_] @int60_digit )+;
     PREFIX =  [([\{\}\])]  @int60_prefix;
-    SIGN = [\-+$%] @uuid_sep;
+    SIGN = [\-+\$%] @uuid_sep;
 
     VALUE = ( PREFIX | BASE | PREFIX BASE ) %value ;
     ORIGIN = ( ( SIGN | PREFIX | SIGN PREFIX )  BASE? ) %origin ;
