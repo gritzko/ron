@@ -13,6 +13,8 @@ const (
 	PREFIX1
 )
 
+const INT60LEN = 10
+
 type UUID struct {
 	Value  uint64
 	Sign   byte // TODO maybe fit into 16 bytes

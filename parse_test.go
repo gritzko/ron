@@ -1,8 +1,8 @@
 package RON
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -108,7 +108,7 @@ func TestParseUUID2(t *testing.T) {
 		zipped := test32[i][0]
 		unzipped, _ := ParseUUIDString(test32[i][1])
 		next, l := ParseUUID([]byte(zipped), def)
-		if l<0 && test32[i][1]=="" {
+		if l < 0 && test32[i][1] == "" {
 			continue
 		}
 		if l != len(zipped) || next != unzipped {
@@ -118,15 +118,15 @@ func TestParseUUID2(t *testing.T) {
 	}
 }
 
-func random_close_int (base uint64, prefix uint) uint64 {
+func random_close_int(base uint64, prefix uint) uint64 {
 	if prefix == 10 {
 		return base
 	}
-	var shift uint = (10-prefix)*6
+	var shift uint = (10 - prefix) * 6
 	base >>= shift
 	base <<= shift
-	rnd := rand.Int()&63
-	base |= uint64(rnd<<(shift-6))
+	rnd := rand.Int() & 63
+	base |= uint64(rnd << (shift - 6))
 	return base
 }
 
@@ -135,50 +135,43 @@ func TestParseFrame(t *testing.T) {
 	def, _ := ParseUUIDString(defstr)
 	var at int
 	// 64 random uuids - 8 brackets
-	var uuids [64]UUID
-	for bv:=0; bv<8; bv++ {
-		for bo:=0; bo<8; bo++ {
+	const dim = INT60LEN + 1
+	var uuids [dim * dim]UUID
+	for bv := 0; bv < dim; bv++ {
+		for bo := 0; bo < dim; bo++ {
 			v := random_close_int(def.Value, uint(bv))
 			o := random_close_int(def.Origin, uint(bo))
-			uuids[bv<<3+bo] = UUID{v, '-', o}
+			uuids[bv*dim+bo] = UUID{v, '-', o}
 		}
 	}
 	// shuffle to 16 ops
-	for i:=0; i<1000; i++ {
-		var f,t int = rand.Int()&63, rand.Int()&63
+	for i := 0; i < 1000; i++ {
+		var f, t int = rand.Int() % len(uuids), rand.Int() % len(uuids)
 		uuids[f], uuids[t] = uuids[t], uuids[f]
 	}
 	// pack into a frame
-	frame := MakeFrame(64*4*22+640)
-	for j:=0; j<16; j++ {
-		at = j<<2
+	frame := MakeFrame(dim*dim*22 + dim*100)
+	const ops = 30
+	for j := 0; j < ops; j++ {
+		at = j << 2
 		frame.Append(uuids[at], uuids[at+1], uuids[at+2], uuids[at+3], []byte("!"))
 	}
+	t.Logf(frame.String())
 	// recover, compare
 	iter := frame.Begin()
-	for k :=0; k <16; k++ {
+	for k := 0; k < ops; k++ {
 		if iter.AtEnd() {
 			t.Fail()
 			t.Log("Premature end")
 			break
 		}
 		at = k << 2
-		if iter.Type!=uuids[at] {
-			t.Fail()
-			t.Logf("type decoding failed at %d, '%s' should be '%s' op: '%s'", k, iter.Type.String(), uuids[at].String(), string(iter.Op.Body))
-			break
-		}
-		if iter.Object!=uuids[at+1] {
-			t.Fail()
-			t.Logf("object decoding failed at %d, '%s' should be '%s'", k, iter.Object.String(), uuids[at+1].String())
-		}
-		if iter.Event!=uuids[at+2] {
-			t.Fail()
-			t.Logf("event decoding failed at %d, '%s' should be '%s'", k, iter.Event.String(), uuids[at+2].String())
-		}
-		if iter.Location!=uuids[at+3] {
-			t.Fail()
-			t.Logf("location decoding failed at %d, '%s' should be '%s'", k, iter.Location.String(), uuids[at+3].String())
+		for u :=0; u <4; u++ {
+			uuid := iter.GetUUID(u)
+			if uuid != uuids[at+u] {
+				t.Fail()
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type.String(), uuids[at+u].String(), string(iter.Op.Body))
+			}
 		}
 		iter.Next()
 	}

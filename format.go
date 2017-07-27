@@ -178,7 +178,8 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
 		return off
 	}
 	if uuid.Value == context.Value || uuid.Sign != context.Sign ||
-		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) {
+		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
+		(uuid.Origin == context.Origin && ABC[output[0]]>=0) { // FIXME this if
 		output[off] = uuid.Sign
 		off++
 	}
