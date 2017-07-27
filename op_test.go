@@ -23,16 +23,16 @@ func TestParseOp (t *testing.T) {
     t.Log("Parser")
 	var frame = ".lww#test-author@(time-origin:loc=1''>test"
 	var op Op
-	pl := XParseOp ( []byte(frame), &op, &ZERO_OP )
+	pl := XParseOp ( []byte(frame), &op, ZERO_OP )
     if len(frame) != pl {
 		t.Fail()
 	}
-	if op.Type.String() != "lww" {
-		t.Logf("'%s' %v != '%s'\n", op.Type.String(), []byte(op.Type.String()), "lww")
+	if op.Type().String() != "lww" {
+		t.Logf("'%s' %v != '%s'\n", op.Type().String(), []byte(op.Type().String()), "lww")
 		t.Fail()
 	}
-	if op.Object.String() != "test-author" {
-		t.Logf("'%s' %v != '%s'\n", op.Type.String(), []byte(op.Object.String()), "test-author")
+	if op.Object().String() != "test-author" {
+		t.Logf("'%s' %v != '%s'\n", op.Type().String(), []byte(op.Object().String()), "test-author")
 		t.Fail()
 	}
 	i, e := op.ParseInt(0)
@@ -53,8 +53,8 @@ func BenchmarkParseOp(b *testing.B) {
 	var off int
 	var op Op
 	for i := 0; i < b.N; i++ {
-		l := XParseOp(frames[off:], &op, &ZERO_OP)
-		if l != len(frame) || op.Event.Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
+		l := XParseOp(frames[off:], &op, ZERO_OP)
+		if l != len(frame) || op.Event().Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
 			b.Logf("parse fail: off %d len %d(%d) '%s'", off, l, len(frame), string(frames[off:]))
 			b.Fail()
 			break
@@ -78,8 +78,8 @@ func BenchmarkIterator_Next(b *testing.B) {
 	b.Logf("'%s'", string(frame.Body))
 	iter := frame.Begin()
 	for i := 0; i < b.N; i++ {
-		if !iter.Event.Equal(times[i]) {
-			b.Logf("parse fail at %d, %s != %s", i, iter.Event.String(), times[i].String())
+		if !iter.Event().Equal(times[i]) {
+			b.Logf("parse fail at %d, %s != %s", i, iter.Event().String(), times[i].String())
 			b.Fail()
 		}
 	}

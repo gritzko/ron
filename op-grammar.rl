@@ -6,9 +6,9 @@
     action redef_uuid {
         switch fc {
         case '`':  *uuid = *prev_uuid
-        case '\\': *uuid = context.Object
-        case '|':  *uuid = context.Event
-        case '/':  *uuid = context.Location
+        case '\\': *uuid = context.uuids[1]
+        case '|':  *uuid = context.uuids[2]
+        case '/':  *uuid = context.uuids[3]
         }
     }
 
@@ -18,32 +18,9 @@
         }
         i = 0
         digits = 0
-        switch fc {
-            case '.': {
-                          n = 0
-                          uuid = & (op.Type)
-                          *uuid = context.Type
-                          if trace {
-                              fmt.Printf("TYPE DEF %s\n", context.Type.String());
-                          }
-                      }
-            case '#': {
-                          n = 1
-                          uuid = & op.Object
-                          *uuid = context.Object
-                      }
-            case '@': {
-                          n = 2
-                          uuid = & op.Event
-                          *uuid = context.Event
-                      }
-            case ':': {
-                          n = 3
-                          uuid = & op.Location
-                          *uuid = context.Location
-                      }
-        }
-        // FIXME   op.SetUUID(i, uuid),  ABC[fc]-10
+        n = -int(ABC[fc]) -30
+        uuid = &op.uuids[n]
+        *uuid = context.uuids[n]
         if n < prev_uuid_ind {
             // error
         }

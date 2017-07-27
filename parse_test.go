@@ -3,6 +3,7 @@ package RON
 import (
 	"math/rand"
 	"testing"
+	"os"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -122,6 +123,9 @@ func random_close_int(base uint64, prefix uint) uint64 {
 	if prefix == 10 {
 		return base
 	}
+	if prefix == 11 {
+		return 0
+	}
 	var shift uint = (10 - prefix) * 6
 	base >>= shift
 	base <<= shift
@@ -131,11 +135,14 @@ func random_close_int(base uint64, prefix uint) uint64 {
 }
 
 func TestParseFrame(t *testing.T) {
+	pid := os.Getpid()
+	t.Logf("random seed %d", pid)
+	rand.Seed(int64(pid))
 	defstr := "0123456789-abcdefghi"
 	def, _ := ParseUUIDString(defstr)
 	var at int
 	// 64 random uuids - 8 brackets
-	const dim = INT60LEN + 1
+	const dim = INT60LEN + 2
 	var uuids [dim * dim]UUID
 	for bv := 0; bv < dim; bv++ {
 		for bo := 0; bo < dim; bo++ {
@@ -170,7 +177,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type.String(), uuids[at+u].String(), string(iter.Op.Body))
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Body))
 			}
 		}
 		iter.Next()

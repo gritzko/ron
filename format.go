@@ -33,7 +33,7 @@ func UnzipBase64(input []byte, number *uint64) int {
 	return i
 }
 
-func (t *UUID) Equal(b UUID) bool {
+func (t UUID) Equal(b UUID) bool {
 	return t.Value == b.Value && t.Origin == b.Origin
 }
 
@@ -93,11 +93,11 @@ func ZipUUIDString(uuid, context UUID) string {
 	return string(ret[0:len])
 }
 
-func (uuid *UUID) String() string {
-	return ZipUUIDString(*uuid, ZERO_UUID)
+func (uuid UUID) String() string {
+	return ZipUUIDString(uuid, ZERO_UUID)
 }
 
-func (a *UUID) LessThan(b UUID) bool {
+func (a UUID) LessThan(b UUID) bool {
 	if a.Value == b.Value {
 		if a.Sign == b.Sign {
 			return a.Origin < b.Origin
@@ -249,14 +249,11 @@ func (frame *Frame) AppendOp(op *Op) {
 
 func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
 	var parsed Op
-	off := XParseOp(atoms, &parsed, &ZERO_OP)
+	off := XParseOp(atoms, &parsed, ZERO_OP)
 	if off <= 0 {
-		off = XParseOp([]byte("'parse error'"), &parsed, &ZERO_OP)
+		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
 	}
-	parsed.Type = t
-	parsed.Object = o
-	parsed.Event = e
-	parsed.Location = l
+	parsed.uuids = [4]UUID{t,o,e,l}
 	frame.AppendOp(&parsed)
 }
 

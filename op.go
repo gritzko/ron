@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (a *UUID) Compare(b UUID) int {
+func Compare(a, b UUID) int {
 	diff := a.Value - b.Value
 	if diff == 0 {
 		diff = uint64(a.Sign) - uint64(b.Sign)
@@ -26,8 +26,7 @@ func (op *Op) Empty() bool {
 }
 
 func (a *Op) Same(b *Op) bool {
-	return a.Type == b.Type && a.Object == b.Object &&
-		a.Event == b.Event && a.Location == b.Location
+	return a.uuids == b.uuids
 }
 
 func (op *Op) IsHeader() bool {
@@ -36,15 +35,12 @@ func (op *Op) IsHeader() bool {
 
 // not good - op is detached from a frame here
 func CreateOp(rdtype, object, event, location UUID, value string) (ret Op, err error) {
-	l := XParseOp([]byte(value), &ret, &ZERO_OP)
+	l := XParseOp([]byte(value), &ret, ZERO_OP)
 	if l <= 0 {
 		err = errors.New("invalid atom string")
 		return
 	}
-	ret.Type = rdtype
-	ret.Object = object
-	ret.Event = event
-	ret.Location = location
+	ret.uuids = [4]UUID{rdtype, object, event, location}
 	return
 }
 
@@ -64,7 +60,7 @@ func (i *Iterator) Next() bool {
 		return false
 	}
 	var prev Op = i.Op
-	l := XParseOp(i.frame.Body[i.offset:], &i.Op, &prev)
+	l := XParseOp(i.frame.Body[i.offset:], &i.Op, prev)
 	i.offset += l
 
 	return i.AtEnd()
@@ -100,14 +96,12 @@ func MakeFrame(prealloc_bytes int) Frame {
 	return Frame{buf, ZERO_OP}
 }
 
+func (op *Op) GetUUIDp (i int) *UUID {
+	return & op.uuids[i]
+}
+
 func (op *Op) GetUUID (i int) UUID {
-	switch i {
-	case 0: return op.Type
-	case 1: return op.Object
-	case 2: return op.Event
-	case 3: return op.Location
-	default: panic("uuid index outside 0..3")
-	}
+	return op.uuids[i]
 }
 
 func (uuid *UUID) isZero () bool {
@@ -115,5 +109,10 @@ func (uuid *UUID) isZero () bool {
 }
 
 func (spec *Op) isZero () bool {
-	return spec.Type.isZero() && spec.Object.isZero() && spec.Event.isZero() && spec.Location.isZero()
+	for t:=0; t<4; t++ {
+		if !spec.uuids[t].isZero() {
+			return false
+		}
+	}
+	return true
 }

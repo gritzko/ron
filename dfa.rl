@@ -9,11 +9,7 @@ type parser struct { // TODO
     ts, te, act int
 }
 
-func XParseOp(data []byte, op *Op, context *Op) int {
-
-    if context==nil {
-        context = &ZERO_OP
-    }
+func XParseOp(data []byte, op *Op, context Op) int {
 
     %% machine RON;
     %% write data;
@@ -58,7 +54,8 @@ func XParseOp(data []byte, op *Op, context *Op) int {
 
 
 // BIG FIXME  ERROR HANDLING, TESTS
-func XParseUUID(data []byte, uuid* UUID) (length int) {
+// FIXME context UUID
+func XParseUUID(data []byte, uuid *UUID) (length int) {
 
     %% machine UUID;
     %% write data;

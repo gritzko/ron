@@ -21,9 +21,9 @@ type UUID struct {
 	Origin uint64
 }
 
-// treat as an immutable object? - allocations
+// OP is an immutable atomic operation object - no write access
 type Op struct { // ~128 bytes
-	Type, Object, Event, Location UUID
+	uuids		[4]UUID
 	AtomCount   int
 	AtomTypes   [8]byte
 	AtomOffsets [8]int
@@ -45,6 +45,9 @@ type Iterator struct {
 
 // Frame Open Q
 // [ ] ERRORS   !!!=code"text"
+// [ ]  including length limits!!!
+// [ ] ron CLI
+// [ ] whitespace
 // [ ] sign = 0 1 2 3   UUID{} ~ ZERO_UUID
 // [ ] end -- test
 // [ ] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
@@ -68,6 +71,22 @@ const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~
 
 var base64 = []byte(BASE64)
 var ABC [256]int8
+
+func (op *Op) Type () UUID {
+	return op.uuids[0]
+}
+
+func (op *Op) Object () UUID {
+	return op.uuids[1]
+}
+
+func (op *Op) Event () UUID {
+	return op.uuids[2]
+}
+
+func (op *Op) Location () UUID {
+	return op.uuids[3]
+}
 
 const SPEC_PUNCT = ".#@:"
 const (
@@ -94,7 +113,7 @@ var ZERO_UUID = UUID{0, '$', 0}
 
 var ERROR_UUID = UUID{INT60_ERROR, '$', 0}
 
-var ZERO_OP = Op{Type: ZERO_UUID, Object: ZERO_UUID, Event: ZERO_UUID, Location: ZERO_UUID, AtomCount: 1, AtomTypes: [8]byte{byte('?')}, AtomOffsets: [8]int{0}, Body: []byte("?")}
+var ZERO_OP Op
 
 var EMPTY_FRAME Frame
 
@@ -113,5 +132,8 @@ func init() {
 	}
 	for i := 0; i < len(BASE64); i++ {
 		ABC[BASE64[i]] = int8(i)
+	}
+	for i:=0; i<len(SPEC_PUNCT); i++ {
+		ABC[SPEC_PUNCT[i]] = -30 -int8(i)
 	}
 }
