@@ -18,11 +18,15 @@
         }
         i = 0
         digits = 0
+        old_n = n
         n = -int(ABC[fc]) -30
         uuid = &op.uuids[n]
         *uuid = context.uuids[n]
-        if n < prev_uuid_ind {
-            // error
+        if n <= old_n {
+            if trace {
+                fmt.Printf("MISORDERED UUIDs %c %d %d\n", fc, n, old_n);
+            }
+            fbreak;
         }
     }
 
@@ -31,6 +35,9 @@
     }
 
     action atom_start {
+        if op.AtomCount >= 8 {
+            fbreak;
+        }
         op.AtomTypes[op.AtomCount] = fc
         op.AtomOffsets[op.AtomCount] = p
         op.AtomCount++
@@ -59,37 +66,50 @@
     }
     action string_atom2 {
     }
+    action atoms_start {
+        uuid = &blank
+    }
 
     action next {
         if trace {
             fmt.Printf("NEXT at %d\n", p)
         }
-        ret = p
+        p-=1
+        done = true
+        fbreak;
+    }
+    action over {
+        if trace {
+            fmt.Printf("OVER at %d\n", p)
+        }
+        p-=1
+        done = true
         fbreak;
     }
 
+    UNIESC = /\\u[0-9a-fA-F]{4}/;
 
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
     FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
-    STRING_ATOM1 = /[^']*/ %string_atom1;
-    STRING_ATOM2 = /[^"]*/ %string_atom2;
+    STRING_ATOM1 = (UNIESC|"\\" any|[^'])* %string_atom1;
+    STRING_ATOM2 = (UNIESC|"\\" any|[^"])* %string_atom2;
 
-    ATOM = (
-            "?" |
-            "!" |
-            "=" INT_ATOM  |
-            "^" FLOAT_ATOM |
+    ATOM = space* (
+            "?"  |
+            "!"  |
+            "=" space* INT_ATOM  |
+            "^" space* FLOAT_ATOM |
             "'" STRING_ATOM1 "'" |
             '"' STRING_ATOM2 '"' |
-            ">" UUID
+            ">" space* UUID
             ) >atom_start %atom;
 
     REDEF = ([`\\|/]|"") @redef_uuid;
 
     OP = (
-            ( [\.#@:] @toel_start REDEF UUID %toel_uuid )*
-            (ATOM+ %atoms ) 
-            ( [\.#@:] @next ) ?
+            ( space* [\.#@:] @toel_start space* REDEF UUID %toel_uuid )*
+            (ATOM+ >atoms_start %atoms ) space*
+            ( [\.#@:] @next )? %/over
          ) ;
 
     # main := OP;

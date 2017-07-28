@@ -44,17 +44,21 @@ type Iterator struct {
 }
 
 // Frame Open Q
-// [ ] ERRORS   !!!=code"text"
-// [ ]  including length limits!!!
+// [x] ERRORS   !!!=code"text"
+// [x]  including length limits!!!
 // [x] ron CLI
-// [ ] whitespace
+// [x] whitespace
 // [ ] sign = 0 1 2 3   UUID{} ~ ZERO_UUID
 //			Origin() vs Replica(), 128 bits
-// [ ] end -- test
+// [x] end -- test
 // [x] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
 // [x] Format - nil context
-// [ ] open/closed frame => static error strings "=400'parsing error'"
+// [x] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
+// cli FIXME
+// [ ] iterator error
+// [ ] value parsing (all types - tables)
+// [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
 
 type Reducer func(a, b Iterator, to *Frame) UUID
 

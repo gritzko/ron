@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 	"os"
+	"bytes"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -190,5 +191,42 @@ func TestParseFrame(t *testing.T) {
 	if !iter.AtEnd() {
 		t.Fail()
 		t.Log("No end")
+	}
+}
+
+func TestXParseOpWhitespace(t *testing.T) {
+	str := []byte(" #test !\n#next?")
+	var op Op
+	l := XParseOp(str, &op, ZERO_OP)
+	if l!=bytes.IndexByte(str,'\n')+1 {
+		t.Fail()
+	}
+	l2 := XParseOp(str[l:], &op, ZERO_OP)
+	if l+l2 != len(str) {
+		t.Fail()
+	}
+}
+
+func TestXParseMalformedOp(t *testing.T) {
+	var tests = []string{
+		"#novalue",
+		"# broken - uuid?",
+		"#too-many@values!!??=5=6^7.0^8.0'extra'",
+		"#invalid-float ^31415",
+		"",
+		"'unescaped ' quote'",
+		">badreference",
+		"#no_uuid-sep@$$",
+		"#trailing garbage",
+		"#reordered .uuids =1",
+		"#repeat #uuids =1",
+	};
+	for i, str := range tests {
+		var op Op
+		l := XParseOp([]byte(str), &op, ZERO_OP)
+		if l > 0 {
+			t.Logf("parsed %d but invalid: '%s' (%d)", i, str, l)
+			t.Fail()
+		}
 	}
 }

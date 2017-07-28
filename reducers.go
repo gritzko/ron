@@ -11,8 +11,8 @@ func Reduce (a, b Frame) Frame {
 	// FIXME: context A$B value A-B must produce "-"
 	i, j := a.Begin(), b.Begin()
 	var error_uuid UUID = ZERO_UUID
-	var fn Reducer = Reducers[i.Type()]
-	if fn==nil {
+	var reducer_fn Reducer = Reducers[i.Type()]
+	if reducer_fn ==nil {
 		error_uuid = UNKNOWN_TYPE_ERROR_UUID
 	} else if i.Type()!=j.Type() {
 		error_uuid = TYPE_MISMATCH_ERROR_UUID
@@ -24,7 +24,7 @@ func Reduce (a, b Frame) Frame {
 			loc = i.Event()
 		}
 		ret.Append(i.Type(), i.Object(), j.Event(), loc, HEADER_ATOMS)
-		error_uuid = fn(i, j, &ret)
+		error_uuid = reducer_fn(i, j, &ret)
 	}
 	if error_uuid!=ZERO_UUID {
 		ret = Frame{Body:make([]byte,100)}

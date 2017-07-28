@@ -52,11 +52,9 @@ func (i *Iterator) Next() bool {
 
 	if i.AtEnd() {
 		return false
-	}
-	if i.offset == len(i.frame.Body) {
-		i.Op.AtomTypes = [8]byte{'!', '!', '!'}
+	} else if i.IsLast() {
+		i.Op = ZERO_OP
 		i.Op.AtomCount = 0
-		i.Op.AtomOffsets = [8]int{}
 		return false
 	}
 	var prev Op = i.Op
@@ -87,8 +85,13 @@ func (frame *Frame) End() (i Iterator) {
 // the last valid op (zeroes for an empty frame).
 // The end op may be explicit, i.e. actually exist in the frame.
 // An explicit end op can not be abbreviated.
-func (i *Iterator) AtEnd() bool {
-	return i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
+func (i Iterator) AtEnd() bool {
+	return i.offset>0 && i.AtomCount==0
+	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
+}
+
+func (i Iterator) IsLast () bool {
+	return i.offset >= len(i.frame.Body)
 }
 
 func MakeFrame(prealloc_bytes int) Frame {

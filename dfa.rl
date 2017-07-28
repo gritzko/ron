@@ -18,10 +18,10 @@ func XParseOp(data []byte, op *Op, context Op) int {
     _ = prev_uuid
     var ret int
     var uuid *UUID
+    var blank UUID
     var i uint64
     var digits uint
-    var n int
-    var prev_uuid_ind int
+    n, old_n := -1, -1
     var length = -1
     _ = length
 
@@ -32,6 +32,7 @@ func XParseOp(data []byte, op *Op, context Op) int {
     _ = eof
     _,_,_ = ts,te,act
     var bare, full bool
+    done := false
 
 	%%{
 
@@ -49,7 +50,11 @@ func XParseOp(data []byte, op *Op, context Op) int {
         }
     }
 
-    return ret
+    if done {
+        return p
+    } else {
+        return -p
+    }
 }
 
 
