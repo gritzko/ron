@@ -59,6 +59,8 @@ type Iterator struct {
 // [ ] iterator error
 // [ ] value parsing (all types - tables)
 // [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
+// [ ] lww - idempotency
+// [ ] copy generic reduction errors
 
 type Reducer func(a, b Iterator, to *Frame) UUID
 

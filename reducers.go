@@ -56,17 +56,17 @@ func ReduceLWW (a Iterator, b Iterator, ret *Frame) UUID {
 		if loc_cmp == 0 {
 			ev_cmp := Compare(a.Event(), b.Event())
 			if ev_cmp > 0 {
-				ret.AppendOp(&b.Op)
+				ret.AppendOp(b.Op)
 			} else {
-				ret.AppendOp(&a.Op)
+				ret.AppendOp(a.Op)
 			}
 			a.Next()
 			b.Next()
 		} else if loc_cmp > 0 {
-			ret.AppendOp(&a.Op)
+			ret.AppendOp(a.Op)
 			a.Next()
 		} else {
-			ret.AppendOp(&b.Op)
+			ret.AppendOp(b.Op)
 			b.Next()
 		}
 	}

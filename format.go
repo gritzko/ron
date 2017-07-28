@@ -189,7 +189,7 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
 	return off
 }
 
-func FormatSpec(output []byte, op *Op) int {
+func FormatSpec(output []byte, op Op) int {
 	var off int
 	// expand to 88+values
 	for t := 0; t < 4; t++ {
@@ -200,7 +200,7 @@ func FormatSpec(output []byte, op *Op) int {
 	return off
 }
 
-func FormatZippedSpec(output []byte, op *Op, context *Op) int {
+func FormatZippedSpec(output []byte, op Op, context Op) int {
 	var off int
 	// expand to 88+values
 	for t := 0; t < 4; t++ {
@@ -216,7 +216,7 @@ func FormatZippedSpec(output []byte, op *Op, context *Op) int {
 
 // optimize for close values
 // context==nil is valid
-func FormatOp(output []byte, op *Op, context *Op) int {
+func FormatOp(output []byte, op Op, context Op) int {
 	off := FormatZippedSpec(output, op, context)
 	from := op.AtomOffsets[0]
 	copy(output[off:], op.Body[from:])
@@ -224,9 +224,9 @@ func FormatOp(output []byte, op *Op, context *Op) int {
 	return off
 }
 
-func (op *Op) String() string {
+func (op Op) String() string {
 	buf := make([]byte, op.AtomOffsets[op.AtomCount-1]+100) // FIXME!!!
-	l := FormatOp(buf, op, &ZERO_OP)
+	l := FormatOp(buf, op, ZERO_OP)
 	return string(buf[:l])
 }
 
@@ -234,17 +234,17 @@ func (frame *Frame) String() string {
 	return string(frame.Body)
 }
 
-func (frame *Frame) AppendOp(op *Op) {
+func (frame *Frame) AppendOp(op Op) {
 	var l int
 	var uuids [11 * 2 * 4]byte
 	if !frame.last.isZero() || len(frame.Body)==0 {
-		l = FormatZippedSpec(uuids[:], op, &frame.last)
+		l = FormatZippedSpec(uuids[:], op, frame.last)
 	} else {
 		l = FormatSpec(uuids[:], op)
 	}
 	frame.Body = append(frame.Body, uuids[:l]...)
 	frame.Body = append(frame.Body, op.Body[op.AtomOffsets[0]:]...)
-	frame.last = *op
+	frame.last = op
 }
 
 func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
@@ -254,21 +254,27 @@ func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
 		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
 	}
 	parsed.uuids = [4]UUID{t,o,e,l}
-	frame.AppendOp(&parsed)
+	frame.AppendOp(parsed)
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
 	if i.offset >= j.offset {
 		return
 	}
-	frame.AppendOp(&i.Op)
-	// if error => plus1 is closed
-	frame.Body = append(frame.Body, j.Rest()...)
-	frame.last = j.Op
+	if i.frame!=j.frame {
+		panic("mismatching iterators")
+	}
+	frame.AppendOp(i.Op)
+	from := i.offset //+ len(i.Body)
+	till := j.offset
+	frame.Body = append(frame.Body, i.Body[from:till]...)
 }
 
 func (frame *Frame) AppendAll(i Iterator) {
-	frame.AppendRange(i, i.frame.End())
+	frame.AppendOp(i.Op)
+	from := i.offset// + len(i.Body)
+	frame.Body = append(frame.Body, i.frame.Body[from:]...)
+	frame.last = i.frame.last
 }
 
 func (frame *Frame) AppendFrame(second Frame) {

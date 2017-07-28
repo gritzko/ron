@@ -64,10 +64,6 @@ func (i *Iterator) Next() bool {
 	return i.AtEnd()
 }
 
-func (i *Iterator) Rest () [] byte {
-	return []byte{}
-}
-
 func (frame *Frame) Begin() (i Iterator) {
 	i.frame = frame
 	i.Op = ZERO_OP // TODO  ZERO_OP is exactly Op{}

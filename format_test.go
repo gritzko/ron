@@ -159,7 +159,7 @@ func TestOp_String(t *testing.T) {
 	op.uuids[2].Value ++
 	op.uuids[3].Value ++
 	buf := make([]byte, 100)
-	l := FormatOp(buf, &op, &context)
+	l := FormatOp(buf, op, context)
 	if l<=0 {
 		t.Fail()
 		return
@@ -176,12 +176,12 @@ func BenchmarkFormatOp(b *testing.B) {
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	var context Op = op
 	buf := make([]byte, b.N*len(str)*2+100)
-	off := FormatOp(buf, &op, &ZERO_OP)
+	off := FormatOp(buf, op, ZERO_OP)
 	for i:=0; i<b.N; i++ {
 		context = op
 		op.uuids[2].Value ++
 		op.uuids[3].Value ++
-		off += FormatOp(buf[off:], &op, &context)
+		off += FormatOp(buf[off:], op, context)
 	}
 }
 

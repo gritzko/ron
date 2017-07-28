@@ -7,12 +7,12 @@ import (
 	"github.com/gritzko/RON"
 )
 
-var mode_stamp = flag.Bool("stamp", false, "timestamp frames ($1, $2 etc)")
-var mode_now = flag.Bool("now", false, "print a timestamp")
-var mode_unzip = flag.Bool("unzip", true, "don't zip the resulting frame")
-var mode_trim = flag.Bool("trim", false, "trim the resulting frame (if unzipped)")
-var see_stamp = flag.String("see", "", "see a timestamp")
-var me_stamp = flag.String("me", "", "set the replica id")
+//var mode_stamp = flag.Bool("stamp", false, "timestamp frames ($1, $2 etc)")
+//var mode_now = flag.Bool("now", false, "print a timestamp")
+//var mode_unzip = flag.Bool("unzip", true, "don't zip the resulting frame")
+//var mode_trim = flag.Bool("trim", false, "trim the resulting frame (if unzipped)")
+//var see_stamp = flag.String("see", "", "see a timestamp")
+//var me_stamp = flag.String("me", "", "set the replica id")
 
 const MAXFILES int = 10
 
@@ -21,7 +21,7 @@ func readStdin () [][]byte {
 }
 
 func readFiles (inputs []string) [][]byte {
-	var files [MAXFILES]*os.File
+	var files []*os.File = make([]*os.File, len(inputs))
 	var err error
 	for i,name:= range inputs {
 		files[i], err = os.Open(name)
@@ -67,5 +67,6 @@ func main () {
 	result := RON.ReduceAll(frames)
 
 	os.Stdout.Write(result.Body)
+	os.Stdout.Write([]byte("\n"))
 
 }
