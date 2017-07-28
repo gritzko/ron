@@ -230,3 +230,32 @@ func TestXParseMalformedOp(t *testing.T) {
 		}
 	}
 }
+
+func TestOp_ParseFloat(t *testing.T) {
+	var tests = []string{
+		"^3.1415",
+		"^1.0e6",
+		"^1.2345e6",
+		"^0.0",
+	};
+	var correct = []float64{
+		3.1415,
+		1e6,
+		1.2345e6,
+		0,
+	};
+	for i, str := range tests {
+		var op Op
+		l := XParseOp([]byte(str), &op, ZERO_OP)
+		if l != len(str) {
+			t.Logf("not parsed %d: '%s' (%d)", i, str, l)
+			t.Fail()
+			break
+		}
+		val,_ := op.ParseFloat(0)
+		if val!=correct[i] {
+			t.Logf("misparsed %d: '%e' (%e)", i, val, correct[i])
+			t.Fail()
+		}
+	}
+}

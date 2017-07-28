@@ -285,10 +285,8 @@ func (frame *Frame) AppendFrame(second Frame) {
 // no explicit end marker for now
 //}
 
-func (frame *Frame) AppendError(comment string) {
-
-}
-
-func (frame *Frame) Clone() Frame { // TODO size hint
-	return Frame{}
+func (frame Frame) Clone() Frame {
+	body := make ([]byte, 0, len(frame.Body))
+	copy(body, frame.Body)
+	return Frame{Body:body, last:frame.last}
 }

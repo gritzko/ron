@@ -48,19 +48,33 @@ type Iterator struct {
 // [x]  including length limits!!!
 // [x] ron CLI
 // [x] whitespace
-// [ ] sign = 0 1 2 3   UUID{} ~ ZERO_UUID
-//			Origin() vs Replica(), 128 bits
+// [ ] sign = 0 1 2 3   UUID{} ~ ZERO_UUID, upper bits
+//			Origin() vs Replica(), 128 bits, google memory layouts
 // [x] end -- test
 // [x] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
 // [x] Format - nil context
 // [x] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
 // cli FIXME
-// [ ] iterator error
-// [ ] value parsing (all types - tables)
+// [ ] iterator - parse error
+// [ ] value parsing (all types - tables, safe ranges, length limits)
+//		[ ] int
+//		[ ] float
+//		[ ] string
+//		[ ] uuid (save?)
+// [x] lww - idempotency
+//
+// [ ] reducer features
 // [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
-// [ ] lww - idempotency
 // [ ] copy generic reduction errors
+// [ ] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
+// [ ] prereduce - optional, may fail (RGA subtrees)
+//
+// [ ] formatting options
+// [ ] indenting
+// [ ] newlines
+// [ ] trimming/zipping
+// [ ] redefs (bench - fast prefix - bit ops)
 
 type Reducer func(a, b Iterator, to *Frame) UUID
 
