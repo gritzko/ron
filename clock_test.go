@@ -1,7 +1,9 @@
 package RON
 
 import "testing"
-import "time"
+import (
+	"time"
+)
 
 
 func TestClock_Format(t *testing.T) {

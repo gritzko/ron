@@ -9,11 +9,11 @@ import (
 
 func TestParseUUID(t *testing.T) {
 	uuidA, _ := ParseUUID([]byte("1"), ZERO_UUID)
-	if uuidA.Value != (1<<54) || uuidA.Origin != 0 || uuidA.Sign != '$' {
+	if uuidA.Value != (1<<54) || uuidA.Origin != 0 || uuidA.Sign() != NAME_SIGN {
 		t.Fail()
 	}
 	uuidAB, _ := ParseUUID([]byte(")1"), uuidA)
-	if uuidAB.Value != (1<<54)|1 || uuidAB.Origin != 0 || uuidAB.Sign != '$' {
+	if uuidAB.Value != (1<<54)|1 || uuidAB.Origin != 0 || uuidAB.Sign() != NAME_SIGN {
 		t.Fail()
 	}
 	hello, _ := ParseUUID([]byte("hello-111"), ZERO_UUID)
@@ -154,7 +154,7 @@ func TestParseFrame(t *testing.T) {
 		for bo := 0; bo < dim; bo++ {
 			v := random_close_int(def.Value, uint(bv))
 			o := random_close_int(def.Origin, uint(bo))
-			uuids[bv*dim+bo] = UUID{v, '-', o}
+			uuids[bv*dim+bo] = UUID{v, EVENT_SIGN_BIT|o}
 		}
 	}
 	// shuffle to 16 ops

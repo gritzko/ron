@@ -70,6 +70,7 @@ func BenchmarkIterator_Next(b *testing.B) {
 	var times = make([]UUID, b.N)
 	var test_uuid, _ = ParseUUIDString("test")
 	var field_uuid, _ = ParseUUIDString("field")
+	var LWW_UUID = UUID{881557636825219072, NAME_SIGN_BITS}
 	for i := 0; i < b.N; i++ {
 		time := clock.Time()
 		times[i] = time

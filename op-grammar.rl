@@ -91,8 +91,8 @@
 
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
     FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
-    STRING_ATOM1 = (UNIESC|"\\" any|[^'])* %string_atom1;
-    STRING_ATOM2 = (UNIESC|"\\" any|[^"])* %string_atom2;
+    STRING_ATOM1 = (UNIESC|"\\" [^\n\r]|[^'])* %string_atom1;
+    STRING_ATOM2 = (UNIESC|"\\" [^\n\r]|[^"])* %string_atom2;
 
     ATOM = space* (
             "?"  |

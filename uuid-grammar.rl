@@ -32,7 +32,7 @@
             uuid.Value = i << (60-digits)
             digits = 0
         }
-        i = uuid.Origin
+        i = uuid.Replica()
         if trace {
             fmt.Printf("VALUE %s\n", uuid.String())
         }
@@ -49,15 +49,17 @@
     }
 
     action uuid_sep {
-        uuid.Sign = fc
-        i = uuid.Origin
+        //uuid.Sign = fc
+        sign = UUIDSep2Sign(fc)
+        i = uuid.Replica()
+        uuid.Origin &= PREFIX10
     }
 
     action uuid {
         length = pe
+        uuid.Origin |= sign << 60
         if bare && full {
             uuid.Origin = 0
-            uuid.Sign = '$'
         }
         if trace {
             fmt.Printf("UUID %s\n", uuid.String())
@@ -70,6 +72,7 @@
             fmt.Printf("START_UUID\n")
         }
         i = uuid.Value
+        sign = uuid.Sign()
     }
 
 

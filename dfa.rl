@@ -32,6 +32,7 @@ func XParseOp(data []byte, op *Op, context Op) int {
     _ = eof
     _,_,_ = ts,te,act
     var bare, full bool
+    var sign uint64 = 0
     done := false
 
 	%%{
@@ -74,6 +75,7 @@ func XParseUUID(data []byte, uuid *UUID) (length int) {
     _ = eof
     _,_,_ = ts,te,act
     var bare, full bool
+    var sign uint64 = 0
 
 
 	%%{ 

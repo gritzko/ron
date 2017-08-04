@@ -66,3 +66,18 @@ func ParseFrame (data []byte) (ret Frame) {
 	return
 }
 
+func Parse (str string) (Frame, error) {
+	ret := Frame{Body:[]byte(str)}
+	_ = ret.Begin() // FIXME iterator - errors
+	return ret, nil
+}
+
+func UUIDSep2Sign (char byte) uint64 {
+	switch (char) {
+	case NAME_UUID_SEP: return NAME_SIGN
+	case HASH_UUID_SEP: return HASH_SIGN
+	case EVENT_UUID_SEP: return EVENT_SIGN
+	case DERIVED_EVENT_SEP: return DERIVED_EVENT_SIGN
+	default: panic("not an UUID separator")
+	}
+}

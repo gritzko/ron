@@ -41,6 +41,7 @@ func TestUUID_String(t *testing.T) {
 		{"[1s9L3-[Wj8oO", "[1s9L3-(2Biejq", "-(2Biejq"},
 		{"}DcR-}L8w", "}IYI-", "}IYI}"}, //10
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
+		// FIXME: context A$B value A-B must produce "-"
 	}
 	for i, tri := range tests {
 		context, _ := ParseUUID([]byte(tri[0]), ZERO_UUID)
@@ -101,7 +102,7 @@ func BenchmarkUnzip(b *testing.B) {
 	uuids := make([]UUID, b.N)
 	const m32 = 0xffffffff
 	for i := 0; i < b.N; i++ {
-		uuids[i] = UUID{RandUint(), '-', RandUint()}
+		uuids[i] = UUID{RandUint(), EVENT_SIGN_BIT|RandUint()}
 		//uuids[i] = UUID{uint64(i), '-', 100}
 		// FIXME optimize close ids - bench CT/RGA
 	}

@@ -5,12 +5,9 @@ import (
 )
 
 func Compare(a, b UUID) int {
-	diff := a.Value - b.Value
+	diff := int64(a.Value) - int64(b.Value)
 	if diff == 0 {
-		diff = uint64(a.Sign) - uint64(b.Sign)
-		if diff == 0 {
-			diff = a.Origin - b.Origin
-		}
+		diff = int64(a.Origin) - int64(b.Origin)
 	}
 	if diff < 0 {
 		return -1
@@ -18,6 +15,42 @@ func Compare(a, b UUID) int {
 		return 1
 	} else {
 		return 0
+	}
+}
+
+func (a UUID) LaterThan (b UUID) bool {
+	if a.Value==b.Value {
+		return a.Origin > b.Origin
+	} else {
+		return a.Value > b.Value
+	}
+}
+
+func (a UUID) EarlierThan (b UUID) bool {
+	if a.Value==b.Value {
+		return a.Origin < b.Origin
+	} else {
+		return a.Value < b.Value
+	}
+}
+
+func (a UUID) Sign () uint64 {
+	return a.Origin >> 60
+}
+
+func (a UUID) Replica () uint64 {
+	return a.Origin & PREFIX10
+}
+
+func (a UUID) SameAs (b UUID) bool {
+	if a.Value!=b.Value {
+		return false
+	} else if a.Origin==b.Origin {
+		return true
+	} else if (a.Origin^b.Origin) & PREFIX10 != 0 {
+		return false
+	} else {
+		return a.Origin&EVENT_SIGN_BIT==1 && b.Origin&EVENT_SIGN_BIT==1
 	}
 }
 
@@ -64,17 +97,50 @@ func (i *Iterator) Next() bool {
 	return i.AtEnd()
 }
 
-func (frame *Frame) Begin() (i Iterator) {
-	i.frame = frame
-	i.Op = ZERO_OP // TODO  ZERO_OP is exactly Op{}
-	i.Next()
+func (uuid UUID) IsTemplate () bool {
+	return uuid.Sign()==NAME_SIGN && uuid.Value==0 && uuid.Origin!=0
+}
+
+func (frame Frame) Stamp (clock Clock) (ret Frame) {
+	stamps := map[uint64]UUID{}
+	i := frame.Begin()
+	for !i.IsEmpty() {
+		op := i.Op
+		for t:=0; t<4; t++ {
+			uuid := op.uuids[t]
+			if uuid.IsTemplate() {
+				stamp, ok := stamps[uuid.Origin]
+				if !ok {
+					stamp = clock.Time()
+					stamps[uuid.Origin] = stamp
+				}
+				op.uuids[t] = stamp
+			}
+		}
+		ret.AppendOp(op)
+		i.Next()
+	}
 	return
 }
 
-func (frame *Frame) End() (i Iterator) {
+func (op Op) IsEmpty() bool {
+	return op.AtomCount==0
+}
+
+func (frame *Frame) Begin() (i Iterator) {
 	i.frame = frame
-	i.offset = len(frame.Body)
+	i.offset = 0
+	if frame.first.IsEmpty() {
+		i.Op = ZERO_OP // FIXME  ZERO_OP is exactly Op{}
+		i.Next()
+	} else {
+		i.Op = frame.first
+	}
 	return
+}
+
+func (frame *Frame) End() Iterator {
+	return Iterator{frame:frame, offset:len(frame.Body)}
 }
 
 // A frame's end position is an op having a value of !!! and UUIDs from
@@ -92,7 +158,7 @@ func (i Iterator) IsLast () bool {
 
 func MakeFrame(prealloc_bytes int) Frame {
 	var buf = make([]byte, 0, prealloc_bytes)
-	return Frame{buf, ZERO_OP}
+	return Frame{Body: buf}
 }
 
 func (op *Op) GetUUIDp (i int) *UUID {

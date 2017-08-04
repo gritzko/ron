@@ -97,18 +97,6 @@ func (uuid UUID) String() string {
 	return ZipUUIDString(uuid, ZERO_UUID)
 }
 
-func (a UUID) LessThan(b UUID) bool {
-	if a.Value == b.Value {
-		if a.Sign == b.Sign {
-			return a.Origin < b.Origin
-		} else {
-			return a.Sign < b.Sign
-		}
-	} else {
-		return a.Value < b.Value
-	}
-}
-
 func FormatTrimmedInt(output []byte, value uint64) int {
 	if value == 0 {
 		output[0] = '0'
@@ -162,7 +150,7 @@ func FormatZippedInt(output []byte, value, context uint64) int {
 
 func FormatUUID(output []byte, uuid UUID) int {
 	l := FormatTrimmedInt(output, uuid.Value)
-	output[l] = uuid.Sign
+	output[l] = UUID_PUNCT[uuid.Sign()]
 	l++
 	l += FormatTrimmedInt(output[l:], uuid.Origin)
 	return l
@@ -174,17 +162,17 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
 		return 0
 	}
 	off := FormatZippedInt(output, uuid.Value, context.Value)
-	if uuid.Sign == NAME_UUID_SEP && uuid.Origin == 0 {
+	if uuid.Origin == NAME_SIGN_BITS {
 		return off
 	}
-	if uuid.Value == context.Value || uuid.Sign != context.Sign ||
+	if uuid.Value == context.Value || uuid.Sign() != context.Sign() ||
 		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
-		(uuid.Origin == context.Origin && ABC[output[0]]>=0) { // FIXME this if
-		output[off] = uuid.Sign
+		(uuid.Replica() == context.Replica() && ABC[output[0]]>=0) { // FIXME this if
+		output[off] = UUID_PUNCT[uuid.Sign()]
 		off++
 	}
-	if uuid.Origin != context.Origin {
-		off += FormatZippedInt(output[off:], uuid.Origin, context.Origin)
+	if uuid.Replica() != context.Replica() {
+		off += FormatZippedInt(output[off:], uuid.Replica(), context.Replica())
 	}
 	return off
 }
