@@ -183,7 +183,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Body))
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Atoms))
 			}
 		}
 		iter.Next()
@@ -262,11 +262,11 @@ func TestOp_ParseFloat(t *testing.T) {
 
 func TestOp_ParseAtoms (t *testing.T) {
 	var tests = [5][2]string{
-		{ ">0>1>2>3", ">>>>,,,," },
-		{ ">>,#next>>", ">>,,,,,," },
-		{ ",", ",,,,,,,," },
-		{ "=1^2.0", "=^,,,,,," },
-		{ "'str'\"str\"", "'\",,,,,," },
+		{ ">0>1>2>3", ">>>>" },
+		{ ">>,#next>>", ">>" },
+		{ ",", "" },
+		{ "=1^2.0", "=^" },
+		{ "'str'\"str\"", "'\"" },
 	}
 	for i:=0; i<len(tests); i++ {
 		var op Op
@@ -277,7 +277,7 @@ func TestOp_ParseAtoms (t *testing.T) {
 			t.Fail()
 			break
 		}
-		if string(op.AtomTypes[:]) != tests[i][1] {
+		if string(op.AtomTypes[0:op.AtomCount]) != tests[i][1] {
 			t.Logf("misparsed %d: '%s' (%s)", i, string(op.AtomTypes[:]), tests[i][1])
 			t.Fail()
 		}

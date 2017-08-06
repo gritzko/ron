@@ -207,8 +207,8 @@ func FormatZippedSpec(output []byte, op Op, context Op) int {
 func FormatOp(output []byte, op Op, context Op) int {
 	off := FormatZippedSpec(output, op, context)
 	from := op.AtomOffsets[0]
-	copy(output[off:], op.Body[from:])
-	off += len(op.Body) - from
+	copy(output[off:], op.Atoms[from:])
+	off += len(op.Atoms) - from
 	return off
 }
 
@@ -231,7 +231,7 @@ func (frame *Frame) AppendOp(op Op) {
 		l = FormatSpec(uuids[:], op)
 	}
 	frame.Body = append(frame.Body, uuids[:l]...)
-	frame.Body = append(frame.Body, op.Body[op.AtomOffsets[0]:]...)
+	frame.Body = append(frame.Body, op.Atoms[op.AtomOffsets[0]:]...)
 	frame.last = op
 }
 
@@ -253,14 +253,14 @@ func (frame *Frame) AppendRange(i, j Iterator) {
 		panic("mismatching iterators")
 	}
 	frame.AppendOp(i.Op)
-	from := i.offset //+ len(i.Body)
+	from := i.offset //+ len(i.Atoms)
 	till := j.offset
-	frame.Body = append(frame.Body, i.Body[from:till]...)
+	frame.Body = append(frame.Body, i.Atoms[from:till]...)
 }
 
 func (frame *Frame) AppendAll(i Iterator) {
 	frame.AppendOp(i.Op)
-	from := i.offset// + len(i.Body)
+	from := i.offset// + len(i.Atoms)
 	frame.Body = append(frame.Body, i.frame.Body[from:]...)
 	frame.last = i.frame.last
 }

@@ -192,7 +192,7 @@ func BenchmarkFormatOp(b *testing.B) {
 /*
 func TestFrame_Append (t *testing.T) {
 	f1str := ".lww#test@time-author:loc=1"
-	f1 := Frame{Body: []byte(f1str)}
+	f1 := Frame{Atoms: []byte(f1str)}
 	test_uuid,_ := ParseUUIDString("test")
 	time_uuid,_ := ParseUUIDString("time-author")
 	loc_uuid,_ := ParseUUIDString("loc")

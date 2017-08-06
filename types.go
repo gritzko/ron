@@ -39,7 +39,7 @@ type Op struct { // ~128 bytes
 	AtomCount   int
 	AtomTypes   [8]byte
 	AtomOffsets [8]int
-	Body        []byte
+	Atoms       []byte
 }
 
 // Frame... mutable, but append-only

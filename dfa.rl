@@ -24,9 +24,10 @@ func XParseOp(data []byte, op *Op, context Op) int {
     n, old_n := -1, -1
     var length = -1
     _ = length
+    var atoms_at int
 
     op.AtomCount = 0
-    op.AtomTypes = [8]byte{',',',',',',',',',',',',',',','}
+    op.AtomTypes = [8]byte{0,0,0,0,0,0,0,0}
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int
@@ -46,7 +47,6 @@ func XParseOp(data []byte, op *Op, context Op) int {
 	}%%
 
     if ret>0 {
-        op.Body = data[:ret]
         if trace {
             fmt.Printf("ATOMS: %d..%d\n", op.AtomOffsets[0], ret);
         }

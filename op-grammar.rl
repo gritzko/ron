@@ -39,7 +39,7 @@
             fbreak;
         }
         op.AtomTypes[op.AtomCount] = fc
-        op.AtomOffsets[op.AtomCount] = p
+        op.AtomOffsets[op.AtomCount] = p - atoms_at
         op.AtomCount++
         if trace {
             fmt.Printf("ATOM_START %c at %d\n", fc, p);
@@ -56,6 +56,7 @@
             fmt.Printf("ATOMS at %d\n", p)
         }
         ret = p
+        op.Atoms = data[atoms_at:p]
     }
 
     action int_atom {
@@ -68,6 +69,7 @@
     }
     action atoms_start {
         uuid = &blank
+        atoms_at = p
     }
 
     action next {

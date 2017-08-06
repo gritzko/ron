@@ -15,9 +15,9 @@ func (op Op) ParseInt(pos int) (i int64, err error) { // FIXME no error
 	if pos < 7 {
 		till = op.AtomOffsets[pos+1]
 	} else {
-		till = len(op.Body)
+		till = len(op.Atoms)
 	}
-	str := string(op.Body[from:till])
+	str := string(op.Atoms[from:till])
 	i, err = strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		err = errors.Wrap(err, "unparseable int atom")
@@ -31,9 +31,9 @@ func (op Op) ParseFloat (pos int) (ret float64, err error) {
 	if pos+1 < op.AtomCount {
 		till = op.AtomOffsets[pos+1]
 	} else {
-		till = len(op.Body)
+		till = len(op.Atoms)
 	}
-	str := string(op.Body[from:till])
+	str := string(op.Atoms[from:till])
 	ret, err = strconv.ParseFloat(str, 64)
 	if err != nil {
 		err = errors.Wrap(err, "unparseable float atom")
