@@ -259,3 +259,27 @@ func TestOp_ParseFloat(t *testing.T) {
 		}
 	}
 }
+
+func TestOp_ParseAtoms (t *testing.T) {
+	var tests = [5][2]string{
+		{ ">0>1>2>3", ">>>>,,,," },
+		{ ">>,#next>>", ">>,,,,,," },
+		{ ",", ",,,,,,,," },
+		{ "=1^2.0", "=^,,,,,," },
+		{ "'str'\"str\"", "'\",,,,,," },
+	}
+	for i:=0; i<len(tests); i++ {
+		var op Op
+		str := tests[i][0]
+		l := XParseOp([]byte(str), &op, ZERO_OP)
+		if l <= 0 {
+			t.Logf("not parsed %d: '%s' (%d)", i, str, l)
+			t.Fail()
+			break
+		}
+		if string(op.AtomTypes[:]) != tests[i][1] {
+			t.Logf("misparsed %d: '%s' (%s)", i, string(op.AtomTypes[:]), tests[i][1])
+			t.Fail()
+		}
+	}
+}

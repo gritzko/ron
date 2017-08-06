@@ -26,6 +26,7 @@ func XParseOp(data []byte, op *Op, context Op) int {
     _ = length
 
     op.AtomCount = 0
+    op.AtomTypes = [8]byte{',',',',',',',',',',',',',',','}
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int

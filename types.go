@@ -67,7 +67,13 @@ type Iterator struct {
 // [x] Format - nil context
 // [x] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
+
+// [ ] Compare tests!!! (all types)
+// [x] void atom , -- sweet  "op1, op2, op3" is perfectly OK
+// [ ] op.Atoms && tests
+
 // cli FIXME
+// [ ] clean-up: uuid-grammar.rl
 // [ ] iterator - parse error
 // [ ] value parsing (all types - tables, safe ranges, length limits)
 //		[ ] int
@@ -77,6 +83,8 @@ type Iterator struct {
 // [x] lww - idempotency
 //
 // [ ] RGA reducer (fn, errors)
+//		[ ] Reduce()
+//		[ ] tab tests
 //
 // [ ] fuzzer go-fuzz (need samples)
 //
@@ -143,8 +151,11 @@ const DERIVED_EVENT_SEP = byte('-')
 const HASH_UUID_SEP = byte('%')
 
 const INT60_ERROR uint64 = 1<<60 - 1
+const INT60_NEVER = 63<<(6*9)
 
 var ZERO_UUID = UUID{0, NAME_SIGN_BITS}
+
+var NEVER_UUID = UUID{INT60_NEVER, NAME_SIGN_BITS}
 
 var ERROR_UUID = UUID{INT60_ERROR, NAME_SIGN_BITS}
 

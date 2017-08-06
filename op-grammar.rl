@@ -108,7 +108,7 @@
 
     OP = (
             ( space* [\.#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            (ATOM+ >atoms_start %atoms ) space*
+            ( (ATOM+ ","?|",") >atoms_start %atoms ) space*
             ( [\.#@:] @next )? %/over
          ) ;
 
