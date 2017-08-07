@@ -183,7 +183,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Atoms))
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Body))
 			}
 		}
 		iter.Next()
@@ -277,8 +277,8 @@ func TestOp_ParseAtoms (t *testing.T) {
 			t.Fail()
 			break
 		}
-		if string(op.AtomTypes[0:op.AtomCount]) != tests[i][1] {
-			t.Logf("misparsed %d: '%s' (%s)", i, string(op.AtomTypes[:]), tests[i][1])
+		if string(op.Types[0:op.Count]) != tests[i][1] {
+			t.Logf("misparsed %d: '%s' (%s)", i, string(op.Types[:]), tests[i][1])
 			t.Fail()
 		}
 	}

@@ -6,9 +6,9 @@
     action redef_uuid {
         switch fc {
         case '`':  *uuid = *prev_uuid
-        case '\\': *uuid = context.uuids[1]
-        case '|':  *uuid = context.uuids[2]
-        case '/':  *uuid = context.uuids[3]
+        case '\\': *uuid = context.Spec[1]
+        case '|':  *uuid = context.Spec[2]
+        case '/':  *uuid = context.Spec[3]
         }
     }
 
@@ -20,8 +20,8 @@
         digits = 0
         old_n = n
         n = -int(ABC[fc]) -30
-        uuid = &op.uuids[n]
-        *uuid = context.uuids[n]
+        uuid = &op.Spec[n]
+        *uuid = context.Spec[n]
         if n <= old_n {
             if trace {
                 fmt.Printf("MISORDERED UUIDs %c %d %d\n", fc, n, old_n);
@@ -35,12 +35,12 @@
     }
 
     action atom_start {
-        if op.AtomCount >= 8 {
+        if op.Count >= 8 {
             fbreak;
         }
-        op.AtomTypes[op.AtomCount] = fc
-        op.AtomOffsets[op.AtomCount] = p - atoms_at
-        op.AtomCount++
+        op.Types[op.Count] = fc
+        op.Offsets[op.Count] = p - atoms_at
+        op.Count++
         if trace {
             fmt.Printf("ATOM_START %c at %d\n", fc, p);
         }
@@ -56,7 +56,7 @@
             fmt.Printf("ATOMS at %d\n", p)
         }
         ret = p
-        op.Atoms = data[atoms_at:p]
+        op.Body = data[atoms_at:p]
     }
 
     action int_atom {

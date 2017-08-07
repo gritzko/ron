@@ -154,11 +154,12 @@ func BenchmarkUnzip(b *testing.B) {
 }
 
 func TestOp_String(t *testing.T) {
+	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := ".lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	context := op
-	op.uuids[2].Value ++
-	op.uuids[3].Value ++
+	op.Spec[2].Value ++
+	op.Spec[3].Value ++
 	buf := make([]byte, 100)
 	l := FormatOp(buf, op, context)
 	if l<=0 {
@@ -180,8 +181,8 @@ func BenchmarkFormatOp(b *testing.B) {
 	off := FormatOp(buf, op, ZERO_OP)
 	for i:=0; i<b.N; i++ {
 		context = op
-		op.uuids[2].Value ++
-		op.uuids[3].Value ++
+		op.Spec[2].Value ++
+		op.Spec[3].Value ++
 		off += FormatOp(buf[off:], op, context)
 	}
 }

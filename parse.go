@@ -6,18 +6,18 @@ import (
 )
 
 func (op Op) ParseInt(pos int) (i int64, err error) { // FIXME no error
-	if pos > op.AtomCount || op.AtomTypes[pos] != '=' {
+	if pos > op.Count || op.Types[pos] != '=' {
 		err = errors.New("no int at the pos")
 		return
 	}
 	var from, till int
-	from = op.AtomOffsets[pos]+1
+	from = op.Offsets[pos]+1
 	if pos < 7 {
-		till = op.AtomOffsets[pos+1]
+		till = op.Offsets[pos+1]
 	} else {
-		till = len(op.Atoms)
+		till = len(op.Body)
 	}
-	str := string(op.Atoms[from:till])
+	str := string(op.Body[from:till])
 	i, err = strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		err = errors.Wrap(err, "unparseable int atom")
@@ -27,13 +27,13 @@ func (op Op) ParseInt(pos int) (i int64, err error) { // FIXME no error
 
 func (op Op) ParseFloat (pos int) (ret float64, err error) {
 	var from, till int
-	from = op.AtomOffsets[pos]+1 // FIXME refac
-	if pos+1 < op.AtomCount {
-		till = op.AtomOffsets[pos+1]
+	from = op.Offsets[pos]+1 // FIXME refac
+	if pos+1 < op.Count {
+		till = op.Offsets[pos+1]
 	} else {
-		till = len(op.Atoms)
+		till = len(op.Body)
 	}
-	str := string(op.Atoms[from:till])
+	str := string(op.Body[from:till])
 	ret, err = strconv.ParseFloat(str, 64)
 	if err != nil {
 		err = errors.Wrap(err, "unparseable float atom")

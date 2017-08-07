@@ -33,13 +33,19 @@ type UUID struct {
 	Origin uint64
 }
 
+type Spec [4]UUID
+
+type Atoms struct {
+	Count       int
+	Types		[8]byte
+	Offsets		[8]int
+	Body		[]byte
+}
+
 // OP is an immutable atomic operation object - no write access
 type Op struct { // ~128 bytes
-	uuids       [4]UUID
-	AtomCount   int
-	AtomTypes   [8]byte
-	AtomOffsets [8]int
-	Atoms       []byte
+	Spec
+	Atoms
 }
 
 // Frame... mutable, but append-only
@@ -68,10 +74,16 @@ type Iterator struct {
 // [x] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
 
-// [ ] Compare tests!!! (all types)
+// [ ] Compare tests!!! (all types, derived is +1?)
 // [x] void atom , -- sweet  "op1, op2, op3" is perfectly OK
-// [ ] op.Atoms && tests
-
+// [x] op.Atoms && tests
+// [x] typedef Spec [4]UUID,
+// [ ] typedef Atoms, Atoms.Count()
+// [ ] Location -> Reference
+// [ ] ?!,; kind
+// [ ] multiframe (still atomic)
+// [ ] AppendOp/Query/Patch/State - Spec/Atoms
+//
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl
 // [ ] iterator - parse error
@@ -85,14 +97,16 @@ type Iterator struct {
 // [ ] RGA reducer (fn, errors)
 //		[ ] Reduce()
 //		[ ] tab tests
+//		[ ] benchmark: 1mln ops
 //
 // [ ] fuzzer go-fuzz (need samples)
 //
-// [ ] reducer features
+// [ ] reducer flags
+// [ ] nice base64 constant definitions (ron ... // "comment")
 // [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
 // [ ] copy generic reduction errors
-// [ ] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
-// [ ] prereduce - optional, may fail (RGA subtrees)
+// [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
+// [x] prereduce - optional, may fail (RGA subtrees)
 //
 // [ ] formatting options
 // [ ] indenting
@@ -100,8 +114,27 @@ type Iterator struct {
 // [ ] trimming/zipping
 // [ ] redefs (bench - fast prefix - bit ops)
 
+// Reducer is essentially a replicated data type.
+// It provides two reducing functions: total and incremental.
+// A reduction of the object's full op log produces its RON state.
+// A reduction of a log segment produces a patch.
+// A reduced frame has same type, object id; event id is the one
+// of the last input frame.
 type Reducer interface {
+	// Reduce is a non-reordering incremental reducer.
+	// It turns two adjacent frames into a single reduced frame,
+	// if that is possible (quite often, two ops can not
+	// be meaningfully combined without having the full state).
+	// For a full op log, chained Reduce() must produce exactly
+	// the same end result as ReduceAll()
+	// Associative, commutative*, idempotent.
 	Reduce(a, b Frame) (result Frame, err UUID)
+	// ReduceAll is a reordering batch reducer. It turns a sequence
+	// of frames into a reduced multiframe. In case the input is
+	// the full log, the result must match that of chained Reduce().
+	// Complexity guarantees: max O(log N)
+	// (could be made to reduce 1mln single-op frames)
+	// Associative, commutative*, idempotent.
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
@@ -115,19 +148,19 @@ var base64 = []byte(BASE64)
 var ABC [256]int8
 
 func (op *Op) Type() UUID {
-	return op.uuids[0]
+	return op.Spec[0]
 }
 
 func (op *Op) Object() UUID {
-	return op.uuids[1]
+	return op.Spec[1]
 }
 
 func (op *Op) Event() UUID {
-	return op.uuids[2]
+	return op.Spec[2]
 }
 
 func (op *Op) Location() UUID {
-	return op.uuids[3]
+	return op.Spec[3]
 }
 
 const SPEC_PUNCT = ".#@:"
@@ -159,7 +192,7 @@ var NEVER_UUID = UUID{INT60_NEVER, NAME_SIGN_BITS}
 
 var ERROR_UUID = UUID{INT60_ERROR, NAME_SIGN_BITS}
 
-var ZERO_OP = Op{uuids: [4]UUID{ZERO_UUID, ZERO_UUID, ZERO_UUID, ZERO_UUID}}
+var ZERO_OP = Op{}
 
 var EMPTY_FRAME Frame
 

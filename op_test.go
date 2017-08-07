@@ -54,7 +54,7 @@ func BenchmarkParseOp(b *testing.B) {
 	var op Op
 	for i := 0; i < b.N; i++ {
 		l := XParseOp(frames[off:], &op, ZERO_OP)
-		if l != len(frame) || op.Event().Origin != origin.Origin || op.AtomCount !=1 || op.AtomTypes[0]!='=' {
+		if l != len(frame) || op.Event().Origin != origin.Origin || op.Count !=1 || op.Types[0]!='=' {
 			b.Logf("parse fail: off %d len %d(%d) '%s'", off, l, len(frame), string(frames[off:]))
 			b.Fail()
 			break

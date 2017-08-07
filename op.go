@@ -55,15 +55,15 @@ func (a UUID) SameAs (b UUID) bool {
 }
 
 func (op *Op) Empty() bool {
-	return op.AtomCount == 0
+	return op.Count == 0
 }
 
 func (a *Op) Same(b *Op) bool {
-	return a.uuids == b.uuids
+	return a.Spec == b.Spec
 }
 
 func (op *Op) IsHeader() bool {
-	return op.AtomTypes[0] == '!'
+	return op.Types[0] == '!'
 }
 
 // not good - op is detached from a frame here
@@ -73,7 +73,7 @@ func CreateOp(rdtype, object, event, location UUID, value string) (ret Op, err e
 		err = errors.New("invalid atom string")
 		return
 	}
-	ret.uuids = [4]UUID{rdtype, object, event, location}
+	ret.Spec = Spec{rdtype, object, event, location}
 	return
 }
 
@@ -83,18 +83,22 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 
 func (i *Iterator) Next() bool {
 
-	if i.AtEnd() {
+	if i.IsEmpty() {
 		return false
 	} else if i.IsLast() {
 		i.Op = ZERO_OP
-		i.Op.AtomCount = 0
 		return false
 	}
 	var prev Op = i.Op
 	l := XParseOp(i.frame.Body[i.offset:], &i.Op, prev)
-	i.offset += l
 
-	return i.AtEnd()
+	if l>0 {
+		i.offset += l
+		return true
+	} else {
+		i.Op = ZERO_OP
+		return false
+	}
 }
 
 func (uuid UUID) IsTemplate () bool {
@@ -107,14 +111,14 @@ func (frame Frame) Stamp (clock Clock) (ret Frame) {
 	for !i.IsEmpty() {
 		op := i.Op
 		for t:=0; t<4; t++ {
-			uuid := op.uuids[t]
+			uuid := op.Spec[t]
 			if uuid.IsTemplate() {
 				stamp, ok := stamps[uuid.Origin]
 				if !ok {
 					stamp = clock.Time()
 					stamps[uuid.Origin] = stamp
 				}
-				op.uuids[t] = stamp
+				op.Spec[t] = stamp
 			}
 		}
 		ret.AppendOp(op)
@@ -124,14 +128,15 @@ func (frame Frame) Stamp (clock Clock) (ret Frame) {
 }
 
 func (op Op) IsEmpty() bool {
-	return op.AtomCount==0
+	return op.Count==0
 }
 
 func (frame *Frame) Begin() (i Iterator) {
 	i.frame = frame
 	i.offset = 0
 	if frame.first.IsEmpty() {
-		i.Op = ZERO_OP // FIXME  ZERO_OP is exactly Op{}
+		i.Op = ZERO_OP
+		i.Count=1 // HACK
 		i.Next()
 	} else {
 		i.Op = frame.first
@@ -148,7 +153,7 @@ func (frame *Frame) End() Iterator {
 // The end op may be explicit, i.e. actually exist in the frame.
 // An explicit end op can not be abbreviated.
 func (i Iterator) AtEnd() bool {
-	return i.offset>0 && i.AtomCount==0
+	return i.offset>0 && i.Count==0
 	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
 }
 
@@ -162,11 +167,11 @@ func MakeFrame(prealloc_bytes int) Frame {
 }
 
 func (op *Op) GetUUIDp (i int) *UUID {
-	return & op.uuids[i]
+	return & op.Spec[i]
 }
 
 func (op *Op) GetUUID (i int) UUID {
-	return op.uuids[i]
+	return op.Spec[i]
 }
 
 func (uuid *UUID) IsZero() bool {
@@ -175,7 +180,7 @@ func (uuid *UUID) IsZero() bool {
 
 func (spec *Op) isZero () bool {
 	for t:=0; t<4; t++ {
-		if !spec.uuids[t].IsZero() {
+		if !spec.Spec[t].IsZero() {
 			return false
 		}
 	}

@@ -206,14 +206,14 @@ func FormatZippedSpec(output []byte, op Op, context Op) int {
 // context==nil is valid
 func FormatOp(output []byte, op Op, context Op) int {
 	off := FormatZippedSpec(output, op, context)
-	from := op.AtomOffsets[0]
-	copy(output[off:], op.Atoms[from:])
-	off += len(op.Atoms) - from
+	from := op.Offsets[0]
+	copy(output[off:], op.Body[from:])
+	off += len(op.Body) - from
 	return off
 }
 
 func (op Op) String() string {
-	buf := make([]byte, op.AtomOffsets[op.AtomCount-1]+100) // FIXME!!!
+	buf := make([]byte, op.Offsets[op.Count-1]+100) // FIXME!!!
 	l := FormatOp(buf, op, ZERO_OP)
 	return string(buf[:l])
 }
@@ -231,36 +231,44 @@ func (frame *Frame) AppendOp(op Op) {
 		l = FormatSpec(uuids[:], op)
 	}
 	frame.Body = append(frame.Body, uuids[:l]...)
-	frame.Body = append(frame.Body, op.Atoms[op.AtomOffsets[0]:]...)
+	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 	frame.last = op
 }
 
-func (frame *Frame) Append(t, o, e, l UUID, atoms []byte) {
+func (frame *Frame) Append(t, o, e, l UUID, body []byte) {
 	var parsed Op
-	off := XParseOp(atoms, &parsed, ZERO_OP)
+	off := XParseOp(body, &parsed, ZERO_OP)
 	if off <= 0 {
 		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
 	}
-	parsed.uuids = [4]UUID{t,o,e,l}
+	parsed.Spec = [4]UUID{t,o,e,l} // TODO Spec
 	frame.AppendOp(parsed)
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
-	if i.offset >= j.offset {
+	if !i.IsEmpty() && !j.IsEmpty() && i.offset >= j.offset {
+		return
+	}
+	if i.IsEmpty() {
 		return
 	}
 	if i.frame!=j.frame {
 		panic("mismatching iterators")
 	}
 	frame.AppendOp(i.Op)
-	from := i.offset //+ len(i.Atoms)
+	from := i.offset //+ len(i.Body)
 	till := j.offset
-	frame.Body = append(frame.Body, i.Atoms[from:till]...)
+	if till > from { // more than 1 op
+		frame.Body = append(frame.Body, i.frame.Body[from:till]...)
+	}
 }
 
 func (frame *Frame) AppendAll(i Iterator) {
+	if i.IsEmpty() {
+		return
+	}
 	frame.AppendOp(i.Op)
-	from := i.offset// + len(i.Atoms)
+	from := i.offset// + len(i.Body)
 	frame.Body = append(frame.Body, i.frame.Body[from:]...)
 	frame.last = i.frame.last
 }
