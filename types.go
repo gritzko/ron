@@ -26,6 +26,7 @@ const HASH_SIGN_BIT = HASH_SIGN<<60
 const DERIVED_EVENT_SIGN_BITS = DERIVED_EVENT_SIGN<<60
 
 const INT60LEN = 10
+const MAX_ATOMS = 7
 
 type UUID struct {
 	Value  uint64
@@ -37,8 +38,8 @@ type Spec [4]UUID
 
 type Atoms struct {
 	Count       int
-	Types		[8]byte
-	Offsets		[8]int
+	Types		[MAX_ATOMS+1]byte
+	Offsets		[MAX_ATOMS]int
 	Body		[]byte
 }
 
@@ -183,6 +184,18 @@ const EVENT_UUID_SEP = byte('+')
 const DERIVED_EVENT_SEP = byte('-')
 const HASH_UUID_SEP = byte('%')
 
+const OP_TERM_PUNCT = ",;!?"
+const RAW_OP_SEP = byte(',')
+const PATCH_HEADER_SEP = byte(';')
+const STATE_HEADER_SEP = byte('!')
+const QUERY_HEADER_SEP = byte('?')
+const (
+	RAW_OP = iota
+	PATCH_HEADER
+	STATE_HEADER
+	QUERY_HEADER
+)
+
 const INT60_ERROR uint64 = 1<<60 - 1
 const INT60_NEVER = 63<<(6*9)
 
@@ -218,6 +231,19 @@ func init() {
 	for i := 0; i < len(SPEC_PUNCT); i++ {
 		ABC[SPEC_PUNCT[i]] = -30 - int8(i)
 	}
+	for i:=0; i<len(OP_TERM_PUNCT); i++ {
+		ABC[OP_TERM_PUNCT[i]] = -5
+	}
 	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
 	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")
+}
+
+func OpTermSep2Code (sep byte) (code byte) {
+	switch sep {
+	case RAW_OP_SEP: return RAW_OP
+	case PATCH_HEADER_SEP: return PATCH_HEADER
+	case STATE_HEADER_SEP: return STATE_HEADER
+	case QUERY_HEADER_SEP: return QUERY_HEADER
+	}
+	panic("no such punctuation")
 }

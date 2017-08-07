@@ -53,6 +53,9 @@ func XParseOp(data []byte, op *Op, context Op) int {
     }
 
     if done {
+        if op.Types[7]==0 {
+            op.Types[7] = ','
+        }
         return p
     } else {
         return -p

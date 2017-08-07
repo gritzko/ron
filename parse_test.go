@@ -173,9 +173,9 @@ func TestParseFrame(t *testing.T) {
 	// recover, compare
 	iter := frame.Begin()
 	for k := 0; k < ops; k++ {
-		if iter.AtEnd() {
+		if iter.IsEmpty() {
 			t.Fail()
-			t.Log("Premature end")
+			t.Logf("Premature end: %d not %d, failed at %d\n", k, ops, iter.Offset())
 			break
 		}
 		at = k << 2
@@ -188,7 +188,7 @@ func TestParseFrame(t *testing.T) {
 		}
 		iter.Next()
 	}
-	if !iter.AtEnd() {
+	if !iter.IsEmpty() {
 		t.Fail()
 		t.Log("No end")
 	}

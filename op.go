@@ -97,6 +97,7 @@ func (i *Iterator) Next() bool {
 		return true
 	} else {
 		i.Op = ZERO_OP
+		i.offset = l - i.offset
 		return false
 	}
 }
@@ -128,7 +129,7 @@ func (frame Frame) Stamp (clock Clock) (ret Frame) {
 }
 
 func (op Op) IsEmpty() bool {
-	return op.Count==0
+	return op.Types[MAX_ATOMS]==0
 }
 
 func (frame *Frame) Begin() (i Iterator) {
@@ -136,7 +137,7 @@ func (frame *Frame) Begin() (i Iterator) {
 	i.offset = 0
 	if frame.first.IsEmpty() {
 		i.Op = ZERO_OP
-		i.Count=1 // HACK
+		i.Types[MAX_ATOMS]=1 // HACK
 		i.Next()
 	} else {
 		i.Op = frame.first
@@ -152,10 +153,10 @@ func (frame *Frame) End() Iterator {
 // the last valid op (zeroes for an empty frame).
 // The end op may be explicit, i.e. actually exist in the frame.
 // An explicit end op can not be abbreviated.
-func (i Iterator) AtEnd() bool {
-	return i.offset>0 && i.Count==0
-	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
-}
+//func (i Iterator) AtEnd() bool {
+//	return i.offset>0 && i.Count==0
+//	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
+//}
 
 func (i Iterator) IsLast () bool {
 	return i.offset >= len(i.frame.Body)
@@ -185,4 +186,8 @@ func (spec *Op) isZero () bool {
 		}
 	}
 	return true
+}
+
+func (i Iterator) Offset () int {
+	return i.offset
 }

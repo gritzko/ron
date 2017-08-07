@@ -35,7 +35,7 @@
     }
 
     action atom_start {
-        if op.Count >= 8 {
+        if op.Count >= MAX_ATOMS {
             fbreak;
         }
         op.Types[op.Count] = fc
@@ -71,6 +71,9 @@
         uuid = &blank
         atoms_at = p
     }
+    action opterm {
+        op.Atoms.Types[MAX_ATOMS] = fc
+    }
 
     action next {
         if trace {
@@ -97,8 +100,6 @@
     STRING_ATOM2 = (UNIESC|"\\" [^\n\r]|[^"])* %string_atom2;
 
     ATOM = space* (
-            "?"  |
-            "!"  |
             "=" space* INT_ATOM  |
             "^" space* FLOAT_ATOM |
             "'" STRING_ATOM1 "'" |
@@ -108,9 +109,11 @@
 
     REDEF = ([`\\|/]|"") @redef_uuid;
 
+    OPTERM = space* [!?,;] @opterm;
+
     OP = (
             ( space* [\.#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            ( (ATOM+ ","?|",") >atoms_start %atoms ) space*
+            ( (ATOM+ OPTERM?|OPTERM) >atoms_start %atoms ) space*
             ( [\.#@:] @next )? %/over
          ) ;
 
