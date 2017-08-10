@@ -1,6 +1,9 @@
 package RON
 
-import "testing"
+import (
+	"testing"
+	"math/rand"
+)
 
 func TestUHeap_TakeUUID(t *testing.T) {
 	var h UHeap
@@ -26,5 +29,19 @@ func TestUHeap_TakeUUID(t *testing.T) {
 	}
 	if h.Len()!=0 {
 		t.Fail()
+	}
+}
+
+
+func BenchmarkUHeap_TakeUUID(b *testing.B) {
+	h := MakeUHeap(false, b.N)
+	for i:=0; i<b.N; i++ {
+		h.Put(UUID{uint64(rand.Int63()), 0})
+	}
+	b.ResetTimer()
+	var bogus uint64 = 0
+	for h.Len()>0 {
+		bogus++
+		h.TakeUUID()
 	}
 }
