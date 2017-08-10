@@ -1,114 +1,160 @@
 package RON
 
-import "container/heap"
-
 //import "github.com/gritzko/RON"
 
+// IHeap is an iterator heap - gives the minimum available element
+// at every step. Useful for merge sort like algorithms.
 type IHeap struct {
 	// most of the time, this is a h of 1-2 elements, optimize for that
 	// sometimes, it can get millions of elements, ensure that is O(NlogN)
-	iters []*Iterator
-	SortBy int8
+	iters               []*Iterator
+	primary, secondary  int
+	prim_desc, sec_desc bool
 }
 
-const LOC_ASC_EVENT_DESC int8 = SPEC_LOCATION*4-SPEC_EVENT // lww
-const EVENT_ASC_LOC_ASC int8 = SPEC_EVENT*4+SPEC_LOCATION // rga rms
-const EVENT_DESC_LOC_DESC int8 = -SPEC_EVENT*4-SPEC_LOCATION // rga concs
-const EVENT_ASC int8 = SPEC_EVENT
-const EVENT_DESC int8 = -SPEC_EVENT
-const LOC_ASC int8 = SPEC_LOCATION
-const LOC_DESC int = -SPEC_LOCATION
+// sort modes, e.g. PRIM_EVENT|PRIM_DESC|SEC_LOCATION
+const (
+	PRIM_DESC     = 4
+	PRIM_TYPE     = SPEC_TYPE
+	PRIM_OBJECT   = SPEC_OBJECT
+	PRIM_EVENT    = SPEC_EVENT
+	PRIM_LOCATION = SPEC_LOCATION
+	SEC_DESC      = 32
+	SEC_TYPE      = SPEC_TYPE << 3
+	SEC_OBJECT    = SPEC_OBJECT << 3
+	SEC_EVENT     = SPEC_EVENT << 3
+	SEC_LOCATION  = SPEC_LOCATION << 3
+)
 
-func (h IHeap) Less(i, j int) bool {
-	switch 	h.SortBy {
-		case SPEC_EVENT: return h.iters[i].Spec[SPEC_EVENT].EarlierThan(h.iters[j].Spec[SPEC_EVENT])
-		case -SPEC_EVENT: return h.iters[j].Spec[SPEC_EVENT].LaterThan(h.iters[i].Spec[SPEC_EVENT])
-		case SPEC_LOCATION: return h.iters[i].Spec[SPEC_LOCATION].EarlierThan(h.iters[j].Spec[SPEC_LOCATION])
-		case -SPEC_LOCATION: return h.iters[j].Spec[SPEC_LOCATION].LaterThan(h.iters[i].Spec[SPEC_LOCATION])
-		case LOC_ASC_EVENT_DESC: {
-			i := Compare(h.iters[i].Spec[SPEC_LOCATION], h.iters[j].Spec[SPEC_LOCATION])
-			if i==0 {
-				i = Compare(h.iters[j].Spec[SPEC_EVENT], h.iters[i].Spec[SPEC_EVENT])
-			}
-			return i < 0
+func MakeIHeap(mode, size int) (ret IHeap) {
+	ret.iters = make([]*Iterator, 1, size+1)
+	ret.prim_desc = (mode & PRIM_DESC) != 0
+	ret.sec_desc = (mode & SEC_DESC) != 0
+	ret.primary = mode & 3
+	ret.secondary = (mode >> 3) & 3
+	return
+}
+
+func (h IHeap) less(i, j int) bool {
+	c := Compare(h.iters[i].Spec[h.primary], h.iters[j].Spec[h.primary])
+	if c == 0 {
+		c = Compare(h.iters[i].Spec[h.secondary], h.iters[j].Spec[h.secondary])
+		if h.sec_desc {
+			c = -c
 		}
-		case EVENT_ASC_LOC_ASC: {
-			i := Compare(h.iters[i].Spec[SPEC_EVENT], h.iters[j].Spec[SPEC_EVENT])
-			if i==0 {
-				i = Compare(h.iters[i].Spec[SPEC_LOCATION], h.iters[j].Spec[SPEC_LOCATION])
-			}
-			return i < 0
-		}
-		case EVENT_DESC_LOC_DESC: {
-			i := Compare(h.iters[i].Spec[SPEC_EVENT], h.iters[j].Spec[SPEC_EVENT])
-			if i==0 {
-				i = Compare(h.iters[i].Spec[SPEC_LOCATION], h.iters[j].Spec[SPEC_LOCATION])
-			}
-			return i > 0
-		}
-		default : panic("unsupported sort mode")
+	} else if h.prim_desc {
+		c = -c
+	}
+	//fmt.Printf("CMP %s %s %d\n", h.iters[i].String(), h.iters[j].String(), c)
+	return c < 0
+}
+
+func (h *IHeap) sink(i int) {
+	to := i
+	j := i << 1
+	if j < len(h.iters) && h.less(j, i) {
+		to = j
+	}
+	j++
+	if j < len(h.iters) && h.less(j, to) {
+		to = j
+	}
+	if to != i {
+		h.swap(i, to)
+		h.sink(to)
 	}
 }
 
-func (h IHeap) Len() int { return len(h.iters) }
+func (h *IHeap) raise(i int) {
+	j := i >> 1
+	if j>0 && h.less(i, j) {
+		h.swap(i, j)
+		if j > 1 {
+			h.raise(j)
+		}
+	}
+}
 
-func (h IHeap) Swap(i, j int) {
+func (h IHeap) Len() int { return len(h.iters) - 1 }
+
+func (h IHeap) swap(i, j int) {
+	//fmt.Printf("SWAP %d %d\n", i, j)
 	h.iters[i], h.iters[j] = h.iters[j], h.iters[i]
 }
 
-func (h *IHeap) Push(x interface{}) {
-	item := x.(*Iterator)
-	h.iters = append(h.iters, item)
-}
-
-func (h *IHeap) Pop() interface{} {
-	n := len(h.iters)
-	item := h.iters[n-1]
-	h.iters = h.iters[0 : n-1]
-	return item
-}
-
-func (h *IHeap) Op() (op Op) {
-	return h.iters[0].Op
-}
-
-func (h *IHeap) Next() (op Op) {
-	h.iters[0].Next()
-	if h.iters[0].IsEmpty() {
-		heap.Pop(h)
-	} else {
-		heap.Fix(h, 0)
+func (h *IHeap) Put(i *Iterator) {
+	if !i.IsEmpty() {
+		at := len(h.iters)
+		h.iters = append(h.iters, i)
+		h.raise(at)
 	}
-	if len(h.iters)>0 {
-		op = h.iters[0].Op
+}
+
+func (h *IHeap) Op() (op *Op) {
+	if len(h.iters) > 1 {
+		op = &h.iters[1].Op
 	}
 	return
 }
 
-func (h *IHeap) PutFrame(frame Frame) {
-	b := frame.Begin()
-	heap.Push(h, &b)
+func (h *IHeap) remove(i int) {
+	h.iters[i] = h.iters[len(h.iters)-1]
+	h.iters = h.iters[:len(h.iters)-1]
+	h.sink(i)
 }
 
-func (h *IHeap) PutIterator(i *Iterator) {
-	if !i.IsEmpty() {
-		heap.Push(h, i)
+func (h *IHeap) next(i int) {
+	h.iters[i].Next()
+	if h.iters[i].IsEmpty() {
+		h.remove(i)
+	} else {
+		h.sink(i)
 	}
+}
+
+func (h *IHeap) Next() (op *Op) {
+	h.next(1)
+	return h.Op()
+}
+
+func (h *IHeap) nexteq(i int, uuid UUID) {
+	if h.iters[i].Event() == uuid {
+		j := i << 1
+		if j < len(h.iters) {
+			if j+1 < len(h.iters) { // rightmost first!
+				h.nexteq(j+1, uuid)
+			}
+			h.nexteq(j, uuid)
+		}
+		h.next(i)
+	}
+}
+
+func (h *IHeap) NextEvent() (op *Op) {
+	if !h.IsEmpty() {
+		event := h.iters[1].Event()
+		h.nexteq(1, event)
+	}
+	return h.Op()
+}
+
+func (h *IHeap) PutFrame(frame Frame) {
+	b := frame.Begin()
+	h.Put(&b)
 }
 
 func (h *IHeap) IsEmpty() bool {
 	return h.Len() == 0
 }
 
-func (h *IHeap) Frame () (ret Frame) {
-	for ! h.IsEmpty() {
-		ret.AppendOp(h.Op())
+func (h *IHeap) Frame() (ret Frame) {
+	for !h.IsEmpty() {
+		ret.AppendOp(*h.Op())
 		h.Next()
 	}
 	return
 }
 
-func (h *IHeap) Clear () {
+func (h *IHeap) Clear() {
 	h.iters = h.iters[:0]
 }
-

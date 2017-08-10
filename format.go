@@ -235,6 +235,7 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.last = op
 }
 
+// FIXME: Atoms instead of []byte, avoid re-parsing
 func (frame *Frame) Append(toel Spec, body []byte) {
 	var parsed Op
 	off := XParseOp(body, &parsed, ZERO_OP)
