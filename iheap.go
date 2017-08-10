@@ -5,8 +5,8 @@ package RON
 // IHeap is an iterator heap - gives the minimum available element
 // at every step. Useful for merge sort like algorithms.
 type IHeap struct {
-	// most of the time, this is a h of 1-2 elements, optimize for that
-	// sometimes, it can get millions of elements, ensure that is O(NlogN)
+	// Most of the time, a heap has 2 elements, optimize for that.
+	// Sometimes, it can get millions of elements, ensure that is O(NlogN)
 	iters               []*Iterator
 	primary, secondary  int
 	prim_desc, sec_desc bool
@@ -144,7 +144,7 @@ func (h *IHeap) PutFrame(frame Frame) {
 }
 
 func (h *IHeap) IsEmpty() bool {
-	return h.Len() == 0
+	return len(h.iters)==1
 }
 
 func (h *IHeap) Frame() (ret Frame) {
@@ -156,5 +156,5 @@ func (h *IHeap) Frame() (ret Frame) {
 }
 
 func (h *IHeap) Clear() {
-	h.iters = h.iters[:0]
+	h.iters = h.iters[:1]
 }
