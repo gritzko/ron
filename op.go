@@ -27,6 +27,7 @@ func (a UUID) LaterThan (b UUID) bool {
 }
 
 func (a UUID) EarlierThan (b UUID) bool {
+	// FIXME define through Compare
 	if a.Value==b.Value {
 		return a.Origin < b.Origin
 	} else {
@@ -54,16 +55,20 @@ func (a UUID) SameAs (b UUID) bool {
 	}
 }
 
-func (op *Op) Empty() bool {
-	return op.Count == 0
-}
-
-func (a *Op) Same(b *Op) bool {
+func (a Op) Same(b *Op) bool {
 	return a.Spec == b.Spec
 }
 
-func (op *Op) IsHeader() bool {
-	return op.Types[0] == '!'
+func (op Op) Term() byte {
+	return op.Types[MAX_ATOMS]
+}
+
+func (op Op) IsHeader() bool {
+	return op.Term() != RAW_OP_SEP
+}
+
+func (op Op) IsRaw() bool {
+	return op.Term() == RAW_OP_SEP
 }
 
 // not good - op is detached from a frame here

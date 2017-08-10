@@ -7,8 +7,8 @@ func TestIHeap_AddFrame(t *testing.T) {
 	frameB := ".lww#test@time3-orig:number=3@(4:string'4'"
 	frameC := ".lww#test@time1-orig:number=1@(2:string'2'@(3:number=3@(4:string'4'"
 	heap := IHeap{SortBy: SPEC_EVENT}
-	heap.AddFrame(ParseFrame([]byte(frameA)))
-	heap.AddFrame(ParseFrame([]byte(frameB)))
+	heap.PutFrame(ParseFrame([]byte(frameA)))
+	heap.PutFrame(ParseFrame([]byte(frameB)))
 	C := heap.Frame()
 	if C.String() != frameC {
 		t.Fail()
@@ -21,9 +21,9 @@ func TestIHeap_Op(t *testing.T) {
 	frameB := ".lww#test@time3-orig:number=3@(4:string'4'"
 	frameC := ".lww#test@time2-orig:number=2@(2:string'2'@(3:number=3@(4:string'4'"
 	heap := IHeap{SortBy: SPEC_LOCATION}
-	heap.AddFrame(ParseFrame([]byte(frameA)))
-	heap.AddFrame(ParseFrame([]byte(frameB)))
-	heap.AddFrame(ParseFrame([]byte(frameC)))
+	heap.PutFrame(ParseFrame([]byte(frameA)))
+	heap.PutFrame(ParseFrame([]byte(frameB)))
+	heap.PutFrame(ParseFrame([]byte(frameC)))
 	loc := heap.Op().Location()
 	count := 0
 	for heap.Op().Location()==loc {

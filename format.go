@@ -235,13 +235,13 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.last = op
 }
 
-func (frame *Frame) Append(t, o, e, l UUID, body []byte) {
+func (frame *Frame) Append(toel Spec, body []byte) {
 	var parsed Op
 	off := XParseOp(body, &parsed, ZERO_OP)
 	if off <= 0 {
 		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
 	}
-	parsed.Spec = [4]UUID{t,o,e,l} // TODO Spec
+	parsed.Spec = toel
 	frame.AppendOp(parsed)
 }
 

@@ -167,7 +167,7 @@ func TestParseFrame(t *testing.T) {
 	const ops = 30
 	for j := 0; j < ops; j++ {
 		at = j << 2
-		frame.Append(uuids[at], uuids[at+1], uuids[at+2], uuids[at+3], []byte("!"))
+		frame.Append(Spec{uuids[at], uuids[at+1], uuids[at+2], uuids[at+3]}, []byte("!"))
 	}
 	t.Logf(frame.String())
 	// recover, compare

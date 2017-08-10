@@ -79,15 +79,15 @@ type Iterator struct {
 // [x] void atom , -- sweet  "op1, op2, op3" is perfectly OK
 // [x] op.Atoms && tests
 // [x] typedef Spec [4]UUID,
-// [ ] typedef Atoms, Atoms.Count()
+// [x] typedef Atoms, Atoms.Count()
 // [ ] Location -> Reference
-// [ ] ?!,; kind
-// [ ] multiframe (still atomic)
+// [x] ?!,; term/mark/kind/status/headerness
+// [ ] multiframe (still atomic)   Frame.Next() etc
 // [ ] AppendOp/Query/Patch/State - Spec/Atoms
 //
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl
-// [ ] iterator - parse error
+// [x] iterator - parse error
 // [ ] value parsing (all types - tables, safe ranges, length limits)
 //		[ ] int
 //		[ ] float
@@ -139,7 +139,11 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-var HEADER_ATOMS []byte = []byte("!")
+// FIXME make this Atoms
+var STATE_HEADER_ATOMS []byte = []byte("!")
+var PATCH_HEADER_ATOMS []byte = []byte(";")
+var RAW_ATOMS []byte = []byte(".")
+var BAKED_ATOMS []byte = []byte(",")
 
 type RawUUID []byte
 
@@ -148,20 +152,27 @@ const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~
 var base64 = []byte(BASE64)
 var ABC [256]int8
 
-func (op *Op) Type() UUID {
-	return op.Spec[0]
+const (
+	SPEC_TYPE = iota
+	SPEC_OBJECT
+	SPEC_EVENT
+	SPEC_LOCATION
+)
+
+func (op Op) Type() UUID {
+	return op.Spec[SPEC_TYPE]
 }
 
-func (op *Op) Object() UUID {
-	return op.Spec[1]
+func (op Op) Object() UUID {
+	return op.Spec[SPEC_OBJECT]
 }
 
-func (op *Op) Event() UUID {
-	return op.Spec[2]
+func (op Op) Event() UUID {
+	return op.Spec[SPEC_EVENT]
 }
 
-func (op *Op) Location() UUID {
-	return op.Spec[3]
+func (op Op) Location() UUID {
+	return op.Spec[SPEC_LOCATION]
 }
 
 const SPEC_PUNCT = ".#@:"
@@ -189,12 +200,6 @@ const RAW_OP_SEP = byte(',')
 const PATCH_HEADER_SEP = byte(';')
 const STATE_HEADER_SEP = byte('!')
 const QUERY_HEADER_SEP = byte('?')
-const (
-	RAW_OP = iota
-	PATCH_HEADER
-	STATE_HEADER
-	QUERY_HEADER
-)
 
 const INT60_ERROR uint64 = 1<<60 - 1
 const INT60_NEVER = 63<<(6*9)
@@ -236,14 +241,4 @@ func init() {
 	}
 	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
 	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")
-}
-
-func OpTermSep2Code (sep byte) (code byte) {
-	switch sep {
-	case RAW_OP_SEP: return RAW_OP
-	case PATCH_HEADER_SEP: return PATCH_HEADER
-	case STATE_HEADER_SEP: return STATE_HEADER
-	case QUERY_HEADER_SEP: return QUERY_HEADER
-	}
-	panic("no such punctuation")
 }
