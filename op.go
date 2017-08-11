@@ -64,7 +64,7 @@ func (op Op) Term() byte {
 }
 
 func (op Op) IsHeader() bool {
-	return op.Term() != RAW_OP_SEP
+	return op.Term() != RAW_OP_SEP && op.Term() != OP_SEP
 }
 
 func (op Op) IsRaw() bool {

@@ -213,6 +213,10 @@ func FormatOp(output []byte, op Op, context Op) int {
 	from := op.Offsets[0]
 	copy(output[off:], op.Body[from:])
 	off += len(op.Body) - from
+	if op.Term()!=OP_SEP || op.Count==0 {
+		output[off] = op.Term()
+		off++
+	}
 	return off
 }
 
@@ -237,6 +241,9 @@ func (frame *Frame) AppendOp(op Op) {
 	}
 	frame.Body = append(frame.Body, uuids[:l]...)
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
+	if op.Term()!=',' || op.Count==0 {
+		frame.Body = append(frame.Body, op.Term())
+	}
 	frame.last = op
 }
 

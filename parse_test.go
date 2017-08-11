@@ -195,7 +195,7 @@ func TestParseFrame(t *testing.T) {
 }
 
 func TestXParseOpWhitespace(t *testing.T) {
-	str := []byte(" #test !\n#next?")
+	str := []byte(" #test .\n#next?.")
 	var op Op
 	l := XParseOp(str, &op, ZERO_OP)
 	if l != bytes.IndexByte(str, '\n')+1 {
