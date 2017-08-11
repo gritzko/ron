@@ -2,6 +2,7 @@ package RON
 
 import (
 	"github.com/pkg/errors"
+//	"fmt"
 )
 
 func Compare(a, b UUID) int {
@@ -98,6 +99,7 @@ func (i *Iterator) Next() bool {
 	l := XParseOp(i.frame.Body[i.offset:], &i.Op, prev)
 
 	if l > 0 {
+		//fmt.Printf("PARSED [ %s ] REST [ %s ]\n", string(i.frame.Body[i.offset:i.offset+l]), string(i.frame.Body[i.offset+l:]))
 		i.offset += l
 		return true
 	} else {

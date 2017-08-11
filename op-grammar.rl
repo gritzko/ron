@@ -55,7 +55,6 @@
         if trace {
             fmt.Printf("ATOMS at %d\n", p)
         }
-        ret = p
         op.Body = data[atoms_at:p]
     }
 
@@ -79,6 +78,7 @@
         if trace {
             fmt.Printf("NEXT at %d\n", p)
         }
+        ret = p
         p-=1
         done = true
         fbreak;
@@ -87,7 +87,8 @@
         if trace {
             fmt.Printf("OVER at %d\n", p)
         }
-        p-=1
+        ret = p
+        p -= 1
         done = true
         fbreak;
     }
