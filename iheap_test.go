@@ -5,9 +5,9 @@ import (
 )
 
 func TestIHeap_AddFrame(t *testing.T) {
-	frameA := ".lww#test@time1-orig:number=1@(2:string'2'"
-	frameB := ".lww#test@time3-orig:number=3@(4:string'4'"
-	frameC := ".lww#test@time1-orig:number=1@(2:string'2'@(3:number=3@(4:string'4'"
+	frameA := "*lww#test@time1-orig:number=1@(2:string'2'"
+	frameB := "*lww#test@time3-orig:number=3@(4:string'4'"
+	frameC := "*lww#test@time1-orig:number=1@(2:string'2'@(3:number=3@(4:string'4'"
 	heap := MakeIHeap(PRIM_EVENT, 2)
 	heap.PutFrame(ParseFrame([]byte(frameA)))
 	heap.PutFrame(ParseFrame([]byte(frameB)))
@@ -19,9 +19,9 @@ func TestIHeap_AddFrame(t *testing.T) {
 }
 
 func TestIHeap_Op(t *testing.T) {
-	frameA := ".lww#test@time1-orig:number=1@(2:string'2'"
-	frameB := ".lww#test@time3-orig:number=3@(4:string'4'"
-	frameC := ".lww#test@time2-orig:number=2@(2:string'2'@(3:number=3@(4:string'4'"
+	frameA := "*lww#test@time1-orig:number=1@(2:string'2'"
+	frameB := "*lww#test@time3-orig:number=3@(4:string'4'"
+	frameC := "*lww#test@time2-orig:number=2@(2:string'2'@(3:number=3@(4:string'4'"
 	heap := MakeIHeap(PRIM_LOCATION, 2)
 	heap.PutFrame(ParseFrame([]byte(frameA)))
 	heap.PutFrame(ParseFrame([]byte(frameB)))
@@ -39,10 +39,10 @@ func TestIHeap_Op(t *testing.T) {
 
 
 func TestIHeap_Merge(t *testing.T) {
-	frameA := ".rga#test@1:0'A'@2'B'"   //  D E A C B
-	frameB := ".rga#test@1:0'A'@3'C'"
-	frameC := ".rga#test@4:0'D'@5'E'"
-	frameR := ".rga#test@4'D'@5'E'@1'A'@3'C'@2'B'"
+	frameA := "*rga#test@1:0'A'@2'B'"   //  D E A C B
+	frameB := "*rga#test@1:0'A'@3'C'"
+	frameC := "*rga#test@4:0'D'@5'E'"
+	frameR := "*rga#test@4'D'@5'E'@1'A'@3'C'@2'B'"
 	heap := MakeIHeap(PRIM_EVENT|PRIM_DESC|SEC_LOCATION, 4)
 	heap.PutFrame(ParseFrame([]byte(frameA)))
 	heap.PutFrame(ParseFrame([]byte(frameB)))

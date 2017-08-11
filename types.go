@@ -89,14 +89,14 @@ type Iterator struct {
 // [ ] clean-up: uuid-grammar.rl
 // [x] iterator - parse error
 // [ ] value parsing (all types - tables, safe ranges, length limits)
-//		[ ] int
-//		[ ] float
+//		[x] int
+//		[x] float 
 //		[ ] string
 //		[ ] uuid (save?)
 // [x] lww - idempotency
 //
 // [ ] RGA reducer (fn, errors)
-//		[ ] Reduce()
+//		[x] Reduce()
 //		[ ] tab tests
 //		[ ] benchmark: 1mln ops
 //
@@ -175,13 +175,22 @@ func (op Op) Location() UUID {
 	return op.Spec[SPEC_LOCATION]
 }
 
-const SPEC_PUNCT = ".#@:"
+const SPEC_PUNCT = "*#@:"
 
 const (
-	SPEC_TYPE_SEP     = "."
+	SPEC_TYPE_SEP     = "*"
 	SPEC_OBJECT_SEP   = '#'
 	SPEC_EVENT_SEP    = '@'
 	SPEC_LOCATION_SEP = ':'
+)
+
+const OP_PUNCT = ",.;!"
+const (
+	OP_SEP = byte(',')
+	RAW_OP_SEP = byte('.')
+	PATCH_HEADER_SEP = byte(';')
+	STATE_HEADER_SEP = byte('!')
+	QUERY_HEADER_SEP = byte('?')
 )
 
 var REDEF_PUNCT = "`\\|/"
@@ -194,12 +203,6 @@ const NAME_UUID_SEP = byte('$')
 const EVENT_UUID_SEP = byte('+')
 const DERIVED_EVENT_SEP = byte('-')
 const HASH_UUID_SEP = byte('%')
-
-const OP_TERM_PUNCT = ",;!?"
-const RAW_OP_SEP = byte(',')
-const PATCH_HEADER_SEP = byte(';')
-const STATE_HEADER_SEP = byte('!')
-const QUERY_HEADER_SEP = byte('?')
 
 const INT60_ERROR uint64 = 1<<60 - 1
 const INT60_NEVER = 63<<(6*9)
@@ -236,8 +239,8 @@ func init() {
 	for i := 0; i < len(SPEC_PUNCT); i++ {
 		ABC[SPEC_PUNCT[i]] = -30 - int8(i)
 	}
-	for i:=0; i<len(OP_TERM_PUNCT); i++ {
-		ABC[OP_TERM_PUNCT[i]] = -5
+	for i:=0; i<len(OP_PUNCT); i++ {
+		ABC[OP_PUNCT[i]] = -5
 	}
 	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
 	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")

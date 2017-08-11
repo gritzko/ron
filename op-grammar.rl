@@ -109,12 +109,12 @@
 
     REDEF = ([`\\|/]|"") @redef_uuid;
 
-    OPTERM = space* [!?,;] @opterm;
+    OPTERM = space* ("?" [,\.;!]? | [,\.;!]) @opterm;
 
     OP = (
-            ( space* [\.#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            ( (ATOM+ OPTERM?|OPTERM) >atoms_start %atoms ) space*
-            ( [\.#@:] @next )? %/over
+            ( space* [*#@:] @toel_start space* REDEF UUID %toel_uuid )*
+            ( (OPTERM | ATOM+ OPTERM?) >atoms_start %atoms ) space*
+            ( [*#@:] @next )? %/over
          ) ;
 
     # main := OP;

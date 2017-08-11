@@ -155,7 +155,7 @@ func BenchmarkUnzip(b *testing.B) {
 
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
-	str := ".lww#object@time-origin:loc=1"
+	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	context := op
 	op.Spec[2].Value ++
@@ -174,7 +174,7 @@ func TestOp_String(t *testing.T) {
 }
 
 func BenchmarkFormatOp(b *testing.B) {
-	str := ".lww#object@time-origin:loc=1"
+	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	var context Op = op
 	buf := make([]byte, b.N*len(str)*2+100)
@@ -192,7 +192,7 @@ func BenchmarkFormatOp(b *testing.B) {
 //     state machine test & Append recombinations  @ | [ a - ] b  64/4 = 16 ops
 /*
 func TestFrame_Append (t *testing.T) {
-	f1str := ".lww#test@time-author:loc=1"
+	f1str := "*lww#test@time-author:loc=1"
 	f1 := Frame{Atoms: []byte(f1str)}
 	test_uuid,_ := ParseUUIDString("test")
 	time_uuid,_ := ParseUUIDString("time-author")
@@ -203,9 +203,9 @@ func TestFrame_Append (t *testing.T) {
 		{"f1+op", f1str + "@)1=2"},
 		{"f1+f1", f1str + "@=2"},
 		{"f1+i", f1str + "@=2"},
-		{"f1x", f1str + ".lww#test@time-author:loc!!!"},
-		{"f1x+f1x", f1str + "@=2.lww#test@time-author:loc!!!"},
-		{"f1e", f1str + ".lww#test@time-author:loc!!!=1'error'"},
+		{"f1x", f1str + "*lww#test@time-author:loc!!!"},
+		{"f1x+f1x", f1str + "@=2*lww#test@time-author:loc!!!"},
+		{"f1e", f1str + "*lww#test@time-author:loc!!!=1'error'"},
 	}
 	// op to f1
 	f2 := f1.Clone()

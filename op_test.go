@@ -21,7 +21,7 @@ func TestOp_Event(t *testing.T) {
 
 func TestParseOp (t *testing.T) {
     t.Log("Parser")
-	var frame = ".lww#test-author@(time-origin:loc=1''>test"
+	var frame = "*lww#test-author@(time-origin:loc=1''>test"
 	var op Op
 	pl := XParseOp ( []byte(frame), &op, ZERO_OP )
     if len(frame) != pl {
@@ -43,7 +43,7 @@ func TestParseOp (t *testing.T) {
 }
 
 func BenchmarkParseOp(b *testing.B) {
-	//var frame= ".lww#test-author@(time-origin:loc=1''>test\n"
+	//var frame= "*lww#test-author@(time-origin:loc=1''>test\n"
 	var frame= "@(time-origin:loc=1"
 	var frames []byte = make([]byte, 0, len(frame)*b.N+10)
 	for i := 0; i < b.N; i++ {

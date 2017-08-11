@@ -13,7 +13,7 @@ func MakeUHeap (desc bool, size int) (ret UHeap) {
 	return
 }
 
-func (h UHeap) Less(i, j int) bool {
+func (h *UHeap) Less(i, j int) bool {
 	c := Compare(h.uuids[i], h.uuids[j])
 	if h.desc {
 		c = -c
