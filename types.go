@@ -83,7 +83,7 @@ type Iterator struct {
 // [ ] Location -> Reference
 // [x] ?!,; term/mark/kind/status/headerness
 // [ ] multiframe (still atomic)   Frame.Next() etc
-// [ ] AppendOp/Query/Patch/State - Spec/Atoms
+// [x] AppendOp/Query/Patch/State - Spec/Atoms
 //
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl
@@ -108,6 +108,7 @@ type Iterator struct {
 // [ ] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
+// [ ] multiframe parsing  ;,,.,,!,. etc
 //
 // [ ] formatting options
 // [ ] indenting
@@ -139,11 +140,10 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-// FIXME make this Atoms
-var STATE_HEADER_ATOMS []byte = []byte("!")
-var PATCH_HEADER_ATOMS []byte = []byte(";")
-var RAW_ATOMS []byte = []byte(".")
-var BAKED_ATOMS []byte = []byte(",")
+var STATE_HEADER_ATOMS = ParseAtoms([]byte("!"))
+var PATCH_HEADER_ATOMS = ParseAtoms([]byte(";"))
+var RAW_OP_ATOMS = ParseAtoms([]byte("."))
+var OP_ATOMS = ParseAtoms([]byte(","))
 
 type RawUUID []byte
 

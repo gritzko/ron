@@ -73,7 +73,7 @@ func BenchmarkIterator_Next(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		time := clock.Time()
 		times[i] = time
-		frame.Append(Spec{LWW_UUID, test_uuid, time, field_uuid}, []byte("=1"))
+		frame.AppendSpecBody(Spec{LWW_UUID, test_uuid, time, field_uuid}, []byte("=1"))
 	}
 	b.Logf("'%s'", string(frame.Body))
 	iter := frame.Begin()

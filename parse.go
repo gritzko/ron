@@ -25,6 +25,15 @@ func (op Op) ParseInt(pos int) (i int64, err error) { // FIXME no error
 	return
 }
 
+func ParseAtoms (body []byte) Atoms {
+	var parsed Op
+	off := XParseOp(body, &parsed, ZERO_OP)
+	if off <= 0 {
+		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
+	}
+	return parsed.Atoms
+}
+
 func (op Op) ParseFloat(pos int) (ret float64, err error) {
 	var from, till int
 	from = op.Offsets[pos] + 1 // FIXME refac

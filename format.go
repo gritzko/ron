@@ -93,8 +93,12 @@ func ZipUUIDString(uuid, context UUID) string {
 	return string(ret[0:len])
 }
 
-func (uuid UUID) String() string {
-	return ZipUUIDString(uuid, ZERO_UUID)
+func (uuid UUID) String() (ret string) {
+	ret = ZipUUIDString(uuid, ZERO_UUID)
+	if len(ret)==0 {
+		ret = "0"
+	}
+	return
 }
 
 func FormatTrimmedInt(output []byte, value uint64) int {
@@ -222,6 +226,7 @@ func (frame *Frame) String() string {
 	return string(frame.Body)
 }
 
+
 func (frame *Frame) AppendOp(op Op) {
 	var l int
 	var uuids [11 * 2 * 4]byte
@@ -235,15 +240,12 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.last = op
 }
 
-// FIXME: Atoms instead of []byte, avoid re-parsing
-func (frame *Frame) Append(toel Spec, body []byte) {
-	var parsed Op
-	off := XParseOp(body, &parsed, ZERO_OP)
-	if off <= 0 {
-		off = XParseOp([]byte("'parse error'"), &parsed, ZERO_OP)
-	}
-	parsed.Spec = toel
-	frame.AppendOp(parsed)
+func (frame *Frame) AppendSpecAtoms(spec Spec, atoms Atoms) {
+	frame.AppendOp(Op{spec,atoms})
+}
+
+func (frame *Frame) AppendSpecBody(toel Spec, body []byte) {
+	frame.AppendSpecAtoms(toel, ParseAtoms(body))
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
