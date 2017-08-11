@@ -1,8 +1,8 @@
 package RON
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 )
 
 func TestUHeap_TakeUUID(t *testing.T) {
@@ -12,35 +12,34 @@ func TestUHeap_TakeUUID(t *testing.T) {
 	h.Put(NEVER_UUID)
 	h.Put(NEVER_UUID)
 	h.Put(NEVER_UUID)
-	if h.Len()!=5 {
+	if h.Len() != 5 {
 		t.Fail()
 	}
-	if h.Take()!=ZERO_UUID {
+	if h.Take() != ZERO_UUID {
 		t.Fail()
 	}
-	if h.TakeUUID()!=ZERO_UUID {
+	if h.TakeUUID() != ZERO_UUID {
 		t.Fail()
 	}
-	if h.Len()!=3 {
+	if h.Len() != 3 {
 		t.Fail()
 	}
-	if h.TakeUUID()!=NEVER_UUID {
+	if h.TakeUUID() != NEVER_UUID {
 		t.Fail()
 	}
-	if h.Len()!=0 {
+	if h.Len() != 0 {
 		t.Fail()
 	}
 }
 
-
 func BenchmarkUHeap_TakeUUID(b *testing.B) {
 	h := MakeUHeap(false, b.N)
-	for i:=0; i<b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		h.Put(UUID{uint64(rand.Int63()), 0})
 	}
 	b.ResetTimer()
 	var bogus uint64 = 0
-	for h.Len()>0 {
+	for h.Len() > 0 {
 		bogus++
 		h.TakeUUID()
 	}

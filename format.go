@@ -167,7 +167,7 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
 	}
 	if uuid.Value == context.Value || uuid.Sign() != context.Sign() ||
 		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
-		(uuid.Replica() == context.Replica() && ABC[output[0]]>=0) { // FIXME this if
+		(uuid.Replica() == context.Replica() && ABC[output[0]] >= 0) { // FIXME this if
 		output[off] = UUID_PUNCT[uuid.Sign()]
 		off++
 	}
@@ -225,7 +225,7 @@ func (frame *Frame) String() string {
 func (frame *Frame) AppendOp(op Op) {
 	var l int
 	var uuids [11 * 2 * 4]byte
-	if !frame.last.isZero() || len(frame.Body)==0 {
+	if !frame.last.isZero() || len(frame.Body) == 0 {
 		l = FormatZippedSpec(uuids[:], op, frame.last)
 	} else {
 		l = FormatSpec(uuids[:], op)
@@ -253,7 +253,7 @@ func (frame *Frame) AppendRange(i, j Iterator) {
 	if i.IsEmpty() {
 		return
 	}
-	if i.frame!=j.frame {
+	if i.frame != j.frame {
 		panic("mismatching iterators")
 	}
 	frame.AppendOp(i.Op)
@@ -269,7 +269,7 @@ func (frame *Frame) AppendAll(i Iterator) {
 		return
 	}
 	frame.AppendOp(i.Op)
-	from := i.offset// + len(i.Body)
+	from := i.offset // + len(i.Body)
 	frame.Body = append(frame.Body, i.frame.Body[from:]...)
 	frame.last = i.frame.last
 }
@@ -283,7 +283,7 @@ func (frame *Frame) AppendFrame(second Frame) {
 //}
 
 func (frame Frame) Clone() Frame {
-	body := make ([]byte, 0, len(frame.Body))
+	body := make([]byte, 0, len(frame.Body))
 	copy(body, frame.Body)
-	return Frame{Body:body, last:frame.last}
+	return Frame{Body: body, last: frame.last}
 }

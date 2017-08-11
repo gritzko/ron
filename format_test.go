@@ -26,7 +26,6 @@ func TestUUIDPrimitives(t *testing.T) {
 	}
 }
 
-
 func TestUUID_String(t *testing.T) {
 	tests := [][]string{
 		{"0", "1", "1"},
@@ -34,7 +33,7 @@ func TestUUID_String(t *testing.T) {
 		{"1time01-src", "1time02+src", "{2+"},
 		{"0$author", "name$author2", "name{2"},
 		{"hash%here", "hash%there", "%there"},
-		{"1", ")1", "0000000001"},  //5
+		{"1", ")1", "0000000001"}, //5
 		{"0", "name$0", "name"},
 		{"time+orig", "time1+orig2", "(1(2"},
 		{"time-orig", "time1+orig2", "(1+(2"},
@@ -102,7 +101,7 @@ func BenchmarkUnzip(b *testing.B) {
 	uuids := make([]UUID, b.N)
 	const m32 = 0xffffffff
 	for i := 0; i < b.N; i++ {
-		uuids[i] = UUID{RandUint(), EVENT_SIGN_BIT|RandUint()}
+		uuids[i] = UUID{RandUint(), EVENT_SIGN_BIT | RandUint()}
 		//uuids[i] = UUID{uint64(i), '-', 100}
 		// FIXME optimize close ids - bench CT/RGA
 	}
@@ -131,7 +130,7 @@ func BenchmarkUnzip(b *testing.B) {
 		//unzip, l := ParseUUID(zipped[ro:ro+ind], context)
 		unzip := context
 		l := XParseUUID(zipped[ro:ro+ind], &unzip)
-		if l<0 {
+		if l < 0 {
 			b.Logf("parse fail at %d: %s should be %s context %s text '%s'",
 				j, unzip.String(), uuids[j].String(), context.String(), string(zipped[ro:]))
 			b.Fail()
@@ -158,11 +157,11 @@ func TestOp_String(t *testing.T) {
 	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	context := op
-	op.Spec[2].Value ++
-	op.Spec[3].Value ++
+	op.Spec[2].Value++
+	op.Spec[3].Value++
 	buf := make([]byte, 100)
 	l := FormatOp(buf, op, context)
-	if l<=0 {
+	if l <= 0 {
 		t.Fail()
 		return
 	}
@@ -179,10 +178,10 @@ func BenchmarkFormatOp(b *testing.B) {
 	var context Op = op
 	buf := make([]byte, b.N*len(str)*2+100)
 	off := FormatOp(buf, op, ZERO_OP)
-	for i:=0; i<b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		context = op
-		op.Spec[2].Value ++
-		op.Spec[3].Value ++
+		op.Spec[2].Value++
+		op.Spec[3].Value++
 		off += FormatOp(buf[off:], op, context)
 	}
 }

@@ -7,7 +7,7 @@ type UHeap struct {
 	desc  bool
 }
 
-func MakeUHeap (desc bool, size int) (ret UHeap) {
+func MakeUHeap(desc bool, size int) (ret UHeap) {
 	ret.uuids = make([]UUID, 0, size)
 	ret.desc = desc
 	return
@@ -48,11 +48,11 @@ func (h *UHeap) Take() UUID {
 }
 
 func (h *UHeap) TakeUUID() (ret UUID) {
-	if len(h.uuids)==0 {
+	if len(h.uuids) == 0 {
 		return ZERO_UUID
 	}
 	ret = heap.Pop(h).(UUID)
-	for len(h.uuids)>0 && h.uuids[0]==ret {
+	for len(h.uuids) > 0 && h.uuids[0] == ret {
 		heap.Pop(h)
 	}
 	return

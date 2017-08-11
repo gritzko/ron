@@ -11,7 +11,7 @@ type Clock struct {
 func time2uint(t time.Time) (i uint64) {
 	months := (t.Year()-2010)*12 + int(t.Month()) - 1
 	i |= uint64(months)
-	days := t.Day()-1
+	days := t.Day() - 1
 	i <<= 6
 	i |= uint64(days)
 	hours := t.Hour()
@@ -30,7 +30,7 @@ func time2uint(t time.Time) (i uint64) {
 	return i
 }
 
-func trim_time (full, last uint64) uint64 {
+func trim_time(full, last uint64) uint64 {
 	if full&PREFIX6 > last {
 		if full&PREFIX5 > last {
 			return full & PREFIX5
@@ -60,7 +60,7 @@ func (clock *Clock) Time() UUID {
 	} else {
 		val = trim_time(val, last)
 	}
-	ret := UUID{val, clock.lastSeen.Origin|EVENT_SIGN_BIT}
+	ret := UUID{val, clock.lastSeen.Origin | EVENT_SIGN_BIT}
 	clock.See(ret)
 	return ret
 }

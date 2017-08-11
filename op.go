@@ -18,40 +18,40 @@ func Compare(a, b UUID) int {
 	}
 }
 
-func (a UUID) LaterThan (b UUID) bool {
-	if a.Value==b.Value {
+func (a UUID) LaterThan(b UUID) bool {
+	if a.Value == b.Value {
 		return a.Origin > b.Origin
 	} else {
 		return a.Value > b.Value
 	}
 }
 
-func (a UUID) EarlierThan (b UUID) bool {
+func (a UUID) EarlierThan(b UUID) bool {
 	// FIXME define through Compare
-	if a.Value==b.Value {
+	if a.Value == b.Value {
 		return a.Origin < b.Origin
 	} else {
 		return a.Value < b.Value
 	}
 }
 
-func (a UUID) Sign () uint64 {
+func (a UUID) Sign() uint64 {
 	return a.Origin >> 60
 }
 
-func (a UUID) Replica () uint64 {
+func (a UUID) Replica() uint64 {
 	return a.Origin & PREFIX10
 }
 
-func (a UUID) SameAs (b UUID) bool {
-	if a.Value!=b.Value {
+func (a UUID) SameAs(b UUID) bool {
+	if a.Value != b.Value {
 		return false
-	} else if a.Origin==b.Origin {
+	} else if a.Origin == b.Origin {
 		return true
-	} else if (a.Origin^b.Origin) & PREFIX10 != 0 {
+	} else if (a.Origin^b.Origin)&PREFIX10 != 0 {
 		return false
 	} else {
-		return a.Origin&EVENT_SIGN_BIT==1 && b.Origin&EVENT_SIGN_BIT==1
+		return a.Origin&EVENT_SIGN_BIT == 1 && b.Origin&EVENT_SIGN_BIT == 1
 	}
 }
 
@@ -97,7 +97,7 @@ func (i *Iterator) Next() bool {
 	var prev Op = i.Op
 	l := XParseOp(i.frame.Body[i.offset:], &i.Op, prev)
 
-	if l>0 {
+	if l > 0 {
 		i.offset += l
 		return true
 	} else {
@@ -107,16 +107,16 @@ func (i *Iterator) Next() bool {
 	}
 }
 
-func (uuid UUID) IsTemplate () bool {
-	return uuid.Sign()==NAME_SIGN && uuid.Value==0 && uuid.Origin!=0
+func (uuid UUID) IsTemplate() bool {
+	return uuid.Sign() == NAME_SIGN && uuid.Value == 0 && uuid.Origin != 0
 }
 
-func (frame Frame) Stamp (clock Clock) (ret Frame) {
+func (frame Frame) Stamp(clock Clock) (ret Frame) {
 	stamps := map[uint64]UUID{}
 	i := frame.Begin()
 	for !i.IsEmpty() {
 		op := i.Op
-		for t:=0; t<4; t++ {
+		for t := 0; t < 4; t++ {
 			uuid := op.Spec[t]
 			if uuid.IsTemplate() {
 				stamp, ok := stamps[uuid.Origin]
@@ -134,7 +134,7 @@ func (frame Frame) Stamp (clock Clock) (ret Frame) {
 }
 
 func (op Op) IsEmpty() bool {
-	return op.Types[MAX_ATOMS]==0
+	return op.Types[MAX_ATOMS] == 0
 }
 
 func (frame *Frame) Begin() (i Iterator) {
@@ -142,7 +142,7 @@ func (frame *Frame) Begin() (i Iterator) {
 	i.offset = 0
 	if frame.first.IsEmpty() {
 		i.Op = ZERO_OP
-		i.Types[MAX_ATOMS]=1 // HACK
+		i.Types[MAX_ATOMS] = 1 // HACK
 		i.Next()
 	} else {
 		i.Op = frame.first
@@ -151,7 +151,7 @@ func (frame *Frame) Begin() (i Iterator) {
 }
 
 func (frame *Frame) End() Iterator {
-	return Iterator{frame:frame, offset:len(frame.Body)}
+	return Iterator{frame: frame, offset: len(frame.Body)}
 }
 
 // A frame's end position is an op having a value of !!! and UUIDs from
@@ -163,7 +163,7 @@ func (frame *Frame) End() Iterator {
 //	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
 //}
 
-func (i Iterator) IsLast () bool {
+func (i Iterator) IsLast() bool {
 	return i.offset >= len(i.frame.Body)
 }
 
@@ -172,20 +172,20 @@ func MakeFrame(prealloc_bytes int) Frame {
 	return Frame{Body: buf}
 }
 
-func (op *Op) GetUUIDp (i int) *UUID {
-	return & op.Spec[i]
+func (op *Op) GetUUIDp(i int) *UUID {
+	return &op.Spec[i]
 }
 
-func (op *Op) GetUUID (i int) UUID {
+func (op *Op) GetUUID(i int) UUID {
 	return op.Spec[i]
 }
 
 func (uuid *UUID) IsZero() bool {
-	return uuid.Value==0 && uuid.Origin==0
+	return uuid.Value == 0 && uuid.Origin == 0
 }
 
-func (spec *Op) isZero () bool {
-	for t:=0; t<4; t++ {
+func (spec *Op) isZero() bool {
+	for t := 0; t < 4; t++ {
 		if !spec.Spec[t].IsZero() {
 			return false
 		}
@@ -193,6 +193,6 @@ func (spec *Op) isZero () bool {
 	return true
 }
 
-func (i Iterator) Offset () int {
+func (i Iterator) Offset() int {
 	return i.offset
 }

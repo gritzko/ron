@@ -28,18 +28,17 @@ func TestIHeap_Op(t *testing.T) {
 	heap.PutFrame(ParseFrame([]byte(frameC)))
 	loc := heap.Op().Location()
 	count := 0
-	for heap.Op().Location()==loc {
-		count ++
+	for heap.Op().Location() == loc {
+		count++
 		heap.Next()
 	}
-	if count!=3 {
+	if count != 3 {
 		t.Fail()
 	}
 }
 
-
 func TestIHeap_Merge(t *testing.T) {
-	frameA := "*rga#test@1:0'A'@2'B'"   //  D E A C B
+	frameA := "*rga#test@1:0'A'@2'B'" //  D E A C B
 	frameB := "*rga#test@1:0'A'@3'C'"
 	frameC := "*rga#test@4:0'D'@5'E'"
 	frameR := "*rga#test@4'D'@5'E'@1'A'@3'C'@2'B'"
@@ -48,7 +47,7 @@ func TestIHeap_Merge(t *testing.T) {
 	heap.PutFrame(ParseFrame([]byte(frameB)))
 	heap.PutFrame(ParseFrame([]byte(frameC)))
 	var res Frame
-	for ! heap.IsEmpty() {
+	for !heap.IsEmpty() {
 		res.AppendOp(*heap.Op())
 		heap.NextEvent()
 	}

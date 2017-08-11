@@ -67,7 +67,7 @@ func (h *IHeap) sink(i int) {
 
 func (h *IHeap) raise(i int) {
 	j := i >> 1
-	if j>0 && h.less(i, j) {
+	if j > 0 && h.less(i, j) {
 		h.swap(i, j)
 		if j > 1 {
 			h.raise(j)
@@ -144,7 +144,7 @@ func (h *IHeap) PutFrame(frame Frame) {
 }
 
 func (h *IHeap) IsEmpty() bool {
-	return len(h.iters)==1
+	return len(h.iters) == 1
 }
 
 func (h *IHeap) Frame() (ret Frame) {

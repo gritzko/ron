@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-
 func TestClock_Format(t *testing.T) {
 
 	tests := [][]string{
@@ -16,7 +15,7 @@ func TestClock_Format(t *testing.T) {
 
 	for i, pair := range tests {
 		date, err := time.Parse(time.UnixDate, pair[0])
-		if err!=nil {
+		if err != nil {
 			t.Fail()
 			break
 		}
@@ -41,10 +40,10 @@ func TestClock_Format(t *testing.T) {
 func BenchmarkClock_Time(b *testing.B) {
 	var prev UUID = ZERO_UUID
 	var clock = Clock{}
-	clock.lastSeen.Origin = 1;
-	for i:=0; i<b.N; i++ {
+	clock.lastSeen.Origin = 1
+	for i := 0; i < b.N; i++ {
 		next := clock.Time()
-		if next.Value<=prev.Value {
+		if next.Value <= prev.Value {
 			b.Fail()
 			b.Logf("%s (%d) <= %s (%d) at %d\n", next.String(), next.Value, prev.String(), prev.Value, i)
 			break

@@ -1,10 +1,10 @@
 package RON
 
 import (
-	"math/rand"
-	"testing"
-	"os"
 	"bytes"
+	"math/rand"
+	"os"
+	"testing"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -24,7 +24,7 @@ func TestParseUUID(t *testing.T) {
 	}
 	err_str := "erro_error$~~~~~~~~~~"
 	error_uid, err := ParseUUIDString(err_str)
-	if err!=nil || error_uid.IsZero() {
+	if err != nil || error_uid.IsZero() {
 		t.Fail()
 	}
 }
@@ -154,7 +154,7 @@ func TestParseFrame(t *testing.T) {
 		for bo := 0; bo < dim; bo++ {
 			v := random_close_int(def.Value, uint(bv))
 			o := random_close_int(def.Origin, uint(bo))
-			uuids[bv*dim+bo] = UUID{v, EVENT_SIGN_BIT|o}
+			uuids[bv*dim+bo] = UUID{v, EVENT_SIGN_BIT | o}
 		}
 	}
 	// shuffle to 16 ops
@@ -179,7 +179,7 @@ func TestParseFrame(t *testing.T) {
 			break
 		}
 		at = k << 2
-		for u :=0; u <4; u++ {
+		for u := 0; u < 4; u++ {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
@@ -198,7 +198,7 @@ func TestXParseOpWhitespace(t *testing.T) {
 	str := []byte(" #test !\n#next?")
 	var op Op
 	l := XParseOp(str, &op, ZERO_OP)
-	if l!=bytes.IndexByte(str,'\n')+1 {
+	if l != bytes.IndexByte(str, '\n')+1 {
 		t.Fail()
 	}
 	l2 := XParseOp(str[l:], &op, ZERO_OP)
@@ -220,7 +220,7 @@ func TestXParseMalformedOp(t *testing.T) {
 		"#trailing garbage",
 		"#reordered .uuids =1",
 		"#repeat #uuids =1",
-	};
+	}
 	for i, str := range tests {
 		var op Op
 		l := XParseOp([]byte(str), &op, ZERO_OP)
@@ -237,13 +237,13 @@ func TestOp_ParseFloat(t *testing.T) {
 		"^1.0e6",
 		"^1.2345e6",
 		"^0.0",
-	};
+	}
 	var correct = []float64{
 		3.1415,
 		1e6,
 		1.2345e6,
 		0,
-	};
+	}
 	for i, str := range tests {
 		var op Op
 		l := XParseOp([]byte(str), &op, ZERO_OP)
@@ -252,23 +252,23 @@ func TestOp_ParseFloat(t *testing.T) {
 			t.Fail()
 			break
 		}
-		val,_ := op.ParseFloat(0)
-		if val!=correct[i] {
+		val, _ := op.ParseFloat(0)
+		if val != correct[i] {
 			t.Logf("misparsed %d: '%e' (%e)", i, val, correct[i])
 			t.Fail()
 		}
 	}
 }
 
-func TestOp_ParseAtoms (t *testing.T) {
+func TestOp_ParseAtoms(t *testing.T) {
 	var tests = [5][2]string{
-		{ ">0>1>2>3", ">>>>" },
-		{ ">>,#next>>", ">>" },
-		{ ",", "" },
-		{ "=1^2.0", "=^" },
-		{ "'str'\"str\"", "'\"" },
+		{">0>1>2>3", ">>>>"},
+		{">>,#next>>", ">>"},
+		{",", ""},
+		{"=1^2.0", "=^"},
+		{"'str'\"str\"", "'\""},
 	}
-	for i:=0; i<len(tests); i++ {
+	for i := 0; i < len(tests); i++ {
 		var op Op
 		str := tests[i][0]
 		l := XParseOp([]byte(str), &op, ZERO_OP)

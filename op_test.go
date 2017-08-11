@@ -19,12 +19,12 @@ func TestOp_Event(t *testing.T) {
 // [ ] strconv -- value parsing methods
 // [ ] Iterator!!!
 
-func TestParseOp (t *testing.T) {
-    t.Log("Parser")
+func TestParseOp(t *testing.T) {
+	t.Log("Parser")
 	var frame = "*lww#test-author@(time-origin:loc=1''>test"
 	var op Op
-	pl := XParseOp ( []byte(frame), &op, ZERO_OP )
-    if len(frame) != pl {
+	pl := XParseOp([]byte(frame), &op, ZERO_OP)
+	if len(frame) != pl {
 		t.Fail()
 	}
 	if op.Type().String() != "lww" {
@@ -36,7 +36,7 @@ func TestParseOp (t *testing.T) {
 		t.Fail()
 	}
 	i, e := op.ParseInt(0)
-	if e!=nil || i!=1 {
+	if e != nil || i != 1 {
 		t.Logf("int parse fails: %d", i)
 		t.Fail()
 	}
@@ -44,7 +44,7 @@ func TestParseOp (t *testing.T) {
 
 func BenchmarkParseOp(b *testing.B) {
 	//var frame= "*lww#test-author@(time-origin:loc=1''>test\n"
-	var frame= "@(time-origin:loc=1"
+	var frame = "@(time-origin:loc=1"
 	var frames []byte = make([]byte, 0, len(frame)*b.N+10)
 	for i := 0; i < b.N; i++ {
 		frames = append(frames, []byte(frame)...)
@@ -54,19 +54,18 @@ func BenchmarkParseOp(b *testing.B) {
 	var op Op
 	for i := 0; i < b.N; i++ {
 		l := XParseOp(frames[off:], &op, ZERO_OP)
-		if l != len(frame) || op.Event().Origin != origin.Origin || op.Count !=1 || op.Types[0]!='=' {
+		if l != len(frame) || op.Event().Origin != origin.Origin || op.Count != 1 || op.Types[0] != '=' {
 			b.Logf("parse fail: off %d len %d(%d) '%s'", off, l, len(frame), string(frames[off:]))
 			b.Fail()
 			break
 		}
-		off+=l
+		off += l
 	}
 }
 
-
 func BenchmarkIterator_Next(b *testing.B) {
 	var clock = Clock{}
-	var frame = MakeFrame(100*b.N)
+	var frame = MakeFrame(100 * b.N)
 	var times = make([]UUID, b.N)
 	var test_uuid, _ = ParseUUIDString("test")
 	var field_uuid, _ = ParseUUIDString("field")
@@ -85,4 +84,3 @@ func BenchmarkIterator_Next(b *testing.B) {
 		}
 	}
 }
-

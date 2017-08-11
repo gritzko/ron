@@ -16,20 +16,20 @@ const (
 const NAME_SIGN uint64 = 0
 const EVENT_SIGN uint64 = 2
 const DERIVED_SIGN uint64 = 1
-const HASH_SIGN uint64  = DERIVED_SIGN
-const DERIVED_EVENT_SIGN = EVENT_SIGN|DERIVED_SIGN
+const HASH_SIGN uint64 = DERIVED_SIGN
+const DERIVED_EVENT_SIGN = EVENT_SIGN | DERIVED_SIGN
 
-const NAME_SIGN_BITS uint64 = NAME_SIGN<<60
-const EVENT_SIGN_BIT uint64 = EVENT_SIGN<<60
-const DERIVED_SIGN_BIT = DERIVED_SIGN<<60
-const HASH_SIGN_BIT = HASH_SIGN<<60
-const DERIVED_EVENT_SIGN_BITS = DERIVED_EVENT_SIGN<<60
+const NAME_SIGN_BITS uint64 = NAME_SIGN << 60
+const EVENT_SIGN_BIT uint64 = EVENT_SIGN << 60
+const DERIVED_SIGN_BIT = DERIVED_SIGN << 60
+const HASH_SIGN_BIT = HASH_SIGN << 60
+const DERIVED_EVENT_SIGN_BITS = DERIVED_EVENT_SIGN << 60
 
 const INT60LEN = 10
 const MAX_ATOMS = 7
 
 type UUID struct {
-	Value  uint64
+	Value uint64
 	//Sign   byte // TODO maybe fit into 16 bytes
 	Origin uint64
 }
@@ -37,10 +37,10 @@ type UUID struct {
 type Spec [4]UUID
 
 type Atoms struct {
-	Count       int
-	Types		[MAX_ATOMS+1]byte
-	Offsets		[MAX_ATOMS]int
-	Body		[]byte
+	Count   int
+	Types   [MAX_ATOMS + 1]byte
+	Offsets [MAX_ATOMS]int
+	Body    []byte
 }
 
 // OP is an immutable atomic operation object - no write access
@@ -90,7 +90,7 @@ type Iterator struct {
 // [x] iterator - parse error
 // [ ] value parsing (all types - tables, safe ranges, length limits)
 //		[x] int
-//		[x] float 
+//		[x] float
 //		[ ] string
 //		[ ] uuid (save?)
 // [x] lww - idempotency
@@ -186,8 +186,8 @@ const (
 
 const OP_PUNCT = ",.;!"
 const (
-	OP_SEP = byte(',')
-	RAW_OP_SEP = byte('.')
+	OP_SEP           = byte(',')
+	RAW_OP_SEP       = byte('.')
 	PATCH_HEADER_SEP = byte(';')
 	STATE_HEADER_SEP = byte('!')
 	QUERY_HEADER_SEP = byte('?')
@@ -205,7 +205,7 @@ const DERIVED_EVENT_SEP = byte('-')
 const HASH_UUID_SEP = byte('%')
 
 const INT60_ERROR uint64 = 1<<60 - 1
-const INT60_NEVER = 63<<(6*9)
+const INT60_NEVER = 63 << (6 * 9)
 
 var ZERO_UUID = UUID{0, NAME_SIGN_BITS}
 
@@ -239,7 +239,7 @@ func init() {
 	for i := 0; i < len(SPEC_PUNCT); i++ {
 		ABC[SPEC_PUNCT[i]] = -30 - int8(i)
 	}
-	for i:=0; i<len(OP_PUNCT); i++ {
+	for i := 0; i < len(OP_PUNCT); i++ {
 		ABC[OP_PUNCT[i]] = -5
 	}
 	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
