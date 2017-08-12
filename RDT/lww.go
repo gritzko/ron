@@ -19,16 +19,22 @@ func (lww LWW) Reduce (af, bf RON.Frame) (res RON.Frame, err RON.UUID) {
 func (lww LWW) ReduceAll(inputs []RON.Frame) (res RON.Frame, err RON.UUID) {
 	heap := RON.MakeIHeap(RON.PRIM_LOCATION|RON.SEC_EVENT|RON.SEC_DESC, len(inputs))
 	var spec RON.Spec
+	haveState := false
 	for k:=0; k<len(inputs); k++ {
 		i := inputs[k].Begin()
 		spec = i.Spec
+		haveState = haveState || i.IsState()
 		if i.IsHeader() {
 			i.Next()
 		}
 		heap.Put(&i)
 	}
 	spec[RON.SPEC_LOCATION] = RON.ZERO_UUID
-	res.AppendSpecAtoms(spec, RON.STATE_HEADER_ATOMS)
+	term := RON.STATE_HEADER_ATOMS
+	if !haveState {
+		term = RON.PATCH_HEADER_ATOMS
+	}
+	res.AppendSpecAtoms(spec, term)
 	for !heap.IsEmpty() {
 		atoms := heap.Op().Atoms
 		atoms.Types[RON.MAX_ATOMS] = RON.OP_SEP
