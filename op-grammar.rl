@@ -13,9 +13,6 @@
     }
 
     action toel_start {
-        if trace {
-            fmt.Printf("TOEL %c\n", fc);
-        }
         i = 0
         digits = 0
         old_n = n
@@ -23,9 +20,6 @@
         uuid = &op.Spec[n]
         *uuid = context.Spec[n]
         if n <= old_n {
-            if trace {
-                fmt.Printf("MISORDERED UUIDs %c %d %d\n", fc, n, old_n);
-            }
             fbreak;
         }
     }
@@ -41,20 +35,11 @@
         op.Types[op.Count] = fc
         op.Offsets[op.Count] = p - atoms_at
         op.Count++
-        if trace {
-            fmt.Printf("ATOM_START %c at %d\n", fc, p);
-        }
     }
     action atom {
-        if trace {
-            fmt.Printf("ATOM at %d\n", p);
-        }
     }
 
     action atoms {
-        if trace {
-            fmt.Printf("ATOMS at %d\n", p)
-        }
         op.Body = data[atoms_at:p]
     }
 
@@ -73,18 +58,12 @@
     }
 
     action next {
-        if trace {
-            fmt.Printf("NEXT at %d\n", p)
-        }
         ret = p
         p-=1
         done = true
         fbreak;
     }
     action over {
-        if trace {
-            fmt.Printf("OVER at %d\n", p)
-        }
         ret = p
         p -= 1
         done = true
