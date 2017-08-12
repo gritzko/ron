@@ -49,7 +49,7 @@ func TestIHeap_Merge(t *testing.T) {
 	var res Frame
 	for !heap.IsEmpty() {
 		res.AppendOp(*heap.Op())
-		heap.NextEvent()
+		heap.NextPrim()
 	}
 	if res.String() != frameR {
 		t.Fail()

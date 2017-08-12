@@ -86,7 +86,7 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 			result.AppendSpecAtoms(spec,atoms)
 			//fmt.Printf("APPND %c[ %s ]\n", op.Term(), string(op.Atoms.Body))
 
-			rga.active_ins.NextEvent() // idempotency
+			rga.active_ins.NextPrim() // idempotency
 			//fmt.Printf("ACTIVE %d\n", rga.active_ins.Len())
 
 			rga.waiting_ins.Unload(&rga.active_ins, event)

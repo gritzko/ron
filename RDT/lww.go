@@ -33,7 +33,7 @@ func (lww LWW) ReduceAll(inputs []RON.Frame) (res RON.Frame, err RON.UUID) {
 		atoms := heap.Op().Atoms
 		atoms.Types[RON.MAX_ATOMS] = RON.OP_SEP
 		res.AppendSpecAtoms(heap.Op().Spec, atoms)
-		heap.NextEvent()
+		heap.NextPrim()
 	}
 
 	return

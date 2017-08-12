@@ -118,7 +118,7 @@ func (h *IHeap) Next() (op *Op) {
 }
 
 func (h *IHeap) nexteq(i int, uuid UUID) {
-	if h.iters[i].Event() == uuid {
+	if h.iters[i].Spec[h.primary] == uuid {
 		j := i << 1
 		if j < len(h.iters) {
 			if j+1 < len(h.iters) { // rightmost first!
@@ -130,9 +130,9 @@ func (h *IHeap) nexteq(i int, uuid UUID) {
 	}
 }
 
-func (h *IHeap) NextEvent() (op *Op) {
+func (h *IHeap) NextPrim() (op *Op) {
 	if !h.IsEmpty() {
-		event := h.iters[1].Event()
+		event := h.iters[1].Spec[h.primary]
 		h.nexteq(1, event)
 	}
 	return h.Op()
