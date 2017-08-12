@@ -62,9 +62,7 @@
     }
     action float_atom {
     }
-    action string_atom1 {
-    }
-    action string_atom2 {
+    action string_atom {
     }
     action atoms_start {
         uuid = &blank
@@ -93,18 +91,19 @@
         fbreak;
     }
 
-    UNIESC = /\\u[0-9a-fA-F]{4}/;
+    UNIESC = "\\u" [0-9a-fA-F]{4};
+    ESC = "\\" [^\n\r];
+    CHAR = [^'\n\r];
 
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
     FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
-    STRING_ATOM1 = (UNIESC|"\\" [^\n\r]|[^'])* %string_atom1;
-    STRING_ATOM2 = (UNIESC|"\\" [^\n\r]|[^"])* %string_atom2;
+
+    STRING_ATOM = (UNIESC|ESC|CHAR)* %string_atom;
 
     ATOM = space* (
             "=" space* INT_ATOM  |
             "^" space* FLOAT_ATOM |
-            "'" STRING_ATOM1 "'" |
-            '"' STRING_ATOM2 '"' |
+            ['] STRING_ATOM ['] |
             ">" space* UUID
             ) >atom_start %atom;
 

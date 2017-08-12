@@ -93,7 +93,9 @@ func (h *IHeap) Put(i *Iterator) {
 func (h *IHeap) Op() (op *Op) {
 	if len(h.iters) > 1 {
 		op = &h.iters[1].Op
-	}
+	} else {
+        op = &ZERO_OP
+    }
 	return
 }
 

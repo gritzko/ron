@@ -102,6 +102,7 @@ type Iterator struct {
 //		[ ] benchmark: 1mln ops
 //
 // [ ] fuzzer go-fuzz (need samples)
+// [ ] defensive atom parsing
 //
 // [ ] reducer flags
 // [ ] nice base64 constant definitions (ron ... // "comment")
@@ -109,13 +110,13 @@ type Iterator struct {
 // [-] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
-// [ ] multiframe parsing  ;,,.,,!,. etc Frame.Split()
+// [ ] Frame.Split() multiframe parsing  ;,,.,,!,. etc
 //
-// [ ] formatting options
-// [ ] indenting
-// [ ] newlines
-// [ ] trimming/zipping
-// [ ] redefs (bench - fast prefix - bit ops)
+// [x] formatting options
+// 		[ ] indenting
+// 		[x] newlines
+// 		[ ] trimming/zipping
+// 		[ ] redefs (bench - fast prefix - bit ops)
 
 // Reducer is essentially a replicated data type.
 // It provides two reducing functions: total and incremental.
@@ -141,10 +142,10 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-var STATE_HEADER_ATOMS = ParseAtoms([]byte("!"))
-var PATCH_HEADER_ATOMS = ParseAtoms([]byte(";"))
-var RAW_OP_ATOMS = ParseAtoms([]byte("."))
-var OP_ATOMS = ParseAtoms([]byte(","))
+var STATE_HEADER_ATOMS = ParseAtoms([]byte(string(STATE_HEADER_SEP)))
+var PATCH_HEADER_ATOMS = ParseAtoms([]byte(string(PATCH_HEADER_SEP)))
+var RAW_OP_ATOMS = ParseAtoms([]byte(string(RAW_OP_SEP)))
+var OP_ATOMS = ParseAtoms([]byte(string(OP_SEP)))
 
 type RawUUID []byte
 

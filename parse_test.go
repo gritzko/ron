@@ -266,7 +266,7 @@ func TestOp_ParseAtoms(t *testing.T) {
 		{">>,#next>>", ">>"},
 		{",", ""},
 		{"=1^2.0", "=^"},
-		{"'str'\"str\"", "'\""},
+		{"'str''quoted \\'mid\\' str'", "''"},
 	}
 	for i := 0; i < len(tests); i++ {
 		var op Op
