@@ -283,3 +283,23 @@ func TestOp_ParseAtoms(t *testing.T) {
 		}
 	}
 }
+
+func TestParse_Errors(t *testing.T) {
+	frames := []string{
+		"#test>linkмусор",
+		"#string'unfinishe",
+		"#id#id#id",
+		"#bad@term??",
+		"#no-term",
+		"#notfloat^1",
+	}
+	for k, f := range frames {
+		buf := []byte(f)
+		var op Op
+		l := XParseOp(buf, &op, ZERO_OP)
+		if l>0 {
+			t.Fail()
+			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, l)
+		}
+	}
+}
