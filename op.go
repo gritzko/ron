@@ -68,6 +68,14 @@ func (op Op) IsHeader() bool {
 	return op.Term() != RAW_OP_SEP && op.Term() != OP_SEP
 }
 
+func (op Op) IsFramed() bool {
+	return op.Term()==OP_SEP
+}
+
+func (op Op) IsState() bool {
+	return op.Term() == STATE_HEADER_SEP
+}
+
 func (op Op) IsRaw() bool {
 	return op.Term() == RAW_OP_SEP
 }

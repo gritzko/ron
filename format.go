@@ -1,5 +1,18 @@
 package RON
 
+const (
+	FORMAT_FRAME_NL = 1 << iota
+	FORMAT_HEADER_SPACE
+	FORMAT_OP_SPACE
+	FORMAT_OP_TAB
+	FORMAT_UUID_SPACE
+	FORMAT_OP_NL
+	FORMAT_OP_INDENT
+	FORMAT_ZIP_REDEF
+	FORMAT_ZIP_PREFIX
+	FORMAT_SKIP_REPEATS
+)
+
 func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	var i = ABC[input[0]]
 	if i <= -10 {
@@ -232,12 +245,18 @@ func (frame *Frame) String() string {
 
 
 func (frame *Frame) AppendOp(op Op) {
+	if (0!=frame.Format&FORMAT_FRAME_NL) && len(frame.Body)>0 && !op.IsFramed() {
+		frame.Body = append(frame.Body, '\n')
+	}
 	var l int
 	var uuids [11 * 2 * 4]byte
 	if !frame.last.isZero() || len(frame.Body) == 0 {
 		l = FormatZippedSpec(uuids[:], op, frame.last)
 	} else {
 		l = FormatSpec(uuids[:], op)
+	}
+	if (0!=frame.Format&FORMAT_HEADER_SPACE) && frame.last.IsHeader() && op.IsFramed() {
+		frame.Body = append(frame.Body, ' ')
 	}
 	frame.Body = append(frame.Body, uuids[:l]...)
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)

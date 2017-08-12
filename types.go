@@ -53,6 +53,7 @@ type Op struct { // ~128 bytes
 type Frame struct {
 	Body        []byte
 	first, last Op
+	Format		uint
 }
 
 // Iterator is a mutable iterator over a frame; each position is an op.
@@ -97,7 +98,7 @@ type Iterator struct {
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
-//		[ ] tab tests
+//		[x] tab tests
 //		[ ] benchmark: 1mln ops
 //
 // [ ] fuzzer go-fuzz (need samples)
@@ -105,10 +106,10 @@ type Iterator struct {
 // [ ] reducer flags
 // [ ] nice base64 constant definitions (ron ... // "comment")
 // [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
-// [ ] copy generic reduction errors
+// [-] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
-// [ ] multiframe parsing  ;,,.,,!,. etc
+// [ ] multiframe parsing  ;,,.,,!,. etc Frame.Split()
 //
 // [ ] formatting options
 // [ ] indenting

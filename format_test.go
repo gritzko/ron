@@ -186,61 +186,30 @@ func BenchmarkFormatOp(b *testing.B) {
 	}
 }
 
-// [ ] UUID case coverage test
-// [ ] Op/Frame case coverage test
-//     state machine test & Append recombinations  @ | [ a - ] b  64/4 = 16 ops
-/*
-func TestFrame_Append (t *testing.T) {
-	f1str := "*lww#test@time-author:loc=1"
-	f1 := Frame{Atoms: []byte(f1str)}
-	test_uuid,_ := ParseUUIDString("test")
-	time_uuid,_ := ParseUUIDString("time-author")
-	loc_uuid,_ := ParseUUIDString("loc")
-	time1_uuid := time_uuid
-	time1_uuid.Value++
-	tests := [][]string{
-		{"f1+op", f1str + "@)1=2"},
-		{"f1+f1", f1str + "@=2"},
-		{"f1+i", f1str + "@=2"},
-		{"f1x", f1str + "*lww#test@time-author:loc!!!"},
-		{"f1x+f1x", f1str + "@=2*lww#test@time-author:loc!!!"},
-		{"f1e", f1str + "*lww#test@time-author:loc!!!=1'error'"},
-	}
-	// op to f1
-	f2 := f1.Clone()
-	f2.Append(LWW_UUID, test_uuid, time1_uuid, loc_uuid, []byte("=2"))
-	tests[0][0] = f2.String()
-	// f1 to f1
-	f11 := f1.Clone()
-	f11.AppendFrame(f1)
-	tests[1][0] = f11.String()
-	// i to f1 - recode defaults
-	i2 := f2.Begin()
-	i2.Next()
-	f2b := f1.Clone()
-	f2b.AppendRange(i2, f2.End())
-	tests[2][0] = f2b.String()
-	// f1x
-	f1x := f1.Clone()
-	f1x.AppendEnd()
-	tests[3][0] = f1x.String()
-	// f1x to f1x
-	f11x := f1x.Clone()
-	f11x.AppendFrame(f1x)
-	tests[4][0] = f11x.String()
-	// f1x to f1
-	// f1 to f1x
-	// f1 to f1e - no append
-	f1e := f1.Clone()
-	f1e.AppendError("=1'error'")
-	f1e.AppendFrame(f2) // fails
-	tests[5][0] = f1e.String()
+type sample struct {
+	flags uint
+	correct string
+}
 
-	for i:=0; i<len(tests); i++ {
-		if tests[i][0] != tests[i][1] {
+func TestFormatOptions(t *testing.T) {
+	framestr := "*lww#test;@1:key'value'@2:number=1*rga#text@3'T'.*rga#text@6:3;@4'e'@5'x'@6't'"
+	formats := []sample{
+		{
+			FORMAT_FRAME_NL | FORMAT_HEADER_SPACE,
+			"*lww#test; @1:key'value'@2:number=1\n*rga#text@3'T'.\n@6:3; @4'e'@5'x'@6't'",
+		},
+	}
+	frame := ParseFrame([]byte(framestr))
+	for k, f := range formats {
+		var formatted = Frame{Format:f.flags}
+		i := frame.Begin()
+		for !i.IsEmpty() {
+			formatted.AppendOp(i.Op)
+			i.Next()
+		}
+		if formatted.String() != f.correct {
 			t.Fail()
-			t.Logf("append fail: '%s' should be '%s'", tests[i][0], tests[i][1])
+			t.Logf("incorrect format at %d\n---\n%s\n---should be---\n%s\n", k, formatted.String(), f.correct)
 		}
 	}
 }
-*/

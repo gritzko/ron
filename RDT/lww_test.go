@@ -19,8 +19,8 @@ var lww_3_tests = [][3]string{
 		"*lww#test@2;:a'A2'",
 	},
 	{ // p+p
-		"*lww#test@1; :a'A1' :b'B1' :c'C1'",
-		"*lww#test@2; :a'A2' :b'B2'",
+		"*lww#test@1; :a'A1':b'B1':c'C1'",
+		"*lww#test@2; :a'A2':b'B2'",
 		"*lww#test@2;:a'A2':b'B2'@1:c'C1'",
 	},
 }
