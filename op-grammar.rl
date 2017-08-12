@@ -93,7 +93,7 @@
 
     UNIESC = "\\u" [0-9a-fA-F]{4};
     ESC = "\\" [^\n\r];
-    CHAR = [^'\n\r];
+    CHAR = [^'\n\r\\];
 
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
     FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;

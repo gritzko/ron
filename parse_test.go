@@ -292,6 +292,7 @@ func TestParse_Errors(t *testing.T) {
 		"#bad@term??",
 		"#no-term",
 		"#notfloat^1",
+		"#notesc'\\'",
 	}
 	for k, f := range frames {
 		buf := []byte(f)
