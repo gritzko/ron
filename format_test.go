@@ -106,19 +106,16 @@ func BenchmarkUnzip(b *testing.B) {
 		// FIXME optimize close ids - bench CT/RGA
 	}
 	//sort.Slice(uuids, func(i, j int) bool { return uuids[i].LessThan(uuids[j]) })
-	zipped := make([]byte, b.N*22+22)
+	zipped := make([]byte, 0, b.N*22+22)
 	lens := make([]int, b.N*2)
 
-	off := FormatZippedUUID(zipped, uuids[0], ZERO_UUID)
-	lens[0] = off
-	zipped[off] = ' '
-	off++
+	zipped = FormatZippedUUID(zipped, uuids[0], ZERO_UUID)
+	lens[0] = len(zipped)
+	zipped = append(zipped, ' ')
 	for i := 1; i < b.N; i++ {
-		l := FormatZippedUUID(zipped[off:], uuids[i], uuids[i-1])
-		off += l
-		lens[i] = l
-		zipped[off] = ' '
-		off++
+		zipped = FormatZippedUUID(zipped, uuids[i], uuids[i-1])
+		lens[i] = len(zipped)-lens[i-1]
+		zipped = append(zipped, ' ')
 	}
 
 	b.ResetTimer()
@@ -159,13 +156,13 @@ func TestOp_String(t *testing.T) {
 	context := op
 	op.Spec[2].Value++
 	op.Spec[3].Value++
-	buf := make([]byte, 100)
-	l := FormatOp(buf, op, context)
-	if l <= 0 {
+	buf := make([]byte, 0, 100)
+	buf = FormatOp(buf, op, context)
+	if len(buf) <= 0 {
 		t.Fail()
 		return
 	}
-	opstr := string(buf[:l])
+	opstr := string(buf)
 	if opstr != "@)1:)1=1" {
 		t.Logf("incorrect: '%s'", opstr)
 		t.Fail()
@@ -176,13 +173,13 @@ func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	var context Op = op
-	buf := make([]byte, b.N*len(str)*2+100)
-	off := FormatOp(buf, op, ZERO_OP)
+	buf := make([]byte, 0, b.N*len(str)*2+100)
+	buf = FormatOp(buf, op, ZERO_OP)
 	for i := 0; i < b.N; i++ {
 		context = op
 		op.Spec[2].Value++
 		op.Spec[3].Value++
-		off += FormatOp(buf[off:], op, context)
+		buf = FormatOp(buf, op, context)
 	}
 }
 

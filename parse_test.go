@@ -59,9 +59,9 @@ func TestParseFormatUUID(t *testing.T) {
 			t.Logf("parse %d: %s must be %s", i, str, tri[2])
 			t.Fail()
 		}
-		var fmt [21]byte
-		l := FormatZippedUUID(fmt[:], uuid, context)
-		zip := string(fmt[:l])
+		var arr [21]byte
+		fmt := FormatZippedUUID(arr[:0], uuid, context)
+		zip := string(fmt)
 		if zip != tri[1] {
 			t.Logf("format %d: %s must be %s", i, zip, tri[1])
 			t.Fail()
@@ -183,7 +183,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.Type().String(), uuids[at+u].String(), string(iter.Op.Body))
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.GetUUID(u).String(), uuids[at+u].String(), string(iter.Op.Body))
 			}
 		}
 		iter.Next()
@@ -293,6 +293,8 @@ func TestParse_Errors(t *testing.T) {
 		"#no-term",
 		"#notfloat^1",
 		"#notesc'\\'",
+		"*type=1NT",
+		"*ty&",
 	}
 	for k, f := range frames {
 		buf := []byte(f)

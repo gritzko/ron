@@ -30,7 +30,6 @@ const MAX_ATOMS = 7
 
 type UUID struct {
 	Value uint64
-	//Sign   byte // TODO maybe fit into 16 bytes
 	Origin uint64
 }
 
@@ -54,6 +53,7 @@ type Frame struct {
 	Body        []byte
 	first, last Op
 	Format		uint
+	Source      int
 }
 
 // Iterator is a mutable iterator over a frame; each position is an op.
@@ -76,15 +76,15 @@ type Iterator struct {
 // [x] open/closed frame => static error strings "=400'parsing error'"
 //	   cause the end op can be displaced!!!
 
-// [ ] Compare tests!!! (all types, derived is +1?)
+// [ ] Compare tests!!! [1,2,3] - mix,sort,cmp (all types, derived is +1)
 // [x] void atom , -- sweet  "op1, op2, op3" is perfectly OK
 // [x] op.Atoms && tests
 // [x] typedef Spec [4]UUID,
 // [x] typedef Atoms, Atoms.Count()
 // [ ] Location -> Reference
 // [x] ?!,; term/mark/kind/status/headerness
-// [ ] multiframe (still atomic)   Frame.Next() etc
 // [x] AppendOp/Query/Patch/State - Spec/Atoms
+// [ ] multiframe (still atomic)   Frame.Split(iterator)
 //
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl

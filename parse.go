@@ -75,6 +75,10 @@ func ParseFrame(data []byte) (ret Frame) {
 	return
 }
 
+func ParseFrameString (frame string) Frame {
+	return ParseFrame([]byte(frame))
+}
+
 func Parse(str string) (Frame, error) {
 	ret := Frame{Body: []byte(str)}
 	_ = ret.Begin() // FIXME iterator - errors

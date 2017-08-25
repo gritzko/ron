@@ -29,12 +29,9 @@
     }
 
     action atom_start {
-        if op.Count >= MAX_ATOMS {
+        if ! op.addAtom(fc, p-atoms_at) {
             fbreak;
         }
-        op.Types[op.Count] = fc
-        op.Offsets[op.Count] = p - atoms_at
-        op.Count++
     }
     action atom {
     }
@@ -99,4 +96,3 @@
     # main := OP;
 
 }%%
-// TODO exact value syntax and case-cov tests

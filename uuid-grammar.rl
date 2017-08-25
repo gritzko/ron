@@ -37,7 +37,6 @@
     }
 
     action uuid_sep {
-        //uuid.Sign = fc
         sign = UUIDSep2Sign(fc)
         i = uuid.Replica()
         uuid.Origin &= PREFIX10

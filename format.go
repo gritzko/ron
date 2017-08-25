@@ -101,9 +101,9 @@ func ZeroTail(value *uint64) (tail uint) {
 const prefix_mask uint64 = 0xffffff << 36
 
 func ZipUUIDString(uuid, context UUID) string {
-	var ret = make([]byte, 21, 21)
-	len := FormatZippedUUID(ret, uuid, context)
-	return string(ret[0:len])
+	var arr [INT60LEN*2+2]byte
+	ret := FormatZippedUUID(arr[:0], uuid, context)
+	return string(ret)
 }
 
 func (uuid UUID) String() (ret string) {
@@ -114,10 +114,10 @@ func (uuid UUID) String() (ret string) {
 	return
 }
 
-func FormatTrimmedInt(output []byte, value uint64) int {
+func FormatTrimmedInt(output []byte, value uint64) (ret []byte) {
 	if value == 0 {
-		output[0] = '0'
-		return 1
+		ret = append(output, '0')
+		return
 	}
 	l := 10
 	if value&((1<<24)-1) == 0 {
@@ -128,115 +128,112 @@ func FormatTrimmedInt(output []byte, value uint64) int {
 		value >>= 6
 		l--
 	}
+	var vals [10]byte
+	add := vals[:l]
 	k := l
 	for k > 0 {
 		k--
-		output[k] = base64[value&63]
+		add[k] = base64[value&63]
 		value >>= 6
 	}
-	return l
+	ret = append(output, add...)
+	return
 }
 
-func FormatInt(output []byte, value uint64) int {
-	l := FormatTrimmedInt(output, value)
+func FormatInt(output []byte, value uint64) (ret []byte) {
+	ret = FormatTrimmedInt(output, value)
+	l := len(ret) - len(output)
 	for l < 10 {
-		output[l] = '0'
+		ret = append(ret, '0')
 		l++
 	}
-	return l
+	return
 }
 
-func FormatZippedInt(output []byte, value, context uint64) int {
+func FormatZippedInt(output []byte, value, context uint64) (ret []byte) {
 	var prefix uint = CommonPrefix(value, context)
-	var off int
+	ret = output
 	if prefix < 4 {
-		off += FormatTrimmedInt(output[off:], value)
+		ret = FormatTrimmedInt(ret, value)
 	} else {
 		if prefix == 10 {
-			return 0
+			return
 		}
-		output[0] = PREFIX_PUNCT[prefix-4]
-		off++
+		ret = append(ret, PREFIX_PUNCT[prefix-4])
 		value = (value << (prefix * 6)) & PREFIX10
 		if value != 0 {
-			off += FormatTrimmedInt(output[off:], value)
+			ret = FormatTrimmedInt(ret, value)
 		}
 	}
-	return off
+	return
 }
 
-func FormatUUID(output []byte, uuid UUID) int {
-	l := FormatTrimmedInt(output, uuid.Value)
-	output[l] = UUID_PUNCT[uuid.Sign()]
-	l++
-	l += FormatTrimmedInt(output[l:], uuid.Origin)
-	return l
+func FormatUUID(output []byte, uuid UUID) []byte {
+	ret := FormatTrimmedInt(output, uuid.Value)
+	ret = append(ret, UUID_PUNCT[uuid.Sign()])
+	ret = FormatTrimmedInt(ret, uuid.Origin)
+	return ret
 }
 
-func FormatZippedUUID(output []byte, uuid UUID, context UUID) int {
+func FormatZippedUUID(output []byte, uuid UUID, context UUID) (ret []byte) {
 
 	if uuid == context && uuid != ZERO_UUID { // FIXME options
-		return 0
+		return output
 	}
-	off := FormatZippedInt(output, uuid.Value, context.Value)
+	ret = FormatZippedInt(output, uuid.Value, context.Value)
 	if uuid.Origin == NAME_SIGN_BITS {
-		return off
+		return ret
 	}
 	if uuid.Value == context.Value || uuid.Sign() != context.Sign() ||
 		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
-		(uuid.Replica() == context.Replica() && ABC[output[0]] >= 0) { // FIXME this if
-		output[off] = UUID_PUNCT[uuid.Sign()]
-		off++
+		(uuid.Replica() == context.Replica() && ABC[ret[len(output)]]>=0) { // FIXME this if
+		ret = append(ret, UUID_PUNCT[uuid.Sign()])
 	}
 	if uuid.Replica() != context.Replica() {
-		off += FormatZippedInt(output[off:], uuid.Replica(), context.Replica())
+		ret = FormatZippedInt(ret, uuid.Replica(), context.Replica())
 	}
-	return off
+	return
 }
 
-func FormatSpec(output []byte, op Op) int {
-	var off int
+func FormatSpec(output []byte, op Op) []byte {
 	// expand to 88+values
 	for t := 0; t < 4; t++ {
-		output[off] = SPEC_PUNCT[t]
-		off++
-		off += FormatUUID(output[off:], op.GetUUID(t))
+		output = append(output, SPEC_PUNCT[t])
+		output = FormatUUID(output, op.GetUUID(t))
 	}
-	return off
+	return output
 }
 
-func FormatZippedSpec(output []byte, op Op, context Op) int {
-	var off int
+func FormatZippedSpec(output []byte, op Op, context Op) []byte {
 	// expand to 88+values
 	for t := 0; t < 4; t++ {
 		if op.GetUUID(t) == context.GetUUID(t) {
 			continue
 		}
-		output[off] = SPEC_PUNCT[t]
-		off++
-		off += FormatZippedUUID(output[off:], op.GetUUID(t), context.GetUUID(t))
+		output = append(output, SPEC_PUNCT[t])
+		output = FormatZippedUUID(output, op.GetUUID(t), context.GetUUID(t))
 	}
-	return off
+	return output
 }
 
 // optimize for close values
-// context==nil is valid
-func FormatOp(output []byte, op Op, context Op) int {
-	off := FormatZippedSpec(output, op, context)
+// context==nil is valid?
+func FormatOp(output []byte, op Op, context Op) []byte {
+	output = FormatZippedSpec(output, op, context)
 	from := op.Offsets[0]
-	copy(output[off:], op.Body[from:])
-	off += len(op.Body) - from
+	//copy(output, op.Body[from:])
+	output = append(output, op.Body[from:]...)
+	//off += len(op.Body) - from
 	if op.Term()!=OP_SEP || op.Count==0 {
-		output[off] = op.Term()
-		off++
+		output = append(output, op.Term())
 	}
-	return off
+	return output
 }
 
 func (op Op) String() string {
-	buf := make([]byte, op.Offsets[op.Count-1]+100) // FIXME!!!
-	l := FormatOp(buf, op, ZERO_OP)
-	return string(buf[:l])
+	var arr[INT60LEN*8+8+40]byte
+	buf := FormatOp(arr[:0], op, ZERO_OP)
+	return string(buf)
 }
 
 func (frame *Frame) String() string {
@@ -248,17 +245,17 @@ func (frame *Frame) AppendOp(op Op) {
 	if (0!=frame.Format&FORMAT_FRAME_NL) && len(frame.Body)>0 && !op.IsFramed() {
 		frame.Body = append(frame.Body, '\n')
 	}
-	var l int
-	var uuids [11 * 2 * 4]byte
+	var uuid_arr [11 * 2 * 4]byte
+	uuids := uuid_arr[:0]
 	if !frame.last.isZero() || len(frame.Body) == 0 {
-		l = FormatZippedSpec(uuids[:], op, frame.last)
+		uuids = FormatZippedSpec(uuids, op, frame.last)
 	} else {
-		l = FormatSpec(uuids[:], op)
+		uuids = FormatSpec(uuids, op)
 	}
 	if (0!=frame.Format&FORMAT_HEADER_SPACE) && frame.last.IsHeader() && op.IsFramed() {
 		frame.Body = append(frame.Body, ' ')
 	}
-	frame.Body = append(frame.Body, uuids[:l]...)
+	frame.Body = append(frame.Body, uuids...)
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 	if op.Term()!=',' || op.Count==0 {
 		frame.Body = append(frame.Body, op.Term())
