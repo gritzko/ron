@@ -29,7 +29,7 @@ while (<> =~ /^(\w+)\s+([^\s]+)\s+(.*)$/) {
     print "const (\n";
     my $i = 0;
     for my $kind (@vals) {
-        print "\t$name"."_".$kind."_BITS = $i\n";
+        print "\t$name"."_".$kind." = $i\n";
         $i++
     }
     print ")\n";
@@ -37,7 +37,7 @@ while (<> =~ /^(\w+)\s+([^\s]+)\s+(.*)$/) {
     print "func ".lc($name)."Sep2Bits (sep byte) uint {\n";
     print "\tswitch sep {\n";
     for my $kind (@vals) {
-        print "\t\tcase ".$name."_".$kind."_SEP:"."\treturn $name"."_".$kind."_BITS\n"; 
+        print "\t\tcase ".$name."_".$kind."_SEP:"."\treturn $name"."_".$kind."\n"; 
     }
     print "\t\tdefault: panic(\"invalid ".lc($name)." separator\")\n";
     print "\t}\n}\n";
@@ -45,7 +45,7 @@ while (<> =~ /^(\w+)\s+([^\s]+)\s+(.*)$/) {
     print "func ".lc($name)."Bits2Sep (bits uint) byte {\n";
     print "\tswitch bits {\n";
     for my $kind (@vals) {
-        print "\t\tcase ".$name."_".$kind."_BITS:"."\treturn $name"."_".$kind."_SEP\n"; 
+        print "\t\tcase ".$name."_".$kind.":"."\treturn $name"."_".$kind."_SEP\n"; 
     }
     print "\t\tdefault: panic(\"invalid ".lc($name)." bits\")\n";
     print "\t}\n}\n";

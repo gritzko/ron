@@ -13,20 +13,8 @@ const (
 	PREFIX1
 )
 
-const NAME_SIGN uint64 = 0
-const EVENT_SIGN uint64 = 2
-const DERIVED_SIGN uint64 = 1
-const HASH_SIGN uint64 = DERIVED_SIGN
-const DERIVED_EVENT_SIGN = EVENT_SIGN | DERIVED_SIGN
-
-const NAME_SIGN_BITS uint64 = NAME_SIGN << 60
-const EVENT_SIGN_BIT uint64 = EVENT_SIGN << 60
-const DERIVED_SIGN_BIT = DERIVED_SIGN << 60
-const HASH_SIGN_BIT = HASH_SIGN << 60
-const DERIVED_EVENT_SIGN_BITS = DERIVED_EVENT_SIGN << 60
-
 const INT60LEN = 10
-const MAX_ATOMS = 7
+const MAX_ATOMS = 8
 
 type UUID struct {
 	Value uint64
@@ -36,9 +24,9 @@ type UUID struct {
 type Spec [4]UUID
 
 type Atoms struct {
-	Count   int
-	Types   [MAX_ATOMS + 1]byte
-	Offsets [MAX_ATOMS]int
+	Count   uint
+	Types   uint
+	Offsets [MAX_ATOMS]uint
 	Body    []byte
 }
 
@@ -46,13 +34,14 @@ type Atoms struct {
 type Op struct { // ~128 bytes
 	Spec
 	Atoms
+	Flags uint
 }
 
 // Frame... mutable, but append-only
 type Frame struct {
 	Body        []byte
 	first, last Op
-	Format		uint
+	Format		int
 	Source      int
 }
 
@@ -142,10 +131,7 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-var STATE_HEADER_ATOMS = ParseAtoms([]byte(string(STATE_HEADER_SEP)))
-var PATCH_HEADER_ATOMS = ParseAtoms([]byte(string(PATCH_HEADER_SEP)))
-var RAW_OP_ATOMS = ParseAtoms([]byte(string(RAW_OP_SEP)))
-var OP_ATOMS = ParseAtoms([]byte(string(OP_SEP)))
+var NO_ATOMS = Atoms{}
 
 type RawUUID []byte
 
@@ -153,13 +139,6 @@ const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~
 
 var base64 = []byte(BASE64)
 var ABC [256]int8
-
-const (
-	SPEC_TYPE = iota
-	SPEC_OBJECT
-	SPEC_EVENT
-	SPEC_LOCATION
-)
 
 func (op Op) Type() UUID {
 	return op.Spec[SPEC_TYPE]
@@ -174,46 +153,28 @@ func (op Op) Event() UUID {
 }
 
 func (op Op) Location() UUID {
-	return op.Spec[SPEC_LOCATION]
+	return op.Spec[SPEC_REF]
 }
 
-const SPEC_PUNCT = "*#@:"
-
-const (
-	SPEC_TYPE_SEP     = "*"
-	SPEC_OBJECT_SEP   = '#'
-	SPEC_EVENT_SEP    = '@'
-	SPEC_LOCATION_SEP = ':'
-)
-
-const OP_PUNCT = ",.;!"
-const (
-	OP_SEP           = byte(',')
-	RAW_OP_SEP       = byte('.')
-	PATCH_HEADER_SEP = byte(';')
-	STATE_HEADER_SEP = byte('!')
-	QUERY_HEADER_SEP = byte('?')
-)
-
-var REDEF_PUNCT = "`\\|/"
+const OP_UPDATE_BIT = 1
+const OP_STATE_BIT = 2
+const OP_QUERY_BIT = 4
 
 // FIXME bracket order to match the numeric order!!!!   }{][)(
-var PREFIX_PUNCT = "([{}])"
-
-const UUID_PUNCT = "$%+-"
-const NAME_UUID_SEP = byte('$')
-const EVENT_UUID_SEP = byte('+')
-const DERIVED_EVENT_SEP = byte('-')
-const HASH_UUID_SEP = byte('%')
 
 const INT60_ERROR uint64 = 1<<60 - 1
 const INT60_NEVER = 63 << (6 * 9)
+const UUID_NAME_UPPER_BITS uint64 = UUID_NAME<<60
+const UUID_EVENT_UPPER_BITS uint64 = UUID_EVENT<<60
+const UUID_DERIVED_UPPER_BITS uint64 = UUID_DERIVED<<60
+const UUID_HASH_UPPER_BITS uint64 = UUID_HASH<<60
+const UUID_UPPER_BITS uint64 = 3<<60
 
-var ZERO_UUID = UUID{0, NAME_SIGN_BITS}
+var ZERO_UUID = UUID{0, UUID_NAME_UPPER_BITS}
 
-var NEVER_UUID = UUID{INT60_NEVER, NAME_SIGN_BITS}
+var NEVER_UUID = UUID{INT60_NEVER, UUID_NAME_UPPER_BITS}
 
-var ERROR_UUID = UUID{INT60_ERROR, NAME_SIGN_BITS}
+var ERROR_UUID = UUID{INT60_ERROR, UUID_NAME_UPPER_BITS}
 
 var ZERO_OP = Op{}
 

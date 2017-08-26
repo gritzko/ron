@@ -29,7 +29,7 @@
     }
 
     action atom_start {
-        if ! op.addAtom(fc, p-atoms_at) {
+        if ! op.addAtom(atomSep2Bits(fc), uint(p-atoms_at)) {
             fbreak;
         }
     }
@@ -51,7 +51,10 @@
         atoms_at = p
     }
     action opterm {
-        op.Atoms.Types[MAX_ATOMS] = fc
+        op.Flags |= opSep2Bits(fc)
+    }
+    action query {
+        op.Flags |= OP_QUERY_BIT
     }
 
     action next {
@@ -85,11 +88,12 @@
 
     REDEF = ([`\\|/]|"") @redef_uuid;
 
-    OPTERM = space* ("?" [,\.;!]? | [,\.;!] ) @opterm ;
+    OPTERM = space*  [,\.;!] @opterm ;
+    QUERY = space* [?] @query;
 
     OP = (
             ( space* [*#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            ( (OPTERM | ATOM+ %atoms OPTERM?) >atoms_start ) space*
+            ( (OPTERM QUERY? | ATOM+ %atoms OPTERM? QUERY?) >atoms_start ) space*
             ( [*#@:] @next )? %/over
          ) ;
 

@@ -8,7 +8,7 @@ type LWW struct {
 
 }
 
-var LWW_UUID = RON.UUID{881557636825219072, RON.NAME_SIGN_BITS}
+var LWW_UUID = RON.UUID{881557636825219072, RON.UUID_NAME_UPPER_BITS}
 
 // LWW arrays and matrices  :)1%)2 :)2   merge is O(N)
 func (lww LWW) Reduce (af, bf RON.Frame) (res RON.Frame, err RON.UUID) {
@@ -29,16 +29,15 @@ func (lww LWW) ReduceAll(inputs []RON.Frame) (res RON.Frame, err RON.UUID) {
 		}
 		heap.Put(&i)
 	}
-	spec[RON.SPEC_LOCATION] = RON.ZERO_UUID
-	term := RON.STATE_HEADER_ATOMS
+	spec[RON.SPEC_REF] = RON.ZERO_UUID
 	if !haveState {
-		term = RON.PATCH_HEADER_ATOMS
+		res.AppendPatchHeader(spec)
+	} else {
+		res.AppendStateHeader(spec)
 	}
-	res.AppendSpecAtoms(spec, term)
 	for !heap.IsEmpty() {
 		atoms := heap.Op().Atoms
-		atoms.Types[RON.MAX_ATOMS] = RON.OP_SEP
-		res.AppendSpecAtoms(heap.Op().Spec, atoms)
+		res.AppendReduced(heap.Op().Spec, atoms)
 		heap.NextPrim()
 	}
 

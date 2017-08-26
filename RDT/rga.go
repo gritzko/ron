@@ -62,12 +62,12 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		//fmt.Printf("LOC %s (%d)\n", loc.String(), cu)
 
 		// note any states, if so use ! else ;
-		header_spec[RON.SPEC_LOCATION] = loc
-		atoms := RON.STATE_HEADER_ATOMS
+		header_spec[RON.SPEC_REF] = loc
 		if !loc.IsZero() {
-			atoms = RON.PATCH_HEADER_ATOMS
+			result.AppendPatchHeader(header_spec)
+		} else {
+			result.AppendStateHeader(header_spec)
 		}
-		result.AppendSpecAtoms(header_spec, atoms)
 
 		for rga.active_ins.Len() > 0 {
 			op := *rga.active_ins.Op()
@@ -76,14 +76,13 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 			spec := op.Spec
 			atoms := op.Atoms
 			if op.IsRaw() {
-				spec[RON.SPEC_LOCATION] = RON.ZERO_UUID
+				spec[RON.SPEC_REF] = RON.ZERO_UUID
 			}
-			atoms.Types[RON.MAX_ATOMS] = RON.OP_SEP
 			del := rga.waiting_rms.Take(event)
 			if del.LaterThan(op.Location()) {
-				spec[RON.SPEC_LOCATION] = del
+				spec[RON.SPEC_REF] = del
 			}
-			result.AppendSpecAtoms(spec,atoms)
+			result.AppendReduced(spec,atoms)
 			//fmt.Printf("APPND %c[ %s ]\n", op.Term(), string(op.Atoms.Body))
 
 			rga.active_ins.NextPrim() // idempotency
@@ -95,8 +94,8 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 	}
 
 	if rga.waiting_rms.Len() > 0 {
-		header_spec[RON.SPEC_LOCATION] = RON.NEVER_UUID
-		result.AppendSpecAtoms(header_spec, RON.PATCH_HEADER_ATOMS)
+		header_spec[RON.SPEC_REF] = RON.NEVER_UUID
+		result.AppendPatchHeader(header_spec)
 
 		for !rga.removes.IsEmpty() {
 			still := rga.waiting_rms.Take(rga.removes.Op().Location())

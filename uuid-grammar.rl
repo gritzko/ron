@@ -37,14 +37,14 @@
     }
 
     action uuid_sep {
-        sign = UUIDSep2Sign(fc)
+        sign = uuidSep2Bits(fc)
         i = uuid.Replica()
         uuid.Origin &= PREFIX10
     }
 
     action uuid {
         length = pe
-        uuid.Origin |= sign << 60
+        uuid.Origin |= uint64(sign) << 60
         if bare && full {
             uuid.Origin = 0
         }
@@ -53,7 +53,7 @@
     action start_uuid {
         bare, full = true, false
         i = uuid.Value
-        sign = uuid.Sign()
+        sign = uuid.Scheme()
     }
 
 

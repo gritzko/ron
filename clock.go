@@ -60,7 +60,7 @@ func (clock *Clock) Time() UUID {
 	} else {
 		val = trim_time(val, last)
 	}
-	ret := UUID{val, clock.lastSeen.Origin | EVENT_SIGN_BIT}
+	ret := NewEventUUID(val, clock.lastSeen.Origin)
 	clock.See(ret)
 	return ret
 }

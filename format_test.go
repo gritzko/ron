@@ -101,7 +101,7 @@ func BenchmarkUnzip(b *testing.B) {
 	uuids := make([]UUID, b.N)
 	const m32 = 0xffffffff
 	for i := 0; i < b.N; i++ {
-		uuids[i] = UUID{RandUint(), EVENT_SIGN_BIT | RandUint()}
+		uuids[i] = UUID{RandUint(), UUID_EVENT_UPPER_BITS | RandUint()}
 		//uuids[i] = UUID{uint64(i), '-', 100}
 		// FIXME optimize close ids - bench CT/RGA
 	}
@@ -184,7 +184,7 @@ func BenchmarkFormatOp(b *testing.B) {
 }
 
 type sample struct {
-	flags uint
+	flags int
 	correct string
 }
 

@@ -9,11 +9,11 @@ import (
 
 func TestParseUUID(t *testing.T) {
 	uuidA, _ := ParseUUID([]byte("1"), ZERO_UUID)
-	if uuidA.Value != (1<<54) || uuidA.Origin != 0 || uuidA.Sign() != NAME_SIGN {
+	if uuidA.Value != (1<<54) || uuidA.Origin != 0 || uuidA.Scheme() != UUID_NAME {
 		t.Fail()
 	}
 	uuidAB, _ := ParseUUID([]byte(")1"), uuidA)
-	if uuidAB.Value != (1<<54)|1 || uuidAB.Origin != 0 || uuidAB.Sign() != NAME_SIGN {
+	if uuidAB.Value != (1<<54)|1 || uuidAB.Origin != 0 || uuidAB.Scheme() != UUID_NAME {
 		t.Fail()
 	}
 	hello, _ := ParseUUID([]byte("hello-111"), ZERO_UUID)
@@ -154,7 +154,7 @@ func TestParseFrame(t *testing.T) {
 		for bo := 0; bo < dim; bo++ {
 			v := random_close_int(def.Value, uint(bv))
 			o := random_close_int(def.Origin, uint(bo))
-			uuids[bv*dim+bo] = UUID{v, EVENT_SIGN_BIT | o}
+			uuids[bv*dim+bo] = UUID{v, UUID_EVENT_UPPER_BITS | o}
 		}
 	}
 	// shuffle to 16 ops
@@ -167,7 +167,7 @@ func TestParseFrame(t *testing.T) {
 	const ops = 30
 	for j := 0; j < ops; j++ {
 		at = j << 2
-		frame.AppendSpecBody(Spec{uuids[at], uuids[at+1], uuids[at+2], uuids[at+3]}, []byte("!"))
+		frame.AppendStateHeader(Spec{uuids[at], uuids[at+1], uuids[at+2], uuids[at+3]})
 	}
 	t.Logf(frame.String())
 	// recover, compare
@@ -195,7 +195,7 @@ func TestParseFrame(t *testing.T) {
 }
 
 func TestXParseOpWhitespace(t *testing.T) {
-	str := []byte(" #test .\n#next?.")
+	str := []byte(" #test .\n#next.?")
 	var op Op
 	l := XParseOp(str, &op, ZERO_OP)
 	if l != bytes.IndexByte(str, '\n')+1 {
@@ -277,8 +277,12 @@ func TestOp_ParseAtoms(t *testing.T) {
 			t.Fail()
 			break
 		}
-		if string(op.Types[0:op.Count]) != tests[i][1] {
-			t.Logf("misparsed %d: '%s' (%s)", i, string(op.Types[:]), tests[i][1])
+		types := ""
+		for a := uint(0); a<op.Atoms.Count; a++ {
+			types += string(atomBits2Sep(op.Atoms.Type(a)))
+		}
+		if types != tests[i][1] {
+			t.Logf("misparsed %d: '%s' (%s)", i, types, tests[i][1])
 			t.Fail()
 		}
 	}

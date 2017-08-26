@@ -36,8 +36,12 @@ func (a UUID) EarlierThan(b UUID) bool {
 	}
 }
 
-func (a UUID) Sign() uint64 {
-	return a.Origin >> 60
+func (a UUID) Scheme() uint {
+	return uint(a.Origin >> 60)
+}
+
+func (a UUID) Sign() byte {
+	return uuidBits2Sep(a.Scheme())
 }
 
 func (a UUID) Replica() uint64 {
@@ -52,7 +56,7 @@ func (a UUID) SameAs(b UUID) bool {
 	} else if (a.Origin^b.Origin)&PREFIX10 != 0 {
 		return false
 	} else {
-		return a.Origin&EVENT_SIGN_BIT == 1 && b.Origin&EVENT_SIGN_BIT == 1
+		return a.Origin&UUID_UPPER_BITS == b.Origin&UUID_UPPER_BITS
 	}
 }
 
@@ -61,23 +65,31 @@ func (a Op) Same(b *Op) bool {
 }
 
 func (op Op) Term() byte {
-	return op.Types[MAX_ATOMS]
+	return opBits2Sep(op.Class())
+}
+
+func (op Op) Class () uint {
+	return 3 & op.Flags
+}
+
+func (op Op) IsQuery () bool {
+	return op.Flags & OP_QUERY_BIT != 0
 }
 
 func (op Op) IsHeader() bool {
-	return op.Term() != RAW_OP_SEP && op.Term() != OP_SEP
+	return op.Class()&OP_STATE_BIT != 0
 }
 
 func (op Op) IsFramed() bool {
-	return op.Term()==OP_SEP
+	return op.Class()==OP_REDUCED
 }
 
 func (op Op) IsState() bool {
-	return op.Term() == STATE_HEADER_SEP
+	return op.Class() == OP_STATE
 }
 
 func (op Op) IsRaw() bool {
-	return op.Term() == RAW_OP_SEP
+	return op.Class() == OP_RAW
 }
 
 // not good - op is detached from a frame here
@@ -97,7 +109,7 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 
 func (i *Iterator) Next() bool {
 
-	if i.IsEmpty() {
+	if i.offset!=0 && i.IsEmpty() { // FIXME test corner cases more
 		return false
 	} else if i.IsLast() {
 		i.Op = ZERO_OP
@@ -118,7 +130,7 @@ func (i *Iterator) Next() bool {
 }
 
 func (uuid UUID) IsTemplate() bool {
-	return uuid.Sign() == NAME_SIGN && uuid.Value == 0 && uuid.Origin != 0
+	return uuid.Sign()==UUID_NAME && uuid.Value == 0 && uuid.Origin != 0
 }
 
 func (frame Frame) Stamp(clock Clock) (ret Frame) {
@@ -144,7 +156,7 @@ func (frame Frame) Stamp(clock Clock) (ret Frame) {
 }
 
 func (op Op) IsEmpty() bool {
-	return op.Types[MAX_ATOMS] == 0
+	return op.Spec[0]==ZERO_UUID && op.Spec[1]==ZERO_UUID && op.Spec[2]==ZERO_UUID && op.Spec[3]==ZERO_UUID
 }
 
 func (frame *Frame) Begin() (i Iterator) {
@@ -152,7 +164,6 @@ func (frame *Frame) Begin() (i Iterator) {
 	i.offset = 0
 	if frame.first.IsEmpty() {
 		i.Op = ZERO_OP
-		i.Types[MAX_ATOMS] = 1 // HACK
 		i.Next()
 	} else {
 		i.Op = frame.first
@@ -205,4 +216,12 @@ func (spec *Op) isZero() bool {
 
 func (i Iterator) Offset() int {
 	return i.offset
+}
+
+func (a Atoms) Type (i uint) uint {
+	return (a.Types >> (i<<1)) & 3
+}
+
+func NewEventUUID (time, origin uint64) UUID {
+	return UUID{Value:time, Origin:(origin&INT60_ERROR)|UUID_EVENT_UPPER_BITS}
 }

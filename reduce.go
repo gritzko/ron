@@ -9,7 +9,7 @@ func (r EmptyReducer) Reduce(a, b Frame) (result Frame, err UUID) {
 	if !ai.IsHeader() {
 		loc = ai.Event()
 	}
-	result.AppendSpecAtoms(Spec{ai.Type(), ai.Object(), bi.Event(), loc}, STATE_HEADER_ATOMS)
+	result.AppendStateHeader(Spec{ai.Type(), ai.Object(), bi.Event(), loc})
 	return
 }
 
@@ -42,7 +42,7 @@ func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
 	}
 	if error_uuid != ZERO_UUID {
 		ret = Frame{Body: make([]byte, 100)}
-		ret.AppendSpecAtoms(Spec{i.Type(), i.Object(), ERROR_UUID, error_uuid}, STATE_HEADER_ATOMS)
+		ret.AppendStateHeader(Spec{i.Type(), i.Object(), ERROR_UUID, error_uuid})
 	}
 	return
 }

@@ -5,17 +5,17 @@ import (
 	"strconv"
 )
 
-func (op Op) ParseInt(pos int) (i int64, err error) { // FIXME no error
-	if pos > op.Count || op.Types[pos] != '=' {
+func (op Op) ParseInt(pos uint) (i int64, err error) { // FIXME no error
+	if pos > op.Atoms.Count || op.Atoms.Type(pos) != ATOM_INT {
 		err = errors.New("no int at the pos")
 		return
 	}
-	var from, till int
-	from = op.Offsets[pos] + 1
+	var till uint
+	from := op.Offsets[pos] + 1
 	if pos < 7 {
 		till = op.Offsets[pos+1]
 	} else {
-		till = len(op.Body)
+		till = uint(len(op.Body))
 	}
 	str := string(op.Body[from:till])
 	i, err = strconv.ParseInt(str, 10, 64)
@@ -34,13 +34,13 @@ func ParseAtoms (body []byte) Atoms {
 	return parsed.Atoms
 }
 
-func (op Op) ParseFloat(pos int) (ret float64, err error) {
-	var from, till int
+func (op Op) ParseFloat(pos uint) (ret float64, err error) {
+	var from, till uint
 	from = op.Offsets[pos] + 1 // FIXME refac
 	if pos+1 < op.Count {
 		till = op.Offsets[pos+1]
 	} else {
-		till = len(op.Body)
+		till = uint(len(op.Body))
 	}
 	str := string(op.Body[from:till])
 	ret, err = strconv.ParseFloat(str, 64)
@@ -83,19 +83,4 @@ func Parse(str string) (Frame, error) {
 	ret := Frame{Body: []byte(str)}
 	_ = ret.Begin() // FIXME iterator - errors
 	return ret, nil
-}
-
-func UUIDSep2Sign(char byte) uint64 {
-	switch char {
-	case NAME_UUID_SEP:
-		return NAME_SIGN
-	case HASH_UUID_SEP:
-		return HASH_SIGN
-	case EVENT_UUID_SEP:
-		return EVENT_SIGN
-	case DERIVED_EVENT_SEP:
-		return DERIVED_EVENT_SIGN
-	default:
-		panic("not an UUID separator")
-	}
 }

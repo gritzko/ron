@@ -10,6 +10,7 @@ type parser struct { // TODO
 }
 
 func XParseOp(data []byte, op *Op, context Op) int {
+    // TODO phase out pointer-signatures!!!
 
     %% machine RON;
     %% write data;
@@ -28,14 +29,14 @@ func XParseOp(data []byte, op *Op, context Op) int {
 
     op.Count = 0
     op.Body = op.Body[:0]
-    op.Types = [8]byte{0,0,0,0,0,0,0,0}
+    op.Flags = 0
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int
     _ = eof
     _,_,_ = ts,te,act
     var bare, full bool
-    var sign uint64 = 0
+    var sign uint = 0
     done := false
 
 	%%{
@@ -54,9 +55,6 @@ func XParseOp(data []byte, op *Op, context Op) int {
     }
 
     if done {
-        if op.Types[7]==0 {
-            op.Types[7] = ','
-        }
         return p
     } else {
         return -p
@@ -80,7 +78,7 @@ func XParseUUID(data []byte, uuid *UUID) (length int) {
     _ = eof
     _,_,_ = ts,te,act
     var bare, full bool
-    var sign uint64 = 0
+    var sign uint = 0
 
 
 	%%{ 

@@ -54,7 +54,7 @@ func BenchmarkParseOp(b *testing.B) {
 	var op Op
 	for i := 0; i < b.N; i++ {
 		l := XParseOp(frames[off:], &op, ZERO_OP)
-		if l != len(frame) || op.Event().Origin != origin.Origin || op.Count != 1 || op.Types[0] != '=' {
+		if l != len(frame) || op.Event().Origin != origin.Origin || op.Count != 1 || op.Atoms.Type(0) != '=' {
 			b.Logf("parse fail: off %d len %d(%d) '%s'", off, l, len(frame), string(frames[off:]))
 			b.Fail()
 			break
@@ -69,11 +69,12 @@ func BenchmarkIterator_Next(b *testing.B) {
 	var times = make([]UUID, b.N)
 	var test_uuid, _ = ParseUUIDString("test")
 	var field_uuid, _ = ParseUUIDString("field")
-	var LWW_UUID = UUID{881557636825219072, NAME_SIGN_BITS}
+	var LWW_UUID = UUID{881557636825219072, UUID_NAME_UPPER_BITS}
+	atoms1 := ParseAtoms([]byte("=1"))
 	for i := 0; i < b.N; i++ {
 		time := clock.Time()
 		times[i] = time
-		frame.AppendSpecBody(Spec{LWW_UUID, test_uuid, time, field_uuid}, []byte("=1"))
+		frame.AppendReduced(Spec{LWW_UUID, test_uuid, time, field_uuid}, atoms1)
 	}
 	b.Logf("'%s'", string(frame.Body))
 	iter := frame.Begin()

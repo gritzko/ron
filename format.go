@@ -181,13 +181,13 @@ func FormatZippedUUID(output []byte, uuid UUID, context UUID) (ret []byte) {
 		return output
 	}
 	ret = FormatZippedInt(output, uuid.Value, context.Value)
-	if uuid.Origin == NAME_SIGN_BITS {
+	if uuid.Origin == UUID_NAME_UPPER_BITS {
 		return ret
 	}
 	if uuid.Value == context.Value || uuid.Sign() != context.Sign() ||
 		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
 		(uuid.Replica() == context.Replica() && ABC[ret[len(output)]]>=0) { // FIXME this if
-		ret = append(ret, UUID_PUNCT[uuid.Sign()])
+		ret = append(ret, UUID_PUNCT[uuid.Scheme()])
 	}
 	if uuid.Replica() != context.Replica() {
 		ret = FormatZippedInt(ret, uuid.Replica(), context.Replica())
@@ -224,7 +224,7 @@ func FormatOp(output []byte, op Op, context Op) []byte {
 	//copy(output, op.Body[from:])
 	output = append(output, op.Body[from:]...)
 	//off += len(op.Body) - from
-	if op.Term()!=OP_SEP || op.Count==0 {
+	if op.Class()!=OP_REDUCED || op.Count==0 {
 		output = append(output, op.Term())
 	}
 	return output
@@ -263,12 +263,28 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.last = op
 }
 
-func (frame *Frame) AppendSpecAtoms(spec Spec, atoms Atoms) {
-	frame.AppendOp(Op{spec,atoms})
+func (frame *Frame) AppendSpecAtomsFlags(spec Spec, atoms Atoms, flags uint) {
+	frame.AppendOp(Op{spec,atoms, flags})
 }
 
-func (frame *Frame) AppendSpecBody(toel Spec, body []byte) {
-	frame.AppendSpecAtoms(toel, ParseAtoms(body))
+func (frame *Frame) AppendReduced(spec Spec, atoms Atoms) {
+	frame.AppendOp(Op{spec,atoms, OP_REDUCED})
+}
+
+func (frame *Frame) AppendRaw(spec Spec, atoms Atoms) {
+	frame.AppendOp(Op{spec,atoms, OP_RAW})
+}
+
+func (frame *Frame) AppendSpecBody(toel Spec, body []byte, flags uint) {
+	frame.AppendSpecAtomsFlags(toel, ParseAtoms(body), flags)
+}
+
+func (frame *Frame) AppendPatchHeader (spec Spec) {
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_PATCH)
+}
+
+func (frame *Frame) AppendStateHeader (spec Spec) {
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_STATE)
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
