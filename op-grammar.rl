@@ -4,11 +4,11 @@
     include UUID "./uuid-grammar.rl";
 
     action redef_uuid {
-        switch fc {
-        case '`':  *uuid = *prev_uuid
-        case '\\': *uuid = context.Spec[1]
-        case '|':  *uuid = context.Spec[2]
-        case '/':  *uuid = context.Spec[3]
+        red := redefSep2Bits(fc)
+        if red==0 {
+            *uuid = *prev_uuid
+        } else {
+            *uuid = context.Spec[red]
         }
     }
 
@@ -16,7 +16,7 @@
         i = 0
         digits = 0
         old_n = n
-        n = -int(ABC[fc]) -30
+        n = specSep2Bits(fc)
         uuid = &op.Spec[n]
         *uuid = context.Spec[n]
         if n <= old_n {
