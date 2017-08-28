@@ -74,31 +74,26 @@
     ESC = "\\" [^\n\r];
     CHAR = [^'\n\r\\];
 
+    REDEF = ([`\\|/]|"") @redef_uuid;
+    SPEC_UUID = [*#@:] @toel_start space* REDEF UUID %toel_uuid space*;
+
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
     FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
-
     STRING_ATOM = (UNIESC|ESC|CHAR)* %string_atom;
 
-    ATOM = space* (
+    ATOM = (
             "=" space* INT_ATOM  |
             "^" space* FLOAT_ATOM |
             ['] STRING_ATOM ['] |
             ">" space* UUID
-            ) >atom_start %atom;
-
-    REDEF = ([`\\|/]|"") @redef_uuid;
-
-    OPTERM = space*  [,\.;!] @opterm ;
-    QUERY = space* [?] @query;
+            ) >atom_start %atom space*;
     ATOMS = ATOM+ %atoms >atoms_start;
 
-    OP = (
-            ( space* [*#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            ( QUERY | OPTERM | ATOMS OPTERM? ) space*
-            ( [*#@:] @next )?
-            %/over
-         ) ;
+    OPTERM = [,\.;!] @opterm space*;
+    QUERY = [?] @query space*;
 
-    # main := OP;
+    NEXT = [*#@:] @next; 
+
+    OP = space* SPEC_UUID* ( QUERY | OPTERM | ATOMS OPTERM? ) NEXT? %/over;
 
 }%%
