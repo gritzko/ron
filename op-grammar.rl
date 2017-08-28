@@ -34,10 +34,12 @@
         }
     }
     action atom {
+        // TODO max size for int/float/string
+        // TODO clean atom slices (no whitespace, no separators)
     }
 
     action atoms {
-        op.Body = data[atoms_at:p]
+        atoms_till = p
     }
 
     action int_atom {
@@ -57,15 +59,11 @@
         op.Flags |= OP_QUERY_BIT
     }
 
-    action next {
-        ret = p
-        p-=1
+    action next { // start of the next op
         done = true
         fbreak;
     }
-    action over {
-        ret = p
-        p -= 1
+    action over { // end of input
         done = true
         fbreak;
     }

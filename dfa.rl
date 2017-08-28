@@ -1,6 +1,6 @@
 package RON
 
-import "fmt"
+//import "fmt"
 const trace = false
 
 type parser struct { // TODO
@@ -17,7 +17,6 @@ func XParseOp(data []byte, op *Op, context Op) int {
 
     var prev_uuid *UUID = &ZERO_UUID
     _ = prev_uuid
-    var ret int
     var uuid *UUID
     var blank UUID
     var i uint64
@@ -25,7 +24,7 @@ func XParseOp(data []byte, op *Op, context Op) int {
     var n, old_n int = -1, -1
     var length = -1
     _ = length
-    var atoms_at int
+    var atoms_at, atoms_till int
     var red uint
 
     op.Count = 0
@@ -49,14 +48,9 @@ func XParseOp(data []byte, op *Op, context Op) int {
 	    write exec;
 	}%%
 
-    if ret>0 {
-        if trace {
-            fmt.Printf("ATOMS: %d..%d\n", op.Offsets[0], ret);
-        }
-    }
-
     if done {
-        return p
+        op.Body = data[atoms_at:atoms_till]
+        return p-1
     } else {
         return -p
     }
