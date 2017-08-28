@@ -152,7 +152,12 @@ func BenchmarkUnzip(b *testing.B) {
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
-	op, _ := ParseOp([]byte(str), ZERO_OP)
+	op, l := ParseOp([]byte(str), ZERO_OP)
+	if l!= len(str) {
+		t.Fail()
+		t.Logf("misparsed %s", str)
+		return
+	}
 	context := op
 	op.Spec[2].Value++
 	op.Spec[3].Value++
@@ -163,8 +168,9 @@ func TestOp_String(t *testing.T) {
 		return
 	}
 	opstr := string(buf)
-	if opstr != "@)1:)1=1" {
-		t.Logf("incorrect: '%s'", opstr)
+	correct := "@)1:)1=1"
+	if opstr != correct {
+		t.Logf("incorrect: '%s' != '%s'", opstr, correct)
 		t.Fail()
 	}
 }

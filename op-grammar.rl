@@ -4,7 +4,7 @@
     include UUID "./uuid-grammar.rl";
 
     action redef_uuid {
-        red := redefSep2Bits(fc)
+        red = redefSep2Bits(fc)
         if red==0 {
             *uuid = *prev_uuid
         } else {
@@ -16,7 +16,7 @@
         i = 0
         digits = 0
         old_n = n
-        n = specSep2Bits(fc)
+        n = int(specSep2Bits(fc))
         uuid = &op.Spec[n]
         *uuid = context.Spec[n]
         if n <= old_n {
@@ -90,11 +90,13 @@
 
     OPTERM = space*  [,\.;!] @opterm ;
     QUERY = space* [?] @query;
+    ATOMS = ATOM+ %atoms >atoms_start;
 
     OP = (
             ( space* [*#@:] @toel_start space* REDEF UUID %toel_uuid )*
-            ( (OPTERM QUERY? | ATOM+ %atoms OPTERM? QUERY?) >atoms_start ) space*
-            ( [*#@:] @next )? %/over
+            ( QUERY | OPTERM | ATOMS OPTERM? ) space*
+            ( [*#@:] @next )?
+            %/over
          ) ;
 
     # main := OP;

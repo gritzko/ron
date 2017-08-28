@@ -22,10 +22,11 @@ func XParseOp(data []byte, op *Op, context Op) int {
     var blank UUID
     var i uint64
     var digits uint
-    n, old_n := -1, -1
+    var n, old_n int = -1, -1
     var length = -1
     _ = length
     var atoms_at int
+    var red uint
 
     op.Count = 0
     op.Body = op.Body[:0]

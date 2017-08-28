@@ -18,39 +18,38 @@ func (r EmptyReducer) ReduceAll(inputs []Frame) (result Frame, err UUID) {
 }
 
 type OmniReducer struct {
+	empty EmptyReducer
 	Types map[uint64]Reducer
 }
 
 var REDUCER = OmniReducer{}
 
-// Reduce picks a reducer function, performs all the sanity checks,
-// creates the header, invokes the reducer, returns the result
-func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
-	var length int = len(a.Body) + len(b.Body)
-	ret := Frame{Body: make([]byte, 0, length)} //FIXME last
-	i, j := a.Begin(), b.Begin()
-	error_uuid := ZERO_UUID
-	var fn Reducer = omni.Types[i.Type().Value]
-	if fn == nil {
-		error_uuid = UNKNOWN_TYPE_ERROR_UUID
-	} else if i.Type() != j.Type() {
-		error_uuid = TYPE_MISMATCH_ERROR_UUID
-	}
-	// plant header
-	if error_uuid == ZERO_UUID {
-		ret, error_uuid = fn.Reduce(a, b)
-	}
-	if error_uuid != ZERO_UUID {
-		ret = Frame{Body: make([]byte, 100)}
-		ret.AppendStateHeader(Spec{i.Type(), i.Object(), ERROR_UUID, error_uuid})
-	}
+func NewOmniReducer () (ret OmniReducer) {
+	ret.Types = make(map[uint64]Reducer)
 	return
 }
 
+func (omni OmniReducer) AddType (id UUID, r Reducer) {
+	omni.Types[id.Value] = r
+}
+
+func (omni OmniReducer) pickReducer (t UUID) Reducer {
+	r := omni.Types[t.Value]
+	if r==nil {
+		r = omni.empty
+	}
+	return r
+}
+
+// Reduce picks a reducer function, performs all the sanity checks,
+// creates the header, invokes the reducer, returns the result
+func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
+	r := omni.pickReducer(a.Begin().Type())
+	return r.Reduce(a, b)
+}
+
 func (omni OmniReducer) ReduceAll(inputs []Frame) (result Frame, err UUID) {
-	//ret = frames[0]
-	//for i:=1; i<len(frames); i++ {
-	//	ret = Reduce(ret, frames[i])
-	//}
-	return
+	r := omni.pickReducer(inputs[0].Begin().Type())
+	// TODO sanity checks
+	return r.ReduceAll(inputs)
 }

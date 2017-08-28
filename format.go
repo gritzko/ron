@@ -170,7 +170,7 @@ func FormatZippedInt(output []byte, value, context uint64) (ret []byte) {
 
 func FormatUUID(output []byte, uuid UUID) []byte {
 	ret := FormatTrimmedInt(output, uuid.Value)
-	ret = append(ret, UUID_PUNCT[uuid.Sign()])
+	ret = append(ret, UUID_PUNCT[uuid.Scheme()])
 	ret = FormatTrimmedInt(ret, uuid.Origin)
 	return ret
 }
