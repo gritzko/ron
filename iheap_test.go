@@ -26,9 +26,9 @@ func TestIHeap_Op(t *testing.T) {
 	heap.PutFrame(ParseFrame([]byte(frameA)))
 	heap.PutFrame(ParseFrame([]byte(frameB)))
 	heap.PutFrame(ParseFrame([]byte(frameC)))
-	loc := heap.Op().Location()
+	loc := heap.Op().Reference()
 	count := 0
-	for heap.Op().Location() == loc {
+	for heap.Op().Reference() == loc {
 		count++
 		heap.Next()
 	}

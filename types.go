@@ -70,7 +70,7 @@ type Iterator struct {
 // [x] op.Atoms && tests
 // [x] typedef Spec [4]UUID,
 // [x] typedef Atoms, Atoms.Count()
-// [ ] Location -> Reference
+// [ ] Reference -> Reference
 // [x] ?!,; term/mark/kind/status/headerness
 // [x] AppendOp/Query/Patch/State - Spec/Atoms
 // [ ] multiframe (still atomic)   Frame.Split(iterator)
@@ -152,7 +152,7 @@ func (op Op) Event() UUID {
 	return op.Spec[SPEC_EVENT]
 }
 
-func (op Op) Location() UUID {
+func (op Op) Reference() UUID {
 	return op.Spec[SPEC_REF]
 }
 

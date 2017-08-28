@@ -33,7 +33,7 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		header_spec[RON.SPEC_TYPE] = iii[k].Type() //FIXME
 		header_spec[RON.SPEC_OBJECT] = iii[k].Object()
 		raw := !iii[k].IsHeader()
-		at := iii[k].Location()
+		at := iii[k].Reference()
 		version = iii[k].Event()
 		if !raw {
 			iii[k].Next()
@@ -41,7 +41,7 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		if iii[k].Count == 0 {
 			rga.removes.Put(&iii[k])
 			for ii := iii[k]; !ii.IsEmpty(); ii.Next() {
-				rga.waiting_rms.Put(ii.Location(), ii.Event())
+				rga.waiting_rms.Put(ii.Reference(), ii.Event())
 			}
 		} else { // inserts
 			//fmt.Printf("WAIT %s\n", at.String())
@@ -79,7 +79,7 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 				spec[RON.SPEC_REF] = RON.ZERO_UUID
 			}
 			del := rga.waiting_rms.Take(event)
-			if del.LaterThan(op.Location()) {
+			if del.LaterThan(op.Reference()) {
 				spec[RON.SPEC_REF] = del
 			}
 			result.AppendReduced(spec,atoms)
@@ -98,7 +98,7 @@ func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		result.AppendPatchHeader(header_spec)
 
 		for !rga.removes.IsEmpty() {
-			still := rga.waiting_rms.Take(rga.removes.Op().Location())
+			still := rga.waiting_rms.Take(rga.removes.Op().Reference())
 			if !still.IsZero() {
 				result.AppendOp(*rga.removes.Op())
 			}
