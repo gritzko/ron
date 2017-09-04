@@ -123,12 +123,15 @@ func (h *IHeap) nexteq(i int, uuid UUID) {
 	if h.iters[i].Spec[h.primary] == uuid {
 		j := i << 1
 		if j < len(h.iters) {
-			if j+1 < len(h.iters) { // rightmost first!
+			if j+1 < len(h.iters) { // FIXME rightmost first!
 				h.nexteq(j+1, uuid)
 			}
 			h.nexteq(j, uuid)
 		}
 		h.next(i)
+		for i<len(h.iters) &&  h.iters[i].Spec[h.primary] == uuid {
+			h.next(i) // FIXME this fix (recheck after removal)
+		}
 	}
 }
 
