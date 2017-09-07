@@ -224,7 +224,7 @@ func FormatOp(output []byte, op Op, context Op) []byte {
 	//copy(output, op.Body[from:])
 	output = append(output, op.Body[from:]...)
 	//off += len(op.Body) - from
-	if op.Class()!=OP_REDUCED || op.Count==0 {
+	if op.IsHeader() || (op.Class()==OP_RAW && context.Class()!=OP_RAW) || op.Count==0 {
 		output = append(output, op.Term())
 	}
 	return output
@@ -257,7 +257,7 @@ func (frame *Frame) AppendOp(op Op) {
 	}
 	frame.Body = append(frame.Body, uuids...)
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
-	if op.Term()!=',' || op.Count==0 {
+	if op.IsHeader() || (op.Class()==OP_RAW && frame.last.Class()!=OP_RAW) || op.Count==0 {
 		frame.Body = append(frame.Body, op.Term())
 	}
 	frame.last = op

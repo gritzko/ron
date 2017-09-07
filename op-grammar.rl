@@ -53,10 +53,10 @@
         atoms_at = p
     }
     action opterm {
-        op.Flags |= opSep2Bits(fc)
+        op.Flags = opSep2Bits(fc)
     }
     action query {
-        op.Flags |= OP_QUERY_BIT
+        op.Flags = OP_QUERY_BIT
     }
 
     action next { // start of the next op

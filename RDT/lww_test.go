@@ -8,6 +8,11 @@ import (
 
 // 3-part tables: first all inserts, then all deletes
 var lww_3_tests = [][3]string{
+	{ // 0+o
+		"*lww#test!",
+		"*lww#test@time:a'A'.",
+		"*lww#test@time!:a'A'",
+	},
 	{ // s+o
 		"*lww#test@1!:a'A'",
 		"*lww#test@2:b'B'.",
@@ -22,6 +27,11 @@ var lww_3_tests = [][3]string{
 		"*lww#test@1; :a'A1':b'B1':c'C1'",
 		"*lww#test@2; :a'A2':b'B2'",
 		"*lww#test@2;:a'A2':b'B2'@1:c'C1'",
+	},
+	{
+		"*lww#test@0ld!@new:key'new_value'",
+		"*lww#test@new:key'new_value'",
+		"*lww#test@new!:key'new_value'",
 	},
 }
 

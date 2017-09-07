@@ -19,6 +19,11 @@ func TestIMultiMap_Take(t *testing.T) {
 
 // 3-part tables: first all inserts, then all deletes
 var rga_3_tests = [][3]string{
+	{ // 0+o
+		"*rga#textB!",
+		"*rga#textB@time'A'.",
+		"*rga#textB@time!'A'",
+	},
 	{ // s+o
 		"*rga#test@1!@'A'",
 		"*rga#test@2:1'B'.",

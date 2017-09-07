@@ -17,7 +17,9 @@ type RGA struct {
 	loc_ins             RON.UHeap
 }
 
-func (rga *RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
+var RGA_UUID = RON.UUID{985043671231496192, RON.UUID_NAME_UPPER_BITS}
+
+func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 
 	rga.active_ins = RON.MakeIHeap(RON.PRIM_EVENT|RON.PRIM_DESC|RON.SEC_LOCATION|RON.SEC_DESC, len(inputs))
 	rga.removes = RON.MakeIHeap(RON.PRIM_EVENT|RON.SEC_LOCATION, len(inputs))

@@ -70,7 +70,7 @@ type Iterator struct {
 // [x] op.Atoms && tests
 // [x] typedef Spec [4]UUID,
 // [x] typedef Atoms, Atoms.Count()
-// [ ] Reference -> Reference
+// [x] Location -> Reference
 // [x] ?!,; term/mark/kind/status/headerness
 // [x] AppendOp/Query/Patch/State - Spec/Atoms
 // [ ] multiframe (still atomic)   Frame.Split(iterator)
@@ -78,12 +78,25 @@ type Iterator struct {
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl
 // [x] iterator - parse error
-// [ ] value parsing (all types - tables, safe ranges, length limits)
+// [ ] value parsing NEW DEAL
+//		[ ] (all types - tables, safe ranges, length limits)
 //		[x] int
 //		[x] float
 //		[ ] string
-//		[ ] uuid (save?)
+//		[ ] uuid (maybe same extension as hashes, ranges?)
+//			?;,.!:
+//			UUID EXTENSION hash%start<hash%end, on-demand parse
+//			to UUIDVector, remember offsets, defaults to `
+//			Extension bit!!!
+//		[ ] int-in-uuid, float-in-uuid, string-in-uuid
+//			float is two ints: value and E? (read IEEE)
+//		[ ] Spec -> QuadUUID, 4 values max
+//		[ ] optionally, atom vectorization =1<2<3<4
 // [x] lww - idempotency
+// [x] parse: imply . if no frame header seen previously (is_frame_open)
+// [ ] parse: get rid of the "NEXT" hack, check ragel docs
+// [ ] sorter: pre-detect errors, split multiframes, etc
+// [ ] parser: proper UTF-8 CHAR
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -93,13 +106,15 @@ type Iterator struct {
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
 //
-// [ ] reducer flags
-// [ ] nice base64 constant definitions (ron ... // "comment")
+// [ ] reducer registry
+// [ ] reducer flags (at least, formatting)
+// [x] nice base64 constant definitions (ron ... // "comment")
 // [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
 // [-] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
-// [ ] Frame.Split() multiframe parsing  ;,,.,,!,. etc
+// [-] Frame.Split() multiframe parsing  ;,,.,,!,. etc
+// [ ] multiframe Sorter
 //
 // [x] formatting options
 // 		[ ] indenting

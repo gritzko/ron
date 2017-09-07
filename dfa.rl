@@ -29,7 +29,11 @@ func XParseOp(data []byte, op *Op, context Op) int {
 
     op.Count = 0
     op.Body = op.Body[:0]
-    op.Flags = 0
+    if context.Flags==OP_RAW { // default op status
+        op.Flags = OP_RAW
+    } else {
+        op.Flags = OP_REDUCED
+    }
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int
