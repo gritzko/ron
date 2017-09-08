@@ -1,17 +1,24 @@
 package RON
 
+import "math/bits"
+
 const (
-	FORMAT_FRAME_NL = 1 << iota
+	FORMAT_ZIP = 1<<iota
+	FORMAT_GRID
+	FORMAT_SPACE
 	FORMAT_HEADER_SPACE
-	FORMAT_OP_SPACE
-	FORMAT_OP_TAB
-	FORMAT_UUID_SPACE
-	FORMAT_OP_NL
-	FORMAT_OP_INDENT
-	FORMAT_ZIP_REDEF
-	FORMAT_ZIP_PREFIX
-	FORMAT_SKIP_REPEATS
+	FORMAT_SKIP_EQ
+	FORMAT_REDEFAULT
+	FORMAT_OP_LINES
+	FORMAT_FRAME_LINES
 )
+//FORMAT_CONDENSED = 1 << iota
+//FORMAT_OP_LINES
+//FORMAT_FRAMES
+//FORMAT_TABLE
+const SPACES22 = "                      "
+const SPACES88 = SPACES22+SPACES22+SPACES22+SPACES22
+const ZEROS10 = "0000000000"
 
 func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	var i = ABC[input[0]]
@@ -22,244 +29,175 @@ func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
 	return
 }
 
-func UnzipBase64(input []byte, number *uint64) int {
-
-	// TODO migrate to Ragel
-
-	var l int = 10
-	if l > len(input) {
-		l = len(input)
-	}
-	var i = 0
-	var res uint64
-	for ; i < l; i++ {
-		code := ABC[input[i]]
-		if code < 0 {
-			break
-		}
-		res <<= 6
-		res |= uint64(code)
-	}
-	if number != nil {
-		*number = res
-	}
-	return i
-}
-
 func (t UUID) Equal(b UUID) bool {
 	return t.Value == b.Value && t.Origin == b.Origin
 }
 
-func CommonPrefix(value, context uint64) uint {
-	// TODO use math.bits
-	var xor = value ^ context
-	if xor >= 1<<(6*6) {
-		return 0
+// FormatInt outputs a 60-bit "Base64x64" int into the output slice
+func FormatInt(output []byte, value uint64) []byte {
+	tail := bits.TrailingZeros64(value)
+	if tail>54 {
+		tail = 54
 	}
-	if xor == 0 {
-		return 10
+	tail -= tail%6
+	for i:=54; i>=tail; i-=6 {
+		output = append( output, BASE64[(value>>uint(i))&63] )
 	}
-	if xor >= 1<<(3*6) { // 456
-		if xor >= 1<<(5*6) {
-			return 4
-		} else if xor >= 1<<(4*6) {
-			return 5
-		} else {
-			return 6
-		}
-	} else { // 789
-		if xor >= 1<<(2*6) {
-			return 7
-		} else if xor >= 1<<(1*6) {
-			return 8
-		} else {
-			return 9
-		}
-	}
+	return output
 }
 
-func ZeroTail(value *uint64) (tail uint) {
-	if *value&((1<<30)-1) == 0 {
-		tail += 5
-		*value >>= 30
+func FormatZipInt(output []byte, value, context uint64) []byte {
+	prefix := Int60Prefix(value,context)
+	if prefix==60 {
+		return output
 	}
-	if *value&((1<<18)-1) == 0 {
-		tail += 3
-		*value >>= 18
+	if prefix >= 4*6 {
+		prefix -= prefix%6
+		value = (value << uint(prefix)) & INT60_FULL
+		pchar := prefixBits2Sep ( uint(prefix)/6 - 4 )
+		output = append(output, pchar)
+		if value!=0 {
+			output = FormatInt(output, value)
+		}
+	} else {
+		output = FormatInt(output, value)
 	}
-	if *value&((1<<12)-1) == 0 {
-		tail += 2
-		*value >>= 12
-	}
-	if tail < 10 && *value&((1<<6)-1) == 0 {
-		tail += 1
-		*value >>= 6
-	}
-	return
+	return output
 }
 
-const prefix_mask uint64 = 0xffffff << 36
+func Int60Prefix (a, b uint64) int {
+	return bits.LeadingZeros64((a^b)&INT60_FULL)-4
+}
 
-func ZipUUIDString(uuid, context UUID) string {
+func (uuid UUID) ZipString(context UUID) string {
 	var arr [INT60LEN*2+2]byte
-	ret := FormatZippedUUID(arr[:0], uuid, context)
+	ret := FormatZipInt(arr[:0], uuid.Value, context.Value)
+	if uuid.Origin != UUID_NAME_UPPER_BITS {
+		ret = append(ret, uuid.Sign())
+		at := len(ret)
+		ret = FormatZipInt(ret, uuid.Replica(), context.Replica())
+		if uuid.Scheme()==context.Scheme() && at>1 {
+			if len(ret)>at && ABC[ret[at]]<0 {
+				copy(ret[at-1:], ret[at:])
+				ret = ret[:len(ret)-1]
+			} else if len(ret)==at {
+				ret = ret[:len(ret)-1]
+			}
+		}
+	}
 	return string(ret)
 }
 
 func (uuid UUID) String() (ret string) {
-	ret = ZipUUIDString(uuid, ZERO_UUID)
+	ret = uuid.ZipString(ZERO_UUID)
 	if len(ret)==0 {
 		ret = "0"
 	}
 	return
 }
 
-func FormatTrimmedInt(output []byte, value uint64) (ret []byte) {
-	if value == 0 {
-		ret = append(output, '0')
-		return
+func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
+	if uuid == context /*&& uuid != ZERO_UUID*/ {
+		return buf
 	}
-	l := 10
-	if value&((1<<24)-1) == 0 {
-		value >>= 24
-		l -= 4
-	}
-	for value&63 == 0 {
-		value >>= 6
-		l--
-	}
-	var vals [10]byte
-	add := vals[:l]
-	k := l
-	for k > 0 {
-		k--
-		add[k] = base64[value&63]
-		value >>= 6
-	}
-	ret = append(output, add...)
-	return
-}
-
-func FormatInt(output []byte, value uint64) (ret []byte) {
-	ret = FormatTrimmedInt(output, value)
-	l := len(ret) - len(output)
-	for l < 10 {
-		ret = append(ret, '0')
-		l++
-	}
-	return
-}
-
-func FormatZippedInt(output []byte, value, context uint64) (ret []byte) {
-	var prefix uint = CommonPrefix(value, context)
-	ret = output
-	if prefix < 4 {
-		ret = FormatTrimmedInt(ret, value)
-	} else {
-		if prefix == 10 {
-			return
-		}
-		ret = append(ret, PREFIX_PUNCT[prefix-4])
-		value = (value << (prefix * 6)) & PREFIX10
-		if value != 0 {
-			ret = FormatTrimmedInt(ret, value)
-		}
-	}
-	return
-}
-
-func FormatUUID(output []byte, uuid UUID) []byte {
-	ret := FormatTrimmedInt(output, uuid.Value)
-	ret = append(ret, UUID_PUNCT[uuid.Scheme()])
-	ret = FormatTrimmedInt(ret, uuid.Origin)
-	return ret
-}
-
-func FormatZippedUUID(output []byte, uuid UUID, context UUID) (ret []byte) {
-
-	if uuid == context && uuid != ZERO_UUID { // FIXME options
-		return output
-	}
-	ret = FormatZippedInt(output, uuid.Value, context.Value)
+	start := len(buf)
+	buf = FormatZipInt(buf, uuid.Value, context.Value)
 	if uuid.Origin == UUID_NAME_UPPER_BITS {
-		return ret
+		return buf
 	}
-	if uuid.Value == context.Value || uuid.Sign() != context.Sign() ||
-		(uuid.Origin&prefix_mask) != (context.Origin&prefix_mask) ||
-		(uuid.Replica() == context.Replica() && ABC[ret[len(output)]]>=0) { // FIXME this if
-		ret = append(ret, UUID_PUNCT[uuid.Scheme()])
+	buf = append(buf, uuid.Sign())
+	at := len(buf)
+	buf = FormatZipInt(buf, uuid.Origin, context.Origin)
+	// sometimes, we may skip UUID separator (+-%$)
+	if uuid.Scheme()==context.Scheme() && at>start+1 {
+		if len(buf)>at && ABC[buf[at]]<0 {
+			copy(buf[at-1:], buf[at:])
+			buf = buf[:len(buf)-1]
+		} else if len(buf)==at && ABC[buf[start]]<0 {
+			buf = buf[:len(buf)-1]
+		}
 	}
-	if uuid.Replica() != context.Replica() {
-		ret = FormatZippedInt(ret, uuid.Replica(), context.Replica())
+	return buf
+}
+
+func (uuid UUID) prefixWith (context UUID) (ret int) {
+	vp := bits.LeadingZeros64(uuid.Value^context.Value)
+	vp -= vp%6
+	op := bits.LeadingZeros64((uuid.Origin^context.Origin)&INT60_FULL)
+	op -= op%6
+	ret = vp + op
+	if uuid.Scheme()!=context.Scheme() {
+		ret--
 	}
 	return
 }
 
-func FormatSpec(output []byte, op Op) []byte {
-	// expand to 88+values
+func (frame *Frame) appendSpec(spec, context Spec) {
+	buf := frame.Body
+	start := len(buf)
+	flags := frame.Format
 	for t := 0; t < 4; t++ {
-		output = append(output, SPEC_PUNCT[t])
-		output = FormatUUID(output, op.GetUUID(t))
-	}
-	return output
-}
-
-func FormatZippedSpec(output []byte, op Op, context Op) []byte {
-	// expand to 88+values
-	for t := 0; t < 4; t++ {
-		if op.GetUUID(t) == context.GetUUID(t) {
+		if 0!=flags&FORMAT_GRID {
+			rest := t*22 - (len(buf)-start)
+			buf = append(buf, SPACES88[:rest]...)
+		} else if 0!=flags&FORMAT_SPACE && t>0 {
+			buf = append(buf, ' ')
+		}
+		if spec[t] == context[t] /*&& 0!=flags&FORMAT_SKIP_EQ*/ {
 			continue
 		}
-		output = append(output, SPEC_PUNCT[t])
-		output = FormatZippedUUID(output, op.GetUUID(t), context.GetUUID(t))
+		buf = append(buf, specBits2Sep(uint(t)))
+		if t>0 && 0!=flags&FORMAT_REDEFAULT {
+			ctxAt := 0
+			ctxUUID := spec[t-1]
+			ctxPL := spec[t].prefixWith(ctxUUID)
+			for i:=1; i<4; i++ {
+				pl := spec[t].prefixWith(context[i])
+				if pl > ctxPL {
+					ctxPL = pl
+					ctxUUID = context[i]
+					ctxAt = i
+				}
+			}
+			if ctxAt != t {
+				buf = append(buf, redefBits2Sep(uint(ctxAt)))
+			}
+			buf = frame.appendUUID(buf, spec[t], ctxUUID)
+		} else {
+			buf = frame.appendUUID(buf, spec[t], context[t])
+		}
 	}
-	return output
-}
-
-// optimize for close values
-// context==nil is valid?
-func FormatOp(output []byte, op Op, context Op) []byte {
-	output = FormatZippedSpec(output, op, context)
-	from := op.Offsets[0]
-	//copy(output, op.Body[from:])
-	output = append(output, op.Body[from:]...)
-	//off += len(op.Body) - from
-	if op.IsHeader() || (op.Class()==OP_RAW && context.Class()!=OP_RAW) || op.Count==0 {
-		output = append(output, op.Term())
-	}
-	return output
+	frame.Body = buf
 }
 
 func (op Op) String() string {
-	var arr[INT60LEN*8+8+40]byte
-	buf := FormatOp(arr[:0], op, ZERO_OP)
-	return string(buf)
+	var frame Frame
+	frame.AppendOp(op)
+	return string(frame.Body)
 }
 
 func (frame *Frame) String() string {
 	return string(frame.Body)
 }
 
-
 func (frame *Frame) AppendOp(op Op) {
-	if (0!=frame.Format&FORMAT_FRAME_NL) && len(frame.Body)>0 && !op.IsFramed() {
+
+	flags := frame.Format
+	if len(frame.Body)>0 && ( 0!=flags&FORMAT_OP_LINES || (0!=flags&FORMAT_FRAME_LINES && op.IsHeader()) ) {
 		frame.Body = append(frame.Body, '\n')
-	}
-	var uuid_arr [11 * 2 * 4]byte
-	uuids := uuid_arr[:0]
-	if !frame.last.isZero() || len(frame.Body) == 0 {
-		uuids = FormatZippedSpec(uuids, op, frame.last)
-	} else {
-		uuids = FormatSpec(uuids, op)
-	}
-	if (0!=frame.Format&FORMAT_HEADER_SPACE) && frame.last.IsHeader() && op.IsFramed() {
+	} else if 0!=flags&FORMAT_HEADER_SPACE && frame.last.IsHeader() {
 		frame.Body = append(frame.Body, ' ')
 	}
-	frame.Body = append(frame.Body, uuids...)
+
+
+	frame.appendSpec(op.Spec, frame.last.Spec)
+
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
+
 	if op.IsHeader() || (op.Class()==OP_RAW && frame.last.Class()!=OP_RAW) || op.Count==0 {
 		frame.Body = append(frame.Body, op.Term())
 	}
+
 	frame.last = op
 }
 

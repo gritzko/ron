@@ -193,12 +193,12 @@ func MakeFrame(prealloc_bytes int) Frame {
 	return Frame{Body: buf}
 }
 
-func (op *Op) GetUUIDp(i int) *UUID {
-	return &op.Spec[i]
+func (op *Spec) GetUUIDp(i int) *UUID {
+	return &op[i]
 }
 
-func (op *Op) GetUUID(i int) UUID {
-	return op.Spec[i]
+func (op *Spec) GetUUID(i int) UUID {
+	return op[i]
 }
 
 func (uuid *UUID) IsZero() bool {

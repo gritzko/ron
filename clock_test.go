@@ -20,7 +20,7 @@ func TestClock_Format(t *testing.T) {
 			break
 		}
 		ui := time2uint(date)
-		s := FormatTrimmedInt([]byte{}, ui)
+		s := FormatInt([]byte{}, ui)
 		str := string(s)
 		if str != pair[1] {
 			t.Logf("case %d: %s must be %s", i, str, pair[1])

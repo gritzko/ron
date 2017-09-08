@@ -177,7 +177,8 @@ const OP_QUERY_BIT = 4
 
 // FIXME bracket order to match the numeric order!!!!   }{][)(
 
-const INT60_ERROR uint64 = 1<<60 - 1
+const INT60_FULL uint64 = 1<<60 - 1
+const INT60_ERROR = INT60_FULL
 const INT60_NEVER = 63 << (6 * 9)
 const UUID_NAME_UPPER_BITS uint64 = UUID_NAME<<60
 const UUID_EVENT_UPPER_BITS uint64 = UUID_EVENT<<60

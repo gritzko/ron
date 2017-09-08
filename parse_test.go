@@ -33,7 +33,7 @@ func TestParseFormatUUID(t *testing.T) {
 	tests := [][]string{
 		{"0", "1", "1"}, // 0
 		{"1-x", ")1", "1000000001-x"},
-		{"test-1", "", "test-1"},
+		{"test-1", "-", "test-1"},
 		{"hello-111", "[world", "helloworld-111"},
 		{"helloworld-111", "[", "hello-111"},
 		{"100001-orig", "[", "1-orig"}, // 5
@@ -59,9 +59,7 @@ func TestParseFormatUUID(t *testing.T) {
 			t.Logf("parse %d: %s must be %s", i, str, tri[2])
 			t.Fail()
 		}
-		var arr [21]byte
-		fmt := FormatZippedUUID(arr[:0], uuid, context)
-		zip := string(fmt)
+		zip := uuid.ZipString(context)
 		if zip != tri[1] {
 			t.Logf("format %d: %s must be %s", i, zip, tri[1])
 			t.Fail()
@@ -164,6 +162,7 @@ func TestParseFrame(t *testing.T) {
 	}
 	// pack into a frame
 	frame := MakeFrame(dim*dim*22 + dim*100)
+	frame.Format|=FORMAT_OP_LINES
 	const ops = 30
 	for j := 0; j < ops; j++ {
 		at = j << 2
@@ -183,7 +182,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.GetUUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' op: '%s'", u, k, iter.GetUUID(u).String(), uuids[at+u].String(), string(iter.Op.Body))
+				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' context: '%s' op: '%s'", u, k, iter.GetUUID(u).String(), uuids[at+u].String(), uuids[at+u-4].String(), string(iter.Op.Body))
 			}
 		}
 		iter.Next()
