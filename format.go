@@ -1,17 +1,24 @@
 package RON
 
-import "math/bits"
+import (
+	"math/bits"
+)
 
 const (
-	FORMAT_ZIP = 1<<iota
+	FORMAT_UNZIP = 1<<iota
 	FORMAT_GRID
 	FORMAT_SPACE
 	FORMAT_HEADER_SPACE
-	FORMAT_SKIP_EQ
+	FORMAT_NOSKIP
 	FORMAT_REDEFAULT
 	FORMAT_OP_LINES
 	FORMAT_FRAME_LINES
+	FORMAT_INDENT
 )
+const FRAME_FORMAT_CARPET = FORMAT_GRID|FORMAT_SPACE|FORMAT_OP_LINES|FORMAT_NOSKIP|FORMAT_UNZIP
+const FRAME_FORMAT_TABULAR = FORMAT_GRID|FORMAT_SPACE|FORMAT_OP_LINES
+const FRAME_FORMAT_NESTED = FORMAT_OP_LINES | FORMAT_INDENT
+const FRAME_FORMAT_DENSE = FORMAT_FRAME_LINES|FORMAT_HEADER_SPACE
 //FORMAT_CONDENSED = 1 << iota
 //FORMAT_OP_LINES
 //FORMAT_FRAMES
@@ -69,23 +76,28 @@ func Int60Prefix (a, b uint64) int {
 	return bits.LeadingZeros64((a^b)&INT60_FULL)-4
 }
 
-func (uuid UUID) ZipString(context UUID) string {
-	var arr [INT60LEN*2+2]byte
-	ret := FormatZipInt(arr[:0], uuid.Value, context.Value)
+func FormatZipUUID (buf []byte, uuid, context UUID) []byte {
+	buf = FormatZipInt(buf, uuid.Value, context.Value)
 	if uuid.Origin != UUID_NAME_UPPER_BITS {
-		ret = append(ret, uuid.Sign())
-		at := len(ret)
-		ret = FormatZipInt(ret, uuid.Replica(), context.Replica())
+		buf = append(buf, uuid.Sign())
+		at := len(buf)
+		buf = FormatZipInt(buf, uuid.Replica(), context.Replica())
 		if uuid.Scheme()==context.Scheme() && at>1 {
-			if len(ret)>at && ABC[ret[at]]<0 {
-				copy(ret[at-1:], ret[at:])
-				ret = ret[:len(ret)-1]
-			} else if len(ret)==at {
-				ret = ret[:len(ret)-1]
+			if len(buf)>at && ABC[buf[at]]<0 {
+				copy(buf[at-1:], buf[at:])
+				buf = buf[:len(buf)-1]
+			} else if len(buf)==at {
+				buf = buf[:len(buf)-1]
 			}
 		}
 	}
-	return string(ret)
+	return buf
+}
+
+// FIXME kill this, use one method UUID.zipUUID()
+func (uuid UUID) ZipString(context UUID) string {
+	var arr [INT60LEN*2+2]byte
+	return string(FormatZipUUID(arr[:0], uuid, context))
 }
 
 func (uuid UUID) String() (ret string) {
@@ -97,9 +109,18 @@ func (uuid UUID) String() (ret string) {
 }
 
 func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
+	if 0!=frame.Format&FORMAT_UNZIP {
+		buf = FormatInt(buf, uuid.Value)
+		if uuid.Origin!=UUID_NAME_UPPER_BITS {
+			buf = append(buf, uuid.Sign())
+			buf = FormatInt(buf, uuid.Replica())
+		}
+		return buf
+	}
 	if uuid == context /*&& uuid != ZERO_UUID*/ {
 		return buf
 	}
+
 	start := len(buf)
 	buf = FormatZipInt(buf, uuid.Value, context.Value)
 	if uuid.Origin == UUID_NAME_UPPER_BITS {
@@ -117,6 +138,7 @@ func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
 			buf = buf[:len(buf)-1]
 		}
 	}
+
 	return buf
 }
 
@@ -143,7 +165,7 @@ func (frame *Frame) appendSpec(spec, context Spec) {
 		} else if 0!=flags&FORMAT_SPACE && t>0 {
 			buf = append(buf, ' ')
 		}
-		if spec[t] == context[t] /*&& 0!=flags&FORMAT_SKIP_EQ*/ {
+		if (spec[t] == context[t]) && (0==flags&FORMAT_NOSKIP) {
 			continue
 		}
 		buf = append(buf, specBits2Sep(uint(t)))
@@ -183,14 +205,22 @@ func (frame *Frame) String() string {
 func (frame *Frame) AppendOp(op Op) {
 
 	flags := frame.Format
+	start := len(frame.Body)
 	if len(frame.Body)>0 && ( 0!=flags&FORMAT_OP_LINES || (0!=flags&FORMAT_FRAME_LINES && op.IsHeader()) ) {
 		frame.Body = append(frame.Body, '\n')
+		if 0!=flags&FORMAT_INDENT && !op.IsHeader() {
+			frame.Body = append(frame.Body, "    "...)
+		}
 	} else if 0!=flags&FORMAT_HEADER_SPACE && frame.last.IsHeader() {
 		frame.Body = append(frame.Body, ' ')
 	}
 
-
 	frame.appendSpec(op.Spec, frame.last.Spec)
+
+	if 0!=flags&FORMAT_GRID {
+		rest := 4*22 - (len(frame.Body) - start)
+		frame.Body = append(frame.Body, SPACES88[:rest]...)
+	}
 
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 
