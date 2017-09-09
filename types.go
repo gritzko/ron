@@ -121,8 +121,9 @@ type Iterator struct {
 // 		[x] newlines
 // 		[ ] trimming/zipping
 // 		[ ] redefs (bench - fast prefix - bit ops)
-// [ ] kill 2 impl of zip UUID
-// [ ] test formatting - line lengths only
+// [x] kill 2 impl of zip UUID
+// [x] test formatting
+// [ ] test redefaults
 
 // Reducer is essentially a replicated data type.
 // It provides two reducing functions: total and incremental.

@@ -77,51 +77,16 @@ func Int60Prefix(a, b uint64) int {
 	return bits.LeadingZeros64((a^b)&INT60_FULL) - 4
 }
 
-func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
-	buf = FormatZipInt(buf, uuid.Value, context.Value)
+func FormatUUID(buf []byte, uuid UUID) []byte {
+	buf = FormatInt(buf, uuid.Value)
 	if uuid.Origin != UUID_NAME_UPPER_BITS {
 		buf = append(buf, uuid.Sign())
-		at := len(buf)
-		buf = FormatZipInt(buf, uuid.Replica(), context.Replica())
-		if uuid.Scheme() == context.Scheme() && at > 1 {
-			if len(buf) > at && ABC[buf[at]] < 0 {
-				copy(buf[at-1:], buf[at:])
-				buf = buf[:len(buf)-1]
-			} else if len(buf) == at {
-				buf = buf[:len(buf)-1]
-			}
-		}
+		buf = FormatInt(buf, uuid.Replica())
 	}
 	return buf
 }
 
-// FIXME kill this, use one method UUID.zipUUID()
-func (uuid UUID) ZipString(context UUID) string {
-	var arr [INT60LEN*2 + 2]byte
-	return string(FormatZipUUID(arr[:0], uuid, context))
-}
-
-func (uuid UUID) String() (ret string) {
-	ret = uuid.ZipString(ZERO_UUID)
-	if len(ret) == 0 {
-		ret = "0"
-	}
-	return
-}
-
-func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
-	if 0 != frame.Format&FORMAT_UNZIP {
-		buf = FormatInt(buf, uuid.Value)
-		if uuid.Origin != UUID_NAME_UPPER_BITS {
-			buf = append(buf, uuid.Sign())
-			buf = FormatInt(buf, uuid.Replica())
-		}
-		return buf
-	}
-	if uuid == context /*&& uuid != ZERO_UUID*/ {
-		return buf
-	}
-
+func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 	start := len(buf)
 	buf = FormatZipInt(buf, uuid.Value, context.Value)
 	if uuid.Origin == UUID_NAME_UPPER_BITS {
@@ -138,6 +103,28 @@ func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
 		} else if len(buf) == at && ABC[buf[start]] < 0 {
 			buf = buf[:len(buf)-1]
 		}
+	}
+	return buf
+}
+
+func (uuid UUID) ZipString(context UUID) string {
+	var arr [INT60LEN*2 + 2]byte
+	return string(FormatZipUUID(arr[:0], uuid, context))
+}
+
+func (uuid UUID) String() (ret string) {
+	ret = uuid.ZipString(ZERO_UUID)
+	if len(ret) == 0 {
+		ret = "0"
+	}
+	return
+}
+
+func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
+	if 0 != frame.Format&FORMAT_UNZIP {
+		buf = FormatUUID(buf, uuid)
+	} else if uuid != context {
+		buf = FormatZipUUID(buf, uuid, context)
 	}
 
 	return buf
