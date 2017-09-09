@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	FORMAT_UNZIP = 1<<iota
+	FORMAT_UNZIP = 1 << iota
 	FORMAT_GRID
 	FORMAT_SPACE
 	FORMAT_HEADER_SPACE
@@ -15,16 +15,17 @@ const (
 	FORMAT_FRAME_LINES
 	FORMAT_INDENT
 )
-const FRAME_FORMAT_CARPET = FORMAT_GRID|FORMAT_SPACE|FORMAT_OP_LINES|FORMAT_NOSKIP|FORMAT_UNZIP
-const FRAME_FORMAT_TABULAR = FORMAT_GRID|FORMAT_SPACE|FORMAT_OP_LINES
-const FRAME_FORMAT_NESTED = FORMAT_OP_LINES | FORMAT_INDENT
-const FRAME_FORMAT_DENSE = FORMAT_FRAME_LINES|FORMAT_HEADER_SPACE
+const FRAME_FORMAT_CARPET = FORMAT_GRID | FORMAT_SPACE | FORMAT_OP_LINES | FORMAT_NOSKIP | FORMAT_UNZIP
+const FRAME_FORMAT_TABLE = FORMAT_GRID | FORMAT_SPACE | FORMAT_OP_LINES
+const FRAME_FORMAT_LIST = FORMAT_OP_LINES | FORMAT_INDENT
+const FRAME_FORMAT_LINE = FORMAT_FRAME_LINES | FORMAT_HEADER_SPACE
+
 //FORMAT_CONDENSED = 1 << iota
 //FORMAT_OP_LINES
 //FORMAT_FRAMES
 //FORMAT_TABLE
 const SPACES22 = "                      "
-const SPACES88 = SPACES22+SPACES22+SPACES22+SPACES22
+const SPACES88 = SPACES22 + SPACES22 + SPACES22 + SPACES22
 const ZEROS10 = "0000000000"
 
 func unzipPrefixSeparator(input []byte) (prefix uint8, length int) {
@@ -43,27 +44,27 @@ func (t UUID) Equal(b UUID) bool {
 // FormatInt outputs a 60-bit "Base64x64" int into the output slice
 func FormatInt(output []byte, value uint64) []byte {
 	tail := bits.TrailingZeros64(value)
-	if tail>54 {
+	if tail > 54 {
 		tail = 54
 	}
-	tail -= tail%6
-	for i:=54; i>=tail; i-=6 {
-		output = append( output, BASE64[(value>>uint(i))&63] )
+	tail -= tail % 6
+	for i := 54; i >= tail; i -= 6 {
+		output = append(output, BASE64[(value>>uint(i))&63])
 	}
 	return output
 }
 
 func FormatZipInt(output []byte, value, context uint64) []byte {
-	prefix := Int60Prefix(value,context)
-	if prefix==60 {
+	prefix := Int60Prefix(value, context)
+	if prefix == 60 {
 		return output
 	}
 	if prefix >= 4*6 {
-		prefix -= prefix%6
+		prefix -= prefix % 6
 		value = (value << uint(prefix)) & INT60_FULL
-		pchar := prefixBits2Sep ( uint(prefix)/6 - 4 )
+		pchar := prefixBits2Sep(uint(prefix)/6 - 4)
 		output = append(output, pchar)
-		if value!=0 {
+		if value != 0 {
 			output = FormatInt(output, value)
 		}
 	} else {
@@ -72,21 +73,21 @@ func FormatZipInt(output []byte, value, context uint64) []byte {
 	return output
 }
 
-func Int60Prefix (a, b uint64) int {
-	return bits.LeadingZeros64((a^b)&INT60_FULL)-4
+func Int60Prefix(a, b uint64) int {
+	return bits.LeadingZeros64((a^b)&INT60_FULL) - 4
 }
 
-func FormatZipUUID (buf []byte, uuid, context UUID) []byte {
+func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 	buf = FormatZipInt(buf, uuid.Value, context.Value)
 	if uuid.Origin != UUID_NAME_UPPER_BITS {
 		buf = append(buf, uuid.Sign())
 		at := len(buf)
 		buf = FormatZipInt(buf, uuid.Replica(), context.Replica())
-		if uuid.Scheme()==context.Scheme() && at>1 {
-			if len(buf)>at && ABC[buf[at]]<0 {
+		if uuid.Scheme() == context.Scheme() && at > 1 {
+			if len(buf) > at && ABC[buf[at]] < 0 {
 				copy(buf[at-1:], buf[at:])
 				buf = buf[:len(buf)-1]
-			} else if len(buf)==at {
+			} else if len(buf) == at {
 				buf = buf[:len(buf)-1]
 			}
 		}
@@ -96,22 +97,22 @@ func FormatZipUUID (buf []byte, uuid, context UUID) []byte {
 
 // FIXME kill this, use one method UUID.zipUUID()
 func (uuid UUID) ZipString(context UUID) string {
-	var arr [INT60LEN*2+2]byte
+	var arr [INT60LEN*2 + 2]byte
 	return string(FormatZipUUID(arr[:0], uuid, context))
 }
 
 func (uuid UUID) String() (ret string) {
 	ret = uuid.ZipString(ZERO_UUID)
-	if len(ret)==0 {
+	if len(ret) == 0 {
 		ret = "0"
 	}
 	return
 }
 
 func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
-	if 0!=frame.Format&FORMAT_UNZIP {
+	if 0 != frame.Format&FORMAT_UNZIP {
 		buf = FormatInt(buf, uuid.Value)
-		if uuid.Origin!=UUID_NAME_UPPER_BITS {
+		if uuid.Origin != UUID_NAME_UPPER_BITS {
 			buf = append(buf, uuid.Sign())
 			buf = FormatInt(buf, uuid.Replica())
 		}
@@ -130,11 +131,11 @@ func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
 	at := len(buf)
 	buf = FormatZipInt(buf, uuid.Origin, context.Origin)
 	// sometimes, we may skip UUID separator (+-%$)
-	if uuid.Scheme()==context.Scheme() && at>start+1 {
-		if len(buf)>at && ABC[buf[at]]<0 {
+	if uuid.Scheme() == context.Scheme() && at > start+1 {
+		if len(buf) > at && ABC[buf[at]] < 0 {
 			copy(buf[at-1:], buf[at:])
 			buf = buf[:len(buf)-1]
-		} else if len(buf)==at && ABC[buf[start]]<0 {
+		} else if len(buf) == at && ABC[buf[start]] < 0 {
 			buf = buf[:len(buf)-1]
 		}
 	}
@@ -142,13 +143,13 @@ func (frame *Frame) appendUUID(buf []byte, uuid UUID, context UUID) []byte {
 	return buf
 }
 
-func (uuid UUID) prefixWith (context UUID) (ret int) {
-	vp := bits.LeadingZeros64(uuid.Value^context.Value)
-	vp -= vp%6
-	op := bits.LeadingZeros64((uuid.Origin^context.Origin)&INT60_FULL)
-	op -= op%6
+func (uuid UUID) prefixWith(context UUID) (ret int) {
+	vp := bits.LeadingZeros64(uuid.Value ^ context.Value)
+	vp -= vp % 6
+	op := bits.LeadingZeros64((uuid.Origin ^ context.Origin) & INT60_FULL)
+	op -= op % 6
 	ret = vp + op
-	if uuid.Scheme()!=context.Scheme() {
+	if uuid.Scheme() != context.Scheme() {
 		ret--
 	}
 	return
@@ -159,21 +160,21 @@ func (frame *Frame) appendSpec(spec, context Spec) {
 	start := len(buf)
 	flags := frame.Format
 	for t := 0; t < 4; t++ {
-		if 0!=flags&FORMAT_GRID {
-			rest := t*22 - (len(buf)-start)
+		if 0 != flags&FORMAT_GRID {
+			rest := t*22 - (len(buf) - start)
 			buf = append(buf, SPACES88[:rest]...)
-		} else if 0!=flags&FORMAT_SPACE && t>0 {
+		} else if 0 != flags&FORMAT_SPACE && t > 0 {
 			buf = append(buf, ' ')
 		}
-		if (spec[t] == context[t]) && (0==flags&FORMAT_NOSKIP) {
+		if (spec[t] == context[t]) && (0 == flags&FORMAT_NOSKIP) {
 			continue
 		}
 		buf = append(buf, specBits2Sep(uint(t)))
-		if t>0 && 0!=flags&FORMAT_REDEFAULT {
+		if t > 0 && 0 != flags&FORMAT_REDEFAULT {
 			ctxAt := 0
 			ctxUUID := spec[t-1]
 			ctxPL := spec[t].prefixWith(ctxUUID)
-			for i:=1; i<4; i++ {
+			for i := 1; i < 4; i++ {
 				pl := spec[t].prefixWith(context[i])
 				if pl > ctxPL {
 					ctxPL = pl
@@ -206,25 +207,25 @@ func (frame *Frame) AppendOp(op Op) {
 
 	flags := frame.Format
 	start := len(frame.Body)
-	if len(frame.Body)>0 && ( 0!=flags&FORMAT_OP_LINES || (0!=flags&FORMAT_FRAME_LINES && op.IsHeader()) ) {
+	if len(frame.Body) > 0 && (0 != flags&FORMAT_OP_LINES || (0 != flags&FORMAT_FRAME_LINES && op.IsHeader())) {
 		frame.Body = append(frame.Body, '\n')
-		if 0!=flags&FORMAT_INDENT && !op.IsHeader() {
+		if 0 != flags&FORMAT_INDENT && !op.IsHeader() {
 			frame.Body = append(frame.Body, "    "...)
 		}
-	} else if 0!=flags&FORMAT_HEADER_SPACE && frame.last.IsHeader() {
+	} else if 0 != flags&FORMAT_HEADER_SPACE && frame.last.IsHeader() {
 		frame.Body = append(frame.Body, ' ')
 	}
 
 	frame.appendSpec(op.Spec, frame.last.Spec)
 
-	if 0!=flags&FORMAT_GRID {
+	if 0 != flags&FORMAT_GRID {
 		rest := 4*22 - (len(frame.Body) - start)
 		frame.Body = append(frame.Body, SPACES88[:rest]...)
 	}
 
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 
-	if op.IsHeader() || (op.Class()==OP_RAW && frame.last.Class()!=OP_RAW) || op.Count==0 {
+	if op.IsHeader() || (op.Class() == OP_RAW && frame.last.Class() != OP_RAW) || op.Count == 0 {
 		frame.Body = append(frame.Body, op.Term())
 	}
 
@@ -232,26 +233,26 @@ func (frame *Frame) AppendOp(op Op) {
 }
 
 func (frame *Frame) AppendSpecAtomsFlags(spec Spec, atoms Atoms, flags uint) {
-	frame.AppendOp(Op{spec,atoms, flags})
+	frame.AppendOp(Op{spec, atoms, flags})
 }
 
 func (frame *Frame) AppendReduced(spec Spec, atoms Atoms) {
-	frame.AppendOp(Op{spec,atoms, OP_REDUCED})
+	frame.AppendOp(Op{spec, atoms, OP_REDUCED})
 }
 
 func (frame *Frame) AppendRaw(spec Spec, atoms Atoms) {
-	frame.AppendOp(Op{spec,atoms, OP_RAW})
+	frame.AppendOp(Op{spec, atoms, OP_RAW})
 }
 
 func (frame *Frame) AppendSpecBody(toel Spec, body []byte, flags uint) {
 	frame.AppendSpecAtomsFlags(toel, ParseAtoms(body), flags)
 }
 
-func (frame *Frame) AppendPatchHeader (spec Spec) {
+func (frame *Frame) AppendPatchHeader(spec Spec) {
 	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_PATCH)
 }
 
-func (frame *Frame) AppendStateHeader (spec Spec) {
+func (frame *Frame) AppendStateHeader(spec Spec) {
 	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_STATE)
 }
 
