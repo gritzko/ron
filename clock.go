@@ -4,8 +4,21 @@ import "time"
 
 // hybrid calendar/logical clock
 type Clock struct {
-	offset   time.Duration
-	lastSeen UUID
+	offset    time.Duration
+	lastSeen  UUID
+	Mode      int
+	MinLength int
+}
+
+const (
+	CLOCK_CALENDAR = iota
+	CLOCK_EPOCH
+	CLOCK_LAMPORT
+)
+
+func NewClock (replica uint64, mode, minLen int) Clock {
+	origin := (replica&INT60_FULL) | UUID_EVENT_UPPER_BITS
+	return Clock{lastSeen:UUID{0,origin}}
 }
 
 func time2uint(t time.Time) (i uint64) {
@@ -65,9 +78,12 @@ func (clock *Clock) Time() UUID {
 	return ret
 }
 
-func (clock *Clock) See(uuid UUID) {
+func (clock *Clock) See(uuid UUID) bool {
 	if clock.lastSeen.Value < uuid.Value {
 		clock.lastSeen.Value = uuid.Value
+		return true
+	} else {
+		return false
 	}
 }
 

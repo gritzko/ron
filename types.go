@@ -96,7 +96,7 @@ type Iterator struct {
 // [x] parse: imply . if no frame header seen previously (is_frame_open)
 // [ ] parse: get rid of the "NEXT" hack, check ragel docs
 // [ ] sorter: pre-detect errors, split multiframes, etc
-// [ ] parser: proper UTF-8 CHAR
+// [ ] parser: proper UTF-8 CHAR pattern
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -105,6 +105,9 @@ type Iterator struct {
 //
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
+// [ ] LWW: out-of-order entries - restart the algo (with alloc)
+// [ ] iheap: seek the loop
+// [ ] LWW: 1000x1000 array test
 //
 // [ ] reducer registry
 // [ ] reducer flags (at least, formatting)
@@ -115,11 +118,12 @@ type Iterator struct {
 // [x] prereduce - optional, may fail (RGA subtrees)
 // [-] Frame.Split() multiframe parsing  ;,,.,,!,. etc
 // [ ] multiframe Sorter
+// [ ] consider ?!,; instead of !.,; and ?
 //
 // [x] formatting options
-// 		[ ] indenting
+// 		[x] indenting
 // 		[x] newlines
-// 		[ ] trimming/zipping
+// 		[x] trimming/zipping
 // 		[ ] redefs (bench - fast prefix - bit ops)
 // [x] kill 2 impl of zip UUID
 // [x] test formatting
@@ -152,6 +156,8 @@ type Reducer interface {
 var NO_ATOMS = Atoms{}
 
 type RawUUID []byte
+
+type Environment map[uint64]UUID
 
 const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~"
 

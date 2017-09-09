@@ -2,6 +2,7 @@ package RON
 
 import (
 	"math/bits"
+	"fmt"
 )
 
 const (
@@ -241,6 +242,16 @@ func (frame *Frame) AppendPatchHeader(spec Spec) {
 
 func (frame *Frame) AppendStateHeader(spec Spec) {
 	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_STATE)
+}
+
+func (frame *Frame) AppendSpecInt (spec Spec, i int) {
+	str := fmt.Sprintf("=%d", i)
+	frame.AppendSpecBody(spec, []byte(str), OP_REDUCED)
+}
+
+func (frame *Frame) AppendSpecUUID (spec Spec, uuid UUID) {
+	str := fmt.Sprintf(">%s", uuid.String())
+	frame.AppendSpecBody(spec, []byte(str), OP_REDUCED)
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {

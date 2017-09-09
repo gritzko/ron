@@ -222,6 +222,25 @@ func (a Atoms) Type (i uint) uint {
 	return (a.Types >> (i<<1)) & 3
 }
 
+func (uuid UUID) IsName () bool {
+	return uuid.Origin>>60 == UUID_NAME
+}
+
 func NewEventUUID (time, origin uint64) UUID {
 	return UUID{Value:time, Origin:(origin&INT60_ERROR)|UUID_EVENT_UPPER_BITS}
+}
+
+func (frame *Frame) Fill (clock Clock, env Environment) Frame {
+	ret := MakeFrame(len(frame.Body)<<1)
+	now := clock.Time()
+	i := frame.Begin()
+	for!i.IsEmpty() {
+		spec := i.Spec
+		if spec[SPEC_EVENT]==ZERO_UUID {
+			spec[SPEC_EVENT] = now
+		}
+		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Flags)
+		i.Next()
+	}
+	return ret
 }
