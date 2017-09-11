@@ -53,7 +53,7 @@
         atoms_at = p
     }
     action opterm {
-        op.Flags = opSep2Bits(fc)
+        op.Kind = opSep2Bits(fc)
     }
 
     action next { // start of the next op
@@ -73,7 +73,7 @@
     SPEC_UUID = [*#@:] @toel_start space* REDEF UUID %toel_uuid space*;
 
     INT_ATOM = [\-+]? [0-9]+ %int_atom ;
-    FLOAT_ATOM = [\-+]? [0-9]+ "." digit+ ([eE][\-+]?digit+)? %float_atom ;
+    FLOAT_ATOM = [\-+]? [0-9]+ ("." digit+)? ([eE][\-+]?digit+)? %float_atom ;
     STRING_ATOM = (UNIESC|ESC|CHAR)* %string_atom;
 
     ATOM = (

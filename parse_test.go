@@ -211,7 +211,7 @@ func TestXParseMalformedOp(t *testing.T) {
 		"#novalue",
 		"# broken - uuid?",
 		"#too-many@values!!??=5=6^7.0^8.0'extra'",
-		"#invalid-float ^31415",
+		"#invalid-float ^31.41.5",
 		"",
 		"'unescaped ' quote'",
 		">badreference",
@@ -235,7 +235,7 @@ func TestOp_ParseFloat(t *testing.T) {
 		"^3.1415",
 		"^1.0e6",
 		"^1.2345e6",
-		"^0.0",
+		"^0",
 	}
 	var correct = []float64{
 		3.1415,
@@ -294,7 +294,7 @@ func TestParse_Errors(t *testing.T) {
 		"#id#id#id",
 		"#bad@term??",
 		"#no-term",
-		"#notfloat^1",
+		"#notfloat^a",
 		"#notesc'\\'",
 		"*type=1NT",
 		"*ty&",

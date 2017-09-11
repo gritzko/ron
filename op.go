@@ -65,23 +65,23 @@ func (a Op) Same(b *Op) bool {
 }
 
 func (op Op) Term() byte {
-	return opBits2Sep(op.Class)
+	return opBits2Sep(op.Kind)
 }
 
 func (op Op) IsQuery () bool {
-	return op.Class == OP_QUERY
+	return op.Kind == OP_QUERY
 }
 
 func (op Op) IsHeader() bool {
-	return op.Class == OP_HEADER
+	return op.Kind == OP_HEADER
 }
 
 func (op Op) IsFramed() bool {
-	return op.Class==OP_REDUCED
+	return op.Kind ==OP_REDUCED
 }
 
 func (op Op) IsRaw() bool {
-	return op.Class == OP_RAW
+	return op.Kind == OP_RAW
 }
 
 // not good - op is detached from a frame here
@@ -232,7 +232,7 @@ func (frame *Frame) Fill (clock Clock, env Environment) Frame {
 			spec[SPEC_EVENT] = now
 		}
 		// TODO implement env fill
-		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Class)
+		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Kind)
 		i.Next()
 	}
 	return ret

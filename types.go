@@ -34,7 +34,7 @@ type Atoms struct {
 type Op struct { // ~128 bytes
 	Spec
 	Atoms
-	Class uint
+	Kind uint
 }
 
 // Frame... mutable, but append-only
