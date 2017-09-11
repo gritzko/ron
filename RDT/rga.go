@@ -67,10 +67,9 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		// note any states, if so use ! else ;
 		header_spec[RON.SPEC_REF] = loc
 		if !loc.IsZero() {
-			result.AppendPatchHeader(header_spec)
-		} else {
-			result.AppendStateHeader(header_spec)
+			// ?
 		}
+		result.AppendStateHeader(header_spec)
 
 		for rga.active_ins.Len() > 0 {
 			op := *rga.active_ins.Op()
@@ -98,7 +97,7 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 
 	if rga.waiting_rms.Len() > 0 {
 		header_spec[RON.SPEC_REF] = RON.NEVER_UUID
-		result.AppendPatchHeader(header_spec)
+		result.AppendStateHeader(header_spec)
 
 		for !rga.removes.IsEmpty() {
 			still := rga.waiting_rms.Take(rga.removes.Op().Reference())

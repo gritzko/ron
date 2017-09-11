@@ -10,23 +10,23 @@ import (
 var lww_3_tests = [][3]string{
 	{ // 0+o
 		"*lww#test!",
-		"*lww#test@time:a'A'.",
+		"*lww#test@time:a'A'",
 		"*lww#test@time!:a'A'",
 	},
 	{ // s+o
 		"*lww#test@1!:a'A'",
-		"*lww#test@2:b'B'.",
+		"*lww#test@2:b'B'",
 		"*lww#test@2!@1:a'A'@2:b'B'",
 	},
 	{ // o+o
-		"*lww#test@1:a'A1'.",
-		"*lww#test@2:a'A2'.",
-		"*lww#test@2;:a'A2'",
+		"*lww#test@1:a'A1'",
+		"*lww#test@2:a'A2'",
+		"*lww#test@2:d!:a'A2'",
 	},
 	{ // p+p
-		"*lww#test@1; :a'A1':b'B1':c'C1'",
-		"*lww#test@2; :a'A2':b'B2'",
-		"*lww#test@2;:a'A2':b'B2'@1:c'C1'",
+		"*lww#test@1:d! :a'A1':b'B1':c'C1'",
+		"*lww#test@2:d! :a'A2':b'B2'",
+		"*lww#test@2:d!:a'A2':b'B2'@1:c'C1'",
 	},
 	{
 		"*lww#test@0ld!@new:key'new_value'",

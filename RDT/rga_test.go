@@ -21,28 +21,28 @@ func TestIMultiMap_Take(t *testing.T) {
 var rga_3_tests = [][3]string{
 	{ // 0+o
 		"*rga#textB!",
-		"*rga#textB@time'A'.",
+		"*rga#textB@time'A'",
 		"*rga#textB@time!'A'",
 	},
 	{ // s+o
 		"*rga#test@1!@'A'",
-		"*rga#test@2:1'B'.",
+		"*rga#test@2:1'B'",
 		"*rga#test@2!@1'A'@2'B'",
 	},
 	{ // o+o
-		"*rga#test@2:1'B'.",
-		"*rga#test@3:2'C'.",
-		"*rga#test@3:1;@2:0'B'@3'C'",
+		"*rga#test@2:1'B'",
+		"*rga#test@3:2'C'",
+		"*rga#test@3:1!@2:0'B'@3'C'",
 	},
 	{ // s+p
 		"*rga#test@1!@'A'",
-		"*rga#test@2:1;:0'B'",
+		"*rga#test@2:1!:0'B'",
 		"*rga#test@2!@1'A'@2'B'",
 	},
-	{ // 3) p+p
-		"*rga#test@2:1;:0'B'",
-		"*rga#test@3:2;:0'C'",
-		"*rga#test@3:1;@2:0'B'@3'C'",
+	{ // 4) p+p
+		"*rga#test@2:1!:0'B'",
+		"*rga#test@3:2!:0'C'",
+		"*rga#test@3:1!@2:0'B'@3'C'",
 	},
 
 	{ // s+s
@@ -50,7 +50,7 @@ var rga_3_tests = [][3]string{
 		"*rga#test@2!@1'A'@2'B'",
 		"*rga#test@2!@1'A'@2'B'",
 	},
-	{ // 5) s1+s2 merge
+	{ // 6) s1+s2 merge
 		"*rga#test@2!@1'A'@2'B'",
 		"*rga#test@3!@1'A'@3'C'",
 		"*rga#test@3!@1'A'@3'C'@2'B'",
@@ -61,15 +61,15 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@1:4'A'@3:0'C'@2'B'",
 	},
 
-	{ // 7) o+rm
-		"*rga#test@2:1'B'.",
-		"*rga#test@3:2.",
-		"*rga#test@3:1;@2:3'B'",
+	{ // 8) o+rm
+		"*rga#test@2:1'B'",
+		"*rga#test@3:2;",
+		"*rga#test@3:1!@2:3'B'",
 	},
 	{ // p+rm
-		"*rga#test@3:1;@2:0'B'@3'C'",
-		"*rga#test@4:2.",
-		"*rga#test@4:1;@2:4'B'@3:0'C'",
+		"*rga#test@3:1!@2:0'B'@3'C'",
+		"*rga#test@4:2;",
+		"*rga#test@4:1!@2:4'B'@3:0'C'",
 	},
 	{ // s+rms
 		"*rga#test@2!@1'A'@2'B'",
