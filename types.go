@@ -34,7 +34,7 @@ type Atoms struct {
 type Op struct { // ~128 bytes
 	Spec
 	Atoms
-	Flags uint
+	Class uint
 }
 
 // Frame... mutable, but append-only
@@ -80,7 +80,7 @@ type Checker interface {
 // [x] multiframe (still atomic)   Frame.Split(iterator)
 //
 // cli FIXME
-// [ ] clean-up: uuid-grammar.rl
+// [ ] clean-up: uuid-grammar.rl (take from Java)
 // [x] iterator - parse error
 // [ ] value parsing NEW DEAL
 //		[ ] (all types - tables, safe ranges, length limits)
@@ -101,6 +101,7 @@ type Checker interface {
 // [ ] parse: get rid of the "NEXT" hack, check ragel docs
 // [x] sorter: pre-detect errors, split multiframes, etc
 // [ ] parser: proper UTF-8 CHAR pattern
+// [ ] AppendRange, Iterator.offset, IsEmpty()
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -120,9 +121,12 @@ type Checker interface {
 // [-] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
-// [-] Frame.Split() multiframe parsing  ;,,.,,!,. etc
-// [ ] multiframe Sorter
-// [ ] consider ?!,; instead of !.,; and ?
+// [x] Frame.Split() multiframe parsing  ;,,.,,!,. etc
+// [x] multiframe Sorter
+// [x] consider ?!,; instead of !.,; and ?
+// [x]   insert ; or , depending on the prev op
+// [ ] test redefs!
+// [ ] ron.go --> cmd_reduce.go
 //
 // [x] formatting options
 // 		[x] indenting

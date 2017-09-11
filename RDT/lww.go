@@ -8,6 +8,7 @@ type LWW struct {
 
 }
 
+// UUID for "lww"
 var LWW_UUID = RON.UUID{881557636825219072, RON.UUID_NAME_UPPER_BITS}
 
 // LWW arrays and matrices  :)1%)2 :)2   merge is O(N)

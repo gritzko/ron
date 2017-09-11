@@ -195,7 +195,7 @@ func (frame *Frame) AppendOp(op Op) {
 
 	flags := frame.Format
 	start := len(frame.Body)
-	if len(frame.Body) > 0 && (0 != flags&FORMAT_OP_LINES || (0 != flags&FORMAT_FRAME_LINES && op.IsHeader())) {
+	if len(frame.Body) > 0 && (0 != flags&FORMAT_OP_LINES || (0 != flags&FORMAT_FRAME_LINES && !op.IsFramed())) {
 		frame.Body = append(frame.Body, '\n')
 		if 0 != flags&FORMAT_INDENT && !op.IsHeader() {
 			frame.Body = append(frame.Body, "    "...)
@@ -213,7 +213,7 @@ func (frame *Frame) AppendOp(op Op) {
 
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 
-	if op.IsHeader() || (op.Class() == OP_RAW && frame.last.Class() != OP_RAW) || op.Count == 0 {
+	if op.IsHeader() || (op.IsRaw() && !frame.last.IsRaw()) || op.Count == 0 {
 		frame.Body = append(frame.Body, op.Term())
 	}
 
@@ -236,12 +236,8 @@ func (frame *Frame) AppendSpecBody(toel Spec, body []byte, flags uint) {
 	frame.AppendSpecAtomsFlags(toel, ParseAtoms(body), flags)
 }
 
-func (frame *Frame) AppendPatchHeader(spec Spec) {
-	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_PATCH)
-}
-
 func (frame *Frame) AppendStateHeader(spec Spec) {
-	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_STATE)
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_HEADER)
 }
 
 func (frame *Frame) AppendSpecInt (spec Spec, i int) {

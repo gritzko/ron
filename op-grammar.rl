@@ -55,9 +55,6 @@
     action opterm {
         op.Flags = opSep2Bits(fc)
     }
-    action query {
-        op.Flags = OP_QUERY_BIT
-    }
 
     action next { // start of the next op
         done = true
@@ -87,11 +84,10 @@
             ) >atom_start %atom space*;
     ATOMS = ATOM+ %atoms >atoms_start;
 
-    OPTERM = [,\.;!] @opterm space*;
-    QUERY = [?] @query space*;
+    OPTERM = [,;!?] @opterm space*;
 
     NEXT = [*#@:] @next; 
 
-    OP = space* SPEC_UUID* ( QUERY | OPTERM | ATOMS OPTERM? ) NEXT? %/over;
+    OP = space* SPEC_UUID* ( OPTERM | ATOMS OPTERM? ) NEXT? %/over;
 
 }%%

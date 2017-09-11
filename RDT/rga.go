@@ -17,6 +17,7 @@ type RGA struct {
 	loc_ins             RON.UHeap
 }
 
+// UUID for "rga"
 var RGA_UUID = RON.UUID{985043671231496192, RON.UUID_NAME_UPPER_BITS}
 
 func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {

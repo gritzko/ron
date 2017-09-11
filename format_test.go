@@ -151,11 +151,11 @@ type sample struct {
 }
 
 func TestFormatOptions(t *testing.T) {
-	framestr := "*lww#test;@1:key'value'@2:number=1*rga#text@3'T'!*rga#text@6:3;@4'e'@5'x'@6't'"
+	framestr := "*lww#test!@1:key'value'@2:number=1*rga#text@3'T'!*rga#text@6:3,@4'e'@5'x'@6't'*lww#more:a=1;"
 	formats := []sample{
 		{
 			FORMAT_FRAME_LINES | FORMAT_HEADER_SPACE,
-			"*lww#test; @1:key'value'@2:number=1\n*rga#text@3'T'!\n@6:3; @4'e'@5'x'@6't'",
+			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more:a=1;",
 		},
 	}
 	frame := ParseFrame([]byte(framestr))
