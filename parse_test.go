@@ -162,7 +162,7 @@ func TestParseFrame(t *testing.T) {
 	}
 	// pack into a frame
 	frame := MakeFrame(dim*dim*22 + dim*100)
-	frame.Format|=FORMAT_OP_LINES
+	frame.Format |= FORMAT_OP_LINES
 	const ops = 30
 	for j := 0; j < ops; j++ {
 		at = j << 2
@@ -277,7 +277,7 @@ func TestOp_ParseAtoms(t *testing.T) {
 			break
 		}
 		types := ""
-		for a := uint(0); a<op.Atoms.Count; a++ {
+		for a := uint(0); a < op.Atoms.Count; a++ {
 			types += string(atomBits2Sep(op.Atoms.Type(a)))
 		}
 		if types != tests[i][1] {
@@ -303,9 +303,30 @@ func TestParse_Errors(t *testing.T) {
 		buf := []byte(f)
 		var op Op
 		l := XParseOp(buf, &op, ZERO_OP)
-		if l>0 {
+		if l > 0 {
 			t.Fail()
 			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, l)
+		}
+	}
+}
+
+func TestFrame_SplitMultiframe(t *testing.T) {
+	splits := []string{
+		"*lww#test!:a=1#best:0!:b=2:c=3:d=4;",
+		"*lww#test!:a=1",
+		"*lww#best!:b=2:c=3",
+		"*lww#best:d=4;",
+	}
+	multi := ParseFrameString(splits[0])
+	monos, err := multi.SplitMultiframe(nil)
+	if err != nil {
+		t.Fail()
+		t.Log(err)
+	}
+	for i := 0; i < len(monos); i++ {
+		if monos[i].String() != splits[i+1] {
+			t.Fail()
+			t.Logf("split fail:\n'%s'\nshould be\n'%s'\n", monos[i].String(), splits[i+1])
 		}
 	}
 }

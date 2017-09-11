@@ -52,6 +52,10 @@ type Iterator struct {
 	offset int
 }
 
+type Checker interface {
+	Check (iterator Iterator) error
+}
+
 // Frame Open Q
 // [x] ERRORS   !!!=code"text"
 // [x]  including length limits!!!
@@ -73,7 +77,7 @@ type Iterator struct {
 // [x] Location -> Reference
 // [x] ?!,; term/mark/kind/status/headerness
 // [x] AppendOp/Query/Patch/State - Spec/Atoms
-// [ ] multiframe (still atomic)   Frame.Split(iterator)
+// [x] multiframe (still atomic)   Frame.Split(iterator)
 //
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl
@@ -95,7 +99,7 @@ type Iterator struct {
 // [x] lww - idempotency
 // [x] parse: imply . if no frame header seen previously (is_frame_open)
 // [ ] parse: get rid of the "NEXT" hack, check ragel docs
-// [ ] sorter: pre-detect errors, split multiframes, etc
+// [x] sorter: pre-detect errors, split multiframes, etc
 // [ ] parser: proper UTF-8 CHAR pattern
 //
 // [ ] RGA reducer (fn, errors)

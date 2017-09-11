@@ -264,6 +264,7 @@ func (frame *Frame) AppendRange(i, j Iterator) {
 	if i.frame != j.frame {
 		panic("mismatching iterators")
 	}
+	// FIXME: last op exclusive!!!
 	frame.AppendOp(i.Op)
 	from := i.offset //+ len(i.Body)
 	till := j.offset

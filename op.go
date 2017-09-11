@@ -239,7 +239,19 @@ func (frame *Frame) Fill (clock Clock, env Environment) Frame {
 		if spec[SPEC_EVENT]==ZERO_UUID {
 			spec[SPEC_EVENT] = now
 		}
+		// TODO implement env fill
 		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Flags)
+		i.Next()
+	}
+	return ret
+}
+
+func (frame Frame) Reformat (format int) Frame {
+	ret := MakeFrame(len(frame.Body))
+	ret.Format = format
+	i := frame.Begin()
+	for !i.IsEmpty() {
+		ret.AppendOp(i.Op)
 		i.Next()
 	}
 	return ret
