@@ -36,5 +36,28 @@ func (um UUID2Map) List(key UUID) []UUID {
 }
 
 func (um *UUID2Map) Put(key UUID, values []UUID) {
-	um.subs[key] = values
+	if len(values)>0 {
+		um.subs[key] = values
+	} else {
+		delete(um.subs, key)
+	}
+}
+
+func (um *UUID2Map) Remove(key UUID, value UUID) {
+	values, ok := um.subs[key]
+	if !ok {
+		return
+	}
+	for i:=0; i<len(values); i++ {
+		if values[i]==value {
+			l1 := len(values)-1
+			values[i] = values[l1]
+			values = values[:l1]
+			i--
+		}
+	}
+	// TODO perf
+	// [ ] um.rm - list of removals
+	// [ ] on every iteration, check against um.rm
+	// [ ] um.rm over limit => iterate/merge
 }

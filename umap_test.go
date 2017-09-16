@@ -22,4 +22,13 @@ func TestUUID2Map_List(t *testing.T) {
 			t.Fail()
 		}
 	}
+	for i := 0; i < 100; i+=2 {
+		um.Remove(ZERO_UUID, UUID{uint64(i), UUID_NAME_UPPER_BITS})
+	}
+	odd := um.List(ZERO_UUID)
+	for i := 1; i < 100; i+=2 {
+		if odd[i].Value != uint64(i) {
+			t.Fail()
+		}
+	}
 }
