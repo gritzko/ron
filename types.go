@@ -17,7 +17,7 @@ const INT60LEN = 10
 const MAX_ATOMS = 8
 
 type UUID struct {
-	Value uint64
+	Value  uint64
 	Origin uint64
 }
 
@@ -41,8 +41,7 @@ type Op struct { // ~128 bytes
 type Frame struct {
 	Body        []byte
 	first, last Op
-	Format		int
-	Source      int
+	Format      int
 }
 
 // Iterator is a mutable iterator over a frame; each position is an op.
@@ -52,8 +51,10 @@ type Iterator struct {
 	offset int
 }
 
+// Checker performs sanity checks on incoming data. Note that a Checker
+// may accumulate data, e.g. keep a max timestamp seen.
 type Checker interface {
-	Check (iterator Iterator) error
+	Check(iterator Iterator) error
 }
 
 // Frame Open Q
@@ -102,6 +103,13 @@ type Checker interface {
 // [x] sorter: pre-detect errors, split multiframes, etc
 // [ ] parser: proper UTF-8 CHAR pattern
 // [ ] AppendRange, Iterator.offset, IsEmpty()
+// [ ] Frame.Header() parsed header fast access
+// [ ] FRAME IS A SLICE
+//      [ ] no *Frame
+//      [ ] fr = fr.Append(...)
+//      [ ] first, last *Op
+// [ ] MakeNameUUID("name")
+//
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -126,7 +134,13 @@ type Checker interface {
 // [x] consider ?!,; instead of !.,; and ?
 // [x]   insert ; or , depending on the prev op
 // [ ] test redefs!
+// [ ] test op term defaulting (Append, op before frame, etc)
 // [ ] ron.go --> cmd_reduce.go
+// [ ] go fmt hook
+// [x] reducers to ignore empty frames
+// [ ] Frame.Realloc() // put valuues on a new slab, release old slices
+// [ ] clock.Authority, clock.See() bool
+// [ ] ParseUUID sig
 //
 // [x] formatting options
 // 		[x] indenting
@@ -184,7 +198,7 @@ func (op Op) Event() UUID {
 	return op.Spec[SPEC_EVENT]
 }
 
-func (op Op) Reference() UUID {
+func (op Op) Ref() UUID {
 	return op.Spec[SPEC_REF]
 }
 
@@ -196,16 +210,16 @@ const OP_QUERY_BIT = 4
 
 const INT60_FULL uint64 = 1<<60 - 1
 const INT60_ERROR = INT60_FULL
-const INT60_NEVER = 63 << (6 * 9)
-const UUID_NAME_UPPER_BITS uint64 = UUID_NAME<<60
-const UUID_EVENT_UPPER_BITS uint64 = UUID_EVENT<<60
-const UUID_DERIVED_UPPER_BITS uint64 = UUID_DERIVED<<60
-const UUID_HASH_UPPER_BITS uint64 = UUID_HASH<<60
-const UUID_UPPER_BITS uint64 = 3<<60
+const INT60_INFINITY = 63 << (6 * 9)
+const UUID_NAME_UPPER_BITS uint64 = UUID_NAME << 60
+const UUID_EVENT_UPPER_BITS uint64 = UUID_EVENT << 60
+const UUID_DERIVED_UPPER_BITS uint64 = UUID_DERIVED << 60
+const UUID_HASH_UPPER_BITS uint64 = UUID_HASH << 60
+const UUID_UPPER_BITS uint64 = 3 << 60
 
 var ZERO_UUID = UUID{0, UUID_NAME_UPPER_BITS}
 
-var NEVER_UUID = UUID{INT60_NEVER, UUID_NAME_UPPER_BITS}
+var NEVER_UUID = UUID{INT60_INFINITY, UUID_NAME_UPPER_BITS}
 
 var ERROR_UUID = UUID{INT60_ERROR, UUID_NAME_UPPER_BITS}
 

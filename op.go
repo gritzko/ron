@@ -2,7 +2,7 @@ package RON
 
 import (
 	"github.com/pkg/errors"
-//	"fmt"
+	//	"fmt"
 )
 
 func Compare(a, b UUID) int {
@@ -68,7 +68,7 @@ func (op Op) Term() byte {
 	return opBits2Sep(op.Kind)
 }
 
-func (op Op) IsQuery () bool {
+func (op Op) IsQuery() bool {
 	return op.Kind == OP_QUERY
 }
 
@@ -77,11 +77,19 @@ func (op Op) IsHeader() bool {
 }
 
 func (op Op) IsFramed() bool {
-	return op.Kind ==OP_REDUCED
+	return op.Kind == OP_REDUCED
 }
 
 func (op Op) IsRaw() bool {
 	return op.Kind == OP_RAW
+}
+
+func (op Op) IsOn() bool {
+	return op.IsQuery() && op.Ref() != NEVER_UUID
+}
+
+func (op Op) IsOff() bool {
+	return op.IsQuery() && op.Ref() == NEVER_UUID
 }
 
 // not good - op is detached from a frame here
@@ -101,7 +109,7 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 
 func (i *Iterator) Next() bool {
 
-	if i.offset!=0 && i.IsEmpty() { // FIXME test corner cases more
+	if i.offset != 0 && i.IsEmpty() { // FIXME test corner cases more
 		return false
 	} else if i.IsLast() {
 		i.Op = ZERO_OP
@@ -122,7 +130,7 @@ func (i *Iterator) Next() bool {
 }
 
 func (uuid UUID) IsTemplate() bool {
-	return uuid.Sign()==UUID_NAME && uuid.Value == 0 && uuid.Origin != 0
+	return uuid.Sign() == UUID_NAME && uuid.Value == 0 && uuid.Origin != 0
 }
 
 func (frame Frame) Stamp(clock Clock) (ret Frame) {
@@ -148,7 +156,7 @@ func (frame Frame) Stamp(clock Clock) (ret Frame) {
 }
 
 func (op Op) IsEmpty() bool {
-	return op.Spec[0]==ZERO_UUID && op.Spec[1]==ZERO_UUID && op.Spec[2]==ZERO_UUID && op.Spec[3]==ZERO_UUID
+	return op.Spec[0] == ZERO_UUID && op.Spec[1] == ZERO_UUID && op.Spec[2] == ZERO_UUID && op.Spec[3] == ZERO_UUID
 }
 
 func (frame *Frame) Begin() (i Iterator) {
@@ -161,6 +169,11 @@ func (frame *Frame) Begin() (i Iterator) {
 		i.Op = frame.first
 	}
 	return
+}
+
+// TODO optimize
+func (frame *Frame) Head() Op {
+    return frame.Begin().Op
 }
 
 func (frame *Frame) End() Iterator {
@@ -193,8 +206,12 @@ func (op *Spec) GetUUID(i int) UUID {
 	return op[i]
 }
 
-func (uuid *UUID) IsZero() bool {
+func (uuid UUID) IsZero() bool {
 	return uuid.Value == 0 && uuid.Origin == 0
+}
+
+func (uuid UUID) IsError() bool {
+	return uuid.Value == INT60_ERROR
 }
 
 func (spec *Op) isZero() bool {
@@ -210,25 +227,41 @@ func (i Iterator) Offset() int {
 	return i.offset
 }
 
-func (a Atoms) Type (i uint) uint {
-	return (a.Types >> (i<<1)) & 3
+func (a Atoms) Type(i uint) uint {
+	return (a.Types >> (i << 1)) & 3
 }
 
-func (uuid UUID) IsName () bool {
+func (a Atoms) IsEmpty () bool {
+    return a.Count==0
+}
+
+func (uuid UUID) IsName() bool {
 	return uuid.Origin>>60 == UUID_NAME
 }
 
-func NewEventUUID (time, origin uint64) UUID {
-	return UUID{Value:time, Origin:(origin&INT60_ERROR)|UUID_EVENT_UPPER_BITS}
+func (uuid UUID) Derived() UUID {
+    if uuid.Scheme()==UUID_EVENT {
+        return UUID{Value:uuid.Value, Origin:uuid.Replica()|UUID_DERIVED_UPPER_BITS}
+    } else {
+        return uuid
+    }
 }
 
-func (frame *Frame) Fill (clock Clock, env Environment) Frame {
-	ret := MakeFrame(len(frame.Body)<<1)
+func NewEventUUID(time, origin uint64) UUID {
+	return UUID{Value: time, Origin: (origin & INT60_ERROR) | UUID_EVENT_UPPER_BITS}
+}
+
+func NewNameUUID(time, origin uint64) UUID {
+	return UUID{Value: time, Origin: (origin & INT60_ERROR) | UUID_NAME_UPPER_BITS}
+}
+
+func (frame *Frame) Fill(clock Clock, env Environment) Frame {
+	ret := MakeFrame(len(frame.Body) << 1)
 	now := clock.Time()
 	i := frame.Begin()
-	for!i.IsEmpty() {
+	for !i.IsEmpty() {
 		spec := i.Spec
-		if spec[SPEC_EVENT]==ZERO_UUID {
+		if spec[SPEC_EVENT] == ZERO_UUID {
 			spec[SPEC_EVENT] = now
 		}
 		// TODO implement env fill
@@ -238,7 +271,7 @@ func (frame *Frame) Fill (clock Clock, env Environment) Frame {
 	return ret
 }
 
-func (frame Frame) Reformat (format int) Frame {
+func (frame Frame) Reformat(format int) Frame {
 	ret := MakeFrame(len(frame.Body))
 	ret.Format = format
 	i := frame.Begin()
@@ -247,4 +280,10 @@ func (frame Frame) Reformat (format int) Frame {
 		i.Next()
 	}
 	return ret
+}
+
+func (uuid UUID) SetScheme(scheme uint) UUID {
+	orig := uint64(scheme) << 60
+	orig |= uuid.Replica()
+	return UUID{Value: uuid.Value, Origin: orig}
 }

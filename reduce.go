@@ -5,7 +5,7 @@ type EmptyReducer struct {
 
 func (r EmptyReducer) Reduce(a, b Frame) (result Frame, err UUID) {
 	ai, bi := a.Begin(), b.Begin()
-	loc := ai.Reference()
+	loc := ai.Ref()
 	if !ai.IsHeader() {
 		loc = ai.Event()
 	}

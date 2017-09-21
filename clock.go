@@ -12,13 +12,15 @@ type Clock struct {
 
 const (
 	CLOCK_CALENDAR = iota
-	CLOCK_EPOCH
+	CLOCK_EPOCH    // TODO implement behavior
 	CLOCK_LAMPORT
 )
 
-func NewClock (replica uint64, mode, minLen int) Clock {
-	origin := (replica&INT60_FULL) | UUID_EVENT_UPPER_BITS
-	return Clock{lastSeen:UUID{0,origin}}
+var MAX_BIT_GRAB uint64 = 1 << 20
+
+func NewClock(replica uint64, mode, minLen int) Clock {
+	origin := (replica & INT60_FULL) | UUID_EVENT_UPPER_BITS
+	return Clock{lastSeen: UUID{0, origin}, Mode: mode, MinLength: minLen}
 }
 
 func time2uint(t time.Time) (i uint64) {
@@ -64,10 +66,18 @@ func trim_time(full, last uint64) uint64 {
 }
 
 func (clock *Clock) Time() UUID {
-	// copy paste
-	t := time.Now().Add(clock.offset).UTC()
-	val := time2uint(t)
+	var val uint64
 	last := clock.lastSeen.Value
+	switch clock.Mode {
+	case CLOCK_CALENDAR:
+		t := time.Now().Add(clock.offset).UTC()
+		val = time2uint(t)
+	case CLOCK_LAMPORT:
+		val = last + 1
+	case CLOCK_EPOCH:
+		t := time.Now().Add(clock.offset).UTC()
+		val = uint64(t.Unix()) << (4 * 6) // TODO define
+	}
 	if val <= last {
 		val = last + 1
 	} else {
@@ -84,6 +94,15 @@ func (clock *Clock) See(uuid UUID) bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+func (clock Clock) IsSane(uuid UUID) bool {
+	switch clock.Mode {
+	case CLOCK_LAMPORT:
+		return clock.lastSeen.Value+MAX_BIT_GRAB > uuid.Value
+	default:
+		return true
 	}
 }
 

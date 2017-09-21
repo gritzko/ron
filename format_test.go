@@ -22,6 +22,7 @@ func TestUUID_String(t *testing.T) {
 	tests := [][]string{
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
 		{"0", "1", "1"},
+		{"0", "123-0", "123-"},
 		{"0", "0000000001-orig", ")1-orig"},
 		{"1time01-src", "1time02+src", "{2+"},
 		{"0$author", "name$author2", "name{2"},

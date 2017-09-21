@@ -240,6 +240,10 @@ func (frame *Frame) AppendStateHeader(spec Spec) {
 	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_HEADER)
 }
 
+func (frame *Frame) AppendQueryHeader(spec Spec) {
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_QUERY)
+}
+
 func (frame *Frame) AppendSpecInt (spec Spec, i int) {
 	str := fmt.Sprintf("=%d", i)
 	frame.AppendSpecBody(spec, []byte(str), OP_REDUCED)
@@ -291,4 +295,10 @@ func (frame Frame) Clone() Frame {
 	body := make([]byte, 0, len(frame.Body))
 	copy(body, frame.Body)
 	return Frame{Body: body, last: frame.last}
+}
+
+func MakeQueryFrame (headerSpec Spec) Frame {
+    ret := MakeFrame(128)
+    ret.AppendQueryHeader(headerSpec)
+    return ret
 }

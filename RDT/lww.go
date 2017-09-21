@@ -25,7 +25,7 @@ func (lww LWW) ReduceAll(inputs []RON.Frame) (res RON.Frame, err RON.UUID) {
 	for k:=0; k<len(inputs); k++ {
 		i := inputs[k].Begin()
 		spec = i.Spec
-		if i.Reference().IsZero() && i.IsHeader() {
+		if i.Ref().IsZero() && i.IsHeader() {
 			haveState = true
 		}
 		if i.IsHeader() {

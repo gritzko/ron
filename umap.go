@@ -56,8 +56,8 @@ func (um *UUID2Map) Remove(key UUID, value UUID) {
 			i--
 		}
 	}
-	// TODO perf
-	// [ ] um.rm - list of removals
+	// TODO perf N^2
+	// [ ] um.rm - list of removals for len(values)>100?
 	// [ ] on every iteration, check against um.rm
 	// [ ] um.rm over limit => iterate/merge
 }
