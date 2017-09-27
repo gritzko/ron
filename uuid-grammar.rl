@@ -40,6 +40,7 @@
         sign = uuidSep2Bits(fc)
         i = uuid.Replica()
         uuid.Origin &= PREFIX10
+        bare = false
     }
 
     action uuid {
@@ -60,11 +61,13 @@
     BASE = ( [0-9a-zA-Z~_] @int60_digit )+;
     PREFIX =  [([\{\}\])]  @int60_prefix;
     SIGN = [\-+\$%] @uuid_sep;
+    PBASE = PREFIX BASE?;
+    INT = PBASE | BASE;
 
-    VALUE = ( PREFIX | BASE | PREFIX BASE ) %value ;
-    ORIGIN = ( ( SIGN | PREFIX | SIGN PREFIX )  BASE? ) %origin ;
+    VALUE = INT %value ;
+    ORIGIN = INT %origin ;
 
-    UUID =  (VALUE? ORIGIN?)
+    UUID =  ( VALUE SIGN ORIGIN? | SIGN ORIGIN? | VALUE (PBASE %origin)? )
             >start_uuid %uuid
            ;
 

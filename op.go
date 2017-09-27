@@ -255,6 +255,15 @@ func NewNameUUID(time, origin uint64) UUID {
 	return UUID{Value: time, Origin: (origin & INT60_ERROR) | UUID_NAME_UPPER_BITS}
 }
 
+// use for static strings only - panics on error
+func NewName (name string) UUID {
+	nam, err := ParseUUIDString(name)
+	if err!=nil {
+		panic("bad name")
+	}
+	return nam
+}
+
 func (frame *Frame) Fill(clock Clock, env Environment) Frame {
 	ret := MakeFrame(len(frame.Body) << 1)
 	now := clock.Time()

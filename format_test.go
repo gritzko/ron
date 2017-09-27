@@ -40,7 +40,7 @@ func TestUUID_String(t *testing.T) {
 		uuid, _ := ParseUUID([]byte(tri[1]), ZERO_UUID)
 		zip := uuid.ZipString(context)
 		if zip != tri[2] {
-			t.Logf("case %d: %s must be %s", i, zip, tri[2])
+			t.Logf("case %d: %s must be %s (%s, %s)", i, zip, tri[2], uuid.String(), context.String())
 			t.Fail()
 		}
 	}

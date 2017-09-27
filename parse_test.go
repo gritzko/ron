@@ -72,7 +72,7 @@ func TestParseUUIDErrors(t *testing.T) {
 }
 
 var test32 = [32][3]string{ // context: 0123456789-abcdefghi
-	{"", "0123456789-abcdefghi"},    // 00000
+	{"-", "0123456789-abcdefghi"},    // 00000
 	{"B", "B"},                      // 00001
 	{"(", "0123-abcdefghi"},         // 00010
 	{"(B", "0123B-abcdefghi"},       // 00011
@@ -118,7 +118,7 @@ func TestParseUUID2(t *testing.T) {
 		}
 		if l != len(zipped) || next != unzipped {
 			t.Fail()
-			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s", i, next.String(), test32[i][1], defstr)
+			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s (%d, %d)", i, next.String(), test32[i][1], defstr, l, len(zipped))
 		}
 	}
 }
@@ -262,7 +262,7 @@ func TestOp_ParseFloat(t *testing.T) {
 func TestOp_ParseAtoms(t *testing.T) {
 	var tests = [5][2]string{
 		{">0>1>2>3", ">>>>"},
-		{">>,#next>>", ">>"},
+		{">0>0,#next>0>0", ">>"},
 		{",", ""},
 		{"=1^2.0", "=^"},
 		{"'str''quoted \\'mid\\' str'", "''"},

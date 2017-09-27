@@ -83,7 +83,7 @@ type Checker interface {
 // cli FIXME
 // [ ] clean-up: uuid-grammar.rl (take from Java)
 // [x] iterator - parse error
-// [ ] value parsing NEW DEAL
+// [ ] value parsing NEW DEAL - [2]uint64
 //		[ ] (all types - tables, safe ranges, length limits)
 //		[x] int
 //		[x] float
@@ -96,7 +96,7 @@ type Checker interface {
 //		[ ] int-in-uuid, float-in-uuid, string-in-uuid
 //			float is two ints: value and E? (read IEEE)
 //		[ ] Spec -> QuadUUID, 4 values max
-//		[ ] optionally, atom vectorization =1<2<3<4
+//		[ ] optionally, atom vectorization =1<2<3<4 OR arb number of atoms
 // [x] lww - idempotency
 // [x] parse: imply . if no frame header seen previously (is_frame_open)
 // [ ] parse: get rid of the "NEXT" hack, check ragel docs
@@ -122,6 +122,17 @@ type Checker interface {
 // [ ] iheap: seek the loop
 // [ ] LWW: 1000x1000 array test
 //
+// ## NEW ORDER ##
+// [ ] parser-local adaptor functions
+// [ ] unified grammar files: Java, C++, Go
+// [ ] Op: 4 UUIDs, []byte atoms
+// [ ] ron.Reader
+// [ ] separate atom parser
+// [ ] reader.Next() reader.ReadInt()...
+// [ ] ron.Writer
+// [ ] Frame, Reader, Writer inherit Op
+// [ ] type Batch []Frame, type Flow chan Batch
+//
 // [ ] reducer registry
 // [ ] reducer flags (at least, formatting)
 // [x] nice base64 constant definitions (ron ... // "comment")
@@ -141,6 +152,7 @@ type Checker interface {
 // [ ] Frame.Realloc() // put valuues on a new slab, release old slices
 // [ ] clock.Authority, clock.See() bool
 // [ ] ParseUUID sig
+// [ ] far future: 64 bit uuid, 2bit type, 2bit 1..4 bytes of origin
 //
 // [x] formatting options
 // 		[x] indenting
