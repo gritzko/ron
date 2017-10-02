@@ -1,8 +1,8 @@
 package RON
 
 import (
-	"math/bits"
 	"fmt"
+	"math/bits"
 )
 
 const (
@@ -214,7 +214,7 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.Body = append(frame.Body, op.Body[op.Offsets[0]:]...)
 
 	if op.IsHeader() || (op.IsRaw() && !frame.last.IsRaw()) || op.Count == 0 {
-		frame.Body = append(frame.Body, op.Term())
+		frame.Body = append(frame.Body, termBits2Sep(op.Term))
 	}
 
 	frame.last = op
@@ -225,11 +225,11 @@ func (frame *Frame) AppendSpecAtomsFlags(spec Spec, atoms Atoms, flags uint) {
 }
 
 func (frame *Frame) AppendReduced(spec Spec, atoms Atoms) {
-	frame.AppendOp(Op{spec, atoms, OP_REDUCED})
+	frame.AppendOp(Op{spec, atoms, TERM_INNER})
 }
 
 func (frame *Frame) AppendRaw(spec Spec, atoms Atoms) {
-	frame.AppendOp(Op{spec, atoms, OP_RAW})
+	frame.AppendOp(Op{spec, atoms, TERM_LAST})
 }
 
 func (frame *Frame) AppendSpecBody(toel Spec, body []byte, flags uint) {
@@ -237,21 +237,21 @@ func (frame *Frame) AppendSpecBody(toel Spec, body []byte, flags uint) {
 }
 
 func (frame *Frame) AppendStateHeader(spec Spec) {
-	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_HEADER)
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_HEADER)
 }
 
 func (frame *Frame) AppendQueryHeader(spec Spec) {
-	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, OP_QUERY)
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_QUERY)
 }
 
-func (frame *Frame) AppendSpecInt (spec Spec, i int) {
+func (frame *Frame) AppendSpecInt(spec Spec, i int) {
 	str := fmt.Sprintf("=%d", i)
-	frame.AppendSpecBody(spec, []byte(str), OP_REDUCED)
+	frame.AppendSpecBody(spec, []byte(str), TERM_INNER)
 }
 
-func (frame *Frame) AppendSpecUUID (spec Spec, uuid UUID) {
+func (frame *Frame) AppendSpecUUID(spec Spec, uuid UUID) {
 	str := fmt.Sprintf(">%s", uuid.String())
-	frame.AppendSpecBody(spec, []byte(str), OP_REDUCED)
+	frame.AppendSpecBody(spec, []byte(str), TERM_INNER)
 }
 
 func (frame *Frame) AppendRange(i, j Iterator) {
@@ -297,8 +297,8 @@ func (frame Frame) Clone() Frame {
 	return Frame{Body: body, last: frame.last}
 }
 
-func MakeQueryFrame (headerSpec Spec) Frame {
-    ret := MakeFrame(128)
-    ret.AppendQueryHeader(headerSpec)
-    return ret
+func MakeQueryFrame(headerSpec Spec) Frame {
+	ret := MakeFrame(128)
+	ret.AppendQueryHeader(headerSpec)
+	return ret
 }

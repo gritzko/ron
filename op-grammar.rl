@@ -53,7 +53,7 @@
         atoms_at = p
     }
     action opterm {
-        op.Kind = opSep2Bits(fc)
+        op.Term = termSep2Bits(fc)
     }
 
     action next { // start of the next op

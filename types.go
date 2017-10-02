@@ -34,7 +34,7 @@ type Atoms struct {
 type Op struct { // ~128 bytes
 	Spec
 	Atoms
-	Kind uint
+	Term uint
 }
 
 // Frame... mutable, but append-only
@@ -95,8 +95,9 @@ type Checker interface {
 //			Extension bit!!!
 //		[ ] int-in-uuid, float-in-uuid, string-in-uuid
 //			float is two ints: value and E? (read IEEE)
-//		[ ] Spec -> QuadUUID, 4 values max
-//		[ ] optionally, atom vectorization =1<2<3<4 OR arb number of atoms
+//		[-] Spec -> QuadUUID, 4 values max
+//		[-] optionally, atom vectorization =1<2<3<4 OR arb number of atoms
+//		[ ] Cursor, aka atom iterator
 // [x] lww - idempotency
 // [x] parse: imply . if no frame header seen previously (is_frame_open)
 // [ ] parse: get rid of the "NEXT" hack, check ragel docs
@@ -108,7 +109,7 @@ type Checker interface {
 //      [ ] no *Frame
 //      [ ] fr = fr.Append(...)
 //      [ ] first, last *Op
-// [ ] MakeNameUUID("name")
+// [x] MakeNameUUID("name")
 //
 //
 // [ ] RGA reducer (fn, errors)
@@ -119,19 +120,21 @@ type Checker interface {
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
 // [ ] LWW: out-of-order entries - restart the algo (with alloc)
-// [ ] iheap: seek the loop
+// [ ] iheap: seek the loop - reimpl (see UHeap), bench
 // [ ] LWW: 1000x1000 array test
 //
 // ## NEW ORDER ##
-// [ ] parser-local adaptor functions
+// [x] @~! explicit frame terminator - or ;  frame.Close() frame.Join()
+// [ ] parser-private adaptor fns  _set_digit()
 // [ ] unified grammar files: Java, C++, Go
 // [ ] Op: 4 UUIDs, []byte atoms
-// [ ] ron.Reader
+// [ ] Iterator, ret code, error/incomplete input
 // [ ] separate atom parser
 // [ ] reader.Next() reader.ReadInt()...
 // [ ] ron.Writer
-// [ ] Frame, Reader, Writer inherit Op
+// [ ] Frame, Reader, Writer inherit Op (see C++)
 // [ ] type Batch []Frame, type Flow chan Batch
+// [ ] kill ABC? bench
 //
 // [ ] reducer registry
 // [ ] reducer flags (at least, formatting)
@@ -147,10 +150,11 @@ type Checker interface {
 // [ ] test redefs!
 // [ ] test op term defaulting (Append, op before frame, etc)
 // [ ] ron.go --> cmd_reduce.go
-// [ ] go fmt hook
+// [x] go fmt hook
+// [ ] test/benchmark hook
 // [x] reducers to ignore empty frames
 // [ ] Frame.Realloc() // put valuues on a new slab, release old slices
-// [ ] clock.Authority, clock.See() bool
+// [x] clock.Authority, clock.See() bool
 // [ ] ParseUUID sig
 // [ ] far future: 64 bit uuid, 2bit type, 2bit 1..4 bytes of origin
 //
@@ -161,7 +165,7 @@ type Checker interface {
 // 		[ ] redefs (bench - fast prefix - bit ops)
 // [x] kill 2 impl of zip UUID
 // [x] test formatting
-// [ ] test redefaults
+// [ ] test redefaults - BACKTICK ONLY (replaces the quant)
 
 // Reducer is essentially a replicated data type.
 // It provides two reducing functions: total and incremental.
@@ -261,8 +265,8 @@ func init() {
 	for i := 0; i < len(SPEC_PUNCT); i++ {
 		ABC[SPEC_PUNCT[i]] = -30 - int8(i)
 	}
-	for i := 0; i < len(OP_PUNCT); i++ {
-		ABC[OP_PUNCT[i]] = -5
+	for i := 0; i < len(TERM_PUNCT); i++ {
+		ABC[TERM_PUNCT[i]] = -5
 	}
 	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
 	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")

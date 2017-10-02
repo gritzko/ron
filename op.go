@@ -64,24 +64,25 @@ func (a Op) Same(b *Op) bool {
 	return a.Spec == b.Spec
 }
 
-func (op Op) Term() byte {
-	return opBits2Sep(op.Kind)
-}
+//
+//func (op Op) Term() byte {
+//	return termBits2Sep(op.Term)
+//}
 
 func (op Op) IsQuery() bool {
-	return op.Kind == OP_QUERY
+	return op.Term == TERM_QUERY
 }
 
 func (op Op) IsHeader() bool {
-	return op.Kind == OP_HEADER
+	return op.Term == TERM_HEADER
 }
 
 func (op Op) IsFramed() bool {
-	return op.Kind == OP_REDUCED
+	return op.Term == TERM_INNER
 }
 
 func (op Op) IsRaw() bool {
-	return op.Kind == OP_RAW
+	return op.Term == TERM_LAST
 }
 
 func (op Op) IsOn() bool {
@@ -173,7 +174,7 @@ func (frame *Frame) Begin() (i Iterator) {
 
 // TODO optimize
 func (frame *Frame) Head() Op {
-    return frame.Begin().Op
+	return frame.Begin().Op
 }
 
 func (frame *Frame) End() Iterator {
@@ -231,8 +232,8 @@ func (a Atoms) Type(i uint) uint {
 	return (a.Types >> (i << 1)) & 3
 }
 
-func (a Atoms) IsEmpty () bool {
-    return a.Count==0
+func (a Atoms) IsEmpty() bool {
+	return a.Count == 0
 }
 
 func (uuid UUID) IsName() bool {
@@ -240,11 +241,11 @@ func (uuid UUID) IsName() bool {
 }
 
 func (uuid UUID) Derived() UUID {
-    if uuid.Scheme()==UUID_EVENT {
-        return UUID{Value:uuid.Value, Origin:uuid.Replica()|UUID_DERIVED_UPPER_BITS}
-    } else {
-        return uuid
-    }
+	if uuid.Scheme() == UUID_EVENT {
+		return UUID{Value: uuid.Value, Origin: uuid.Replica() | UUID_DERIVED_UPPER_BITS}
+	} else {
+		return uuid
+	}
 }
 
 func NewEventUUID(time, origin uint64) UUID {
@@ -256,9 +257,9 @@ func NewNameUUID(time, origin uint64) UUID {
 }
 
 // use for static strings only - panics on error
-func NewName (name string) UUID {
+func NewName(name string) UUID {
 	nam, err := ParseUUIDString(name)
-	if err!=nil {
+	if err != nil {
 		panic("bad name")
 	}
 	return nam
@@ -274,7 +275,7 @@ func (frame *Frame) Fill(clock Clock, env Environment) Frame {
 			spec[SPEC_EVENT] = now
 		}
 		// TODO implement env fill
-		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Kind)
+		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Term)
 		i.Next()
 	}
 	return ret
