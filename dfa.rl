@@ -1,6 +1,7 @@
 package RON
 
-//import "fmt"
+import "fmt"
+import "errors"
 const trace = false
 
 type parser struct { // TODO
@@ -15,15 +16,14 @@ func XParseOp(data []byte, op *Op, context Op) int {
     %% machine RON;
     %% write data;
 
-    var prev_uuid *UUID = &ZERO_UUID
-    _ = prev_uuid
+    var ctx_uuid UUID = ZERO_UUID
+    _ = ctx_uuid
     var uuid *UUID
     var blank UUID
     var i uint64
     var digits uint
+    var uuid_value, uuid_origin, uuid_scheme uint64
     var n, old_n int = -1, -1
-    var length = -1
-    _ = length
     var atoms_at, atoms_till int
     var red uint
 
@@ -39,8 +39,6 @@ func XParseOp(data []byte, op *Op, context Op) int {
 	var ts, te, act int
     _ = eof
     _,_,_ = ts,te,act
-    var bare, full bool
-    var sign uint = 0
     done := false
 
 	%%{
@@ -60,24 +58,32 @@ func XParseOp(data []byte, op *Op, context Op) int {
     }
 }
 
+var DIGIT_OFFSETS [10]uint8
+var PREFIX_MASKS [10]uint64
 
-// BIG FIXME  ERROR HANDLING, TESTS
-// FIXME context UUID
-func XParseUUID(data []byte, uuid *UUID) (length int) {
+func init () {
+    var one uint64 = 1
+    for i:=0; i<10; i++ {
+        var bitoff uint8 = uint8(60 - i*6)
+        DIGIT_OFFSETS[i] = bitoff - 6
+        PREFIX_MASKS[i] = ((one<<60)-1) - ((one<<bitoff)-1)
+    }
+}
+
+
+func (ctx_uuid UUID) Parse (data []byte) (ret UUID, err error) {
 
     %% machine UUID;
     %% write data;
 
     var i uint64
     var digits uint
-    length = -1
+    var uuid_value, uuid_origin, uuid_scheme uint64
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	var ts, te, act int
     _ = eof
     _,_,_ = ts,te,act
-    var bare, full bool
-    var sign uint = 0
 
 
 	%%{ 
@@ -89,7 +95,11 @@ func XParseUUID(data []byte, uuid *UUID) (length int) {
 	    write exec;
 	}%%
 
-    // FIXME checkk all input is parsed
+    if cs < %%{ write first_final; }%% || digits>10 {
+        err = errors.New(fmt.Sprintf("parse error at pos %d", p))
+    } else {
+        ret = NewUUID(uuid_scheme, uuid_value, uuid_origin)
+    }
 
     return
 }

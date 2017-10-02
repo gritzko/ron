@@ -6,7 +6,7 @@
     action redef_uuid {
         red = redefSep2Bits(fc)
         if red==0 {
-            *uuid = *prev_uuid
+            *uuid = ctx_uuid
         } else {
             *uuid = context.Spec[red]
         }
@@ -17,15 +17,14 @@
         digits = 0
         old_n = n
         n = int(specSep2Bits(fc))
-        uuid = &op.Spec[n]
-        *uuid = context.Spec[n]
         if n <= old_n {
             fbreak;
         }
+        ctx_uuid = context.Spec[n]
     }
 
     action toel_uuid {
-        prev_uuid = uuid
+        op.Spec[n] = NewUUID(uuid_scheme, uuid_value, uuid_origin)
     }
 
     action atom_start {

@@ -49,7 +49,7 @@ func BenchmarkParseOp(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		frames = append(frames, []byte(frame)...)
 	}
-	origin, _ := ParseUUID([]byte("1-origin"), ZERO_UUID)
+	origin, _ := ParseUUID([]byte("1-origin"))
 	var off int
 	var op Op
 	for i := 0; i < b.N; i++ {

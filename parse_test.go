@@ -8,17 +8,17 @@ import (
 )
 
 func TestParseUUID(t *testing.T) {
-	uuidA, _ := ParseUUID([]byte("1"), ZERO_UUID)
+	uuidA, _ := ParseUUID([]byte("1"))
 	if uuidA.Value != (1<<54) || uuidA.Origin != 0 || uuidA.Scheme() != UUID_NAME {
 		t.Fail()
 	}
-	uuidAB, _ := ParseUUID([]byte(")1"), uuidA)
+	uuidAB, _ := uuidA.Parse([]byte(")1"))
 	if uuidAB.Value != (1<<54)|1 || uuidAB.Origin != 0 || uuidAB.Scheme() != UUID_NAME {
 		t.Fail()
 	}
-	hello, _ := ParseUUID([]byte("hello-111"), ZERO_UUID)
-	world, _ := ParseUUID([]byte("[world-111"), hello)
-	helloworld, _ := ParseUUID([]byte("helloworld-111"), ZERO_UUID)
+	hello, _ := ParseUUID([]byte("hello-111"))
+	world, _ := hello.Parse([]byte("[world-111"))
+	helloworld, _ := ParseUUID([]byte("helloworld-111"))
 	if !world.Equal(helloworld) {
 		t.Fail()
 	}
@@ -47,9 +47,9 @@ func TestParseFormatUUID(t *testing.T) {
 		{"0123G-abcdb", "(4566(efF", "01234566-abcdefF"},
 	}
 	for i, tri := range tests {
-		context, _ := ParseUUID([]byte(tri[0]), ZERO_UUID)
-		uuid, length := ParseUUID([]byte(tri[1]), context)
-		if length < 0 {
+		context, _ := ParseUUID([]byte(tri[0]))
+		uuid, err := context.Parse([]byte(tri[1]))
+		if err != nil {
 			t.Logf("parse %d fail %s (context: %s)", i, tri[1], tri[0])
 			t.Fail()
 			continue
@@ -72,7 +72,7 @@ func TestParseUUIDErrors(t *testing.T) {
 }
 
 var test32 = [32][3]string{ // context: 0123456789-abcdefghi
-	{"-", "0123456789-abcdefghi"},    // 00000
+	{"-", "0123456789-abcdefghi"},   // 00000
 	{"B", "B"},                      // 00001
 	{"(", "0123-abcdefghi"},         // 00010
 	{"(B", "0123B-abcdefghi"},       // 00011
@@ -80,7 +80,7 @@ var test32 = [32][3]string{ // context: 0123456789-abcdefghi
 	{"+B", "0123456789+B"},          // 00101
 	{"+(", "0123456789+abcd"},       // 00110
 	{"+(B", "0123456789+abcdB"},     // 00111
-	{"A", "A"},                      // 01000
+	{"A", "A"},                      // 01000 8
 	{"AB", "AB"},                    // 01001
 	{"A(", "A-abcd"},                // 01010
 	{"A(B", "A-abcdB"},              // 01011
@@ -88,7 +88,7 @@ var test32 = [32][3]string{ // context: 0123456789-abcdefghi
 	{"A+B", "A+B"},                  // 01101
 	{"A+(", "A+abcd"},               // 01110
 	{"A+(B", "A+abcdB"},             // 01111
-	{")", "012345678-abcdefghi"},    // 10000
+	{")", "012345678-abcdefghi"},    // 10000 16
 	{")B", "012345678B-abcdefghi"},  // 10001
 	{")(", "012345678-abcd"},        // 10010
 	{")(B", "012345678-abcdB"},      // 10011
@@ -112,13 +112,14 @@ func TestParseUUID2(t *testing.T) {
 	for i := 0; i < len(test32); i++ {
 		zipped := test32[i][0]
 		unzipped, _ := ParseUUIDString(test32[i][1])
-		next, l := ParseUUID([]byte(zipped), def)
-		if l < 0 && test32[i][1] == "" {
+		next, err := def.Parse([]byte(zipped))
+		if err != nil && test32[i][1] == "" {
 			continue
 		}
-		if l != len(zipped) || next != unzipped {
+		if next != unzipped {
 			t.Fail()
-			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s (%d, %d)", i, next.String(), test32[i][1], defstr, l, len(zipped))
+			t.Logf("uuid parse fail at %d: '%s' should be '%s' context %s len %d", i, next.String(), test32[i][1], defstr, len(zipped))
+			break
 		}
 	}
 }

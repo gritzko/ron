@@ -51,17 +51,11 @@ func (op Op) ParseFloat(pos uint) (ret float64, err error) {
 }
 
 func ParseUUIDString(uuid string) (ret UUID, err error) {
-	ret, l := ParseUUID([]byte(uuid), ZERO_UUID)
-	if l <= 0 {
-		err = errors.New("invalid UUID string")
-	}
-	return
+	return ZERO_UUID.Parse([]byte(uuid))
 }
 
-func ParseUUID(data []byte, context UUID) (uuid UUID, length int) {
-	uuid = context
-	length = XParseUUID(data, &uuid)
-	return
+func ParseUUID(data []byte) (uuid UUID, err error) {
+	return ZERO_UUID.Parse(data)
 }
 
 func ParseOp(data []byte, context Op) (op Op, length int) {

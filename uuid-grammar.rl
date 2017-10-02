@@ -2,61 +2,55 @@
 
     machine UUID;
 
+    action start_uuid {
+        uuid_value = ctx_uuid.Value;
+        uuid_scheme = ctx_uuid.Scheme()
+        uuid_origin = ctx_uuid.Replica();
+    }
+
 
     action int60_prefix {
-        digits = uint(-ABC[fc]-10+4) * 6
-        i >>= (60-digits)  // FIXME
+        digits = prefixSep2Bits(fc)+4;
+        i &= PREFIX_MASKS[digits];
     }
 
     action int60_digit {
         if digits==0 {
-            i = 0
-            full = true
-        } else if digits>=60 {
-            length = -p
+            i = 0;
+        } else if digits>9 {
+            digits++
             fbreak;
         }
-        digits+=6
-        i <<= 6
-        i |= uint64(ABC[fc])
+        i |= uint64(baseSep2Bits(fc)) << DIGIT_OFFSETS[digits]
+        digits++
     }
 
-    action value {
-        if digits>0 {
-            uuid.Value = i << (60-digits)
-            digits = 0
-        }
-        i = uuid.Replica()
+    action start_value {
+        i = ctx_uuid.Value
+        digits = 0
     }
 
-    action origin {
-        if digits>0 {
-            uuid.Origin = i << (60-digits)
-        }
-        bare = false
+    action start_origin {
+        i = ctx_uuid.Replica()
+        digits = 0
+    }
+
+    action end_value {
+        uuid_value = i
+    }
+
+    action end_origin {
+        uuid_origin = i
     }
 
     action uuid_sep {
-        sign = uuidSep2Bits(fc)
-        i = uuid.Replica()
-        uuid.Origin &= PREFIX10
-        bare = false
+        uuid_scheme = uint64(uuidSep2Bits(fc))
     }
 
-    action uuid {
-        length = pe
-        uuid.Origin |= uint64(sign) << 60
-        if bare && full {
-            uuid.Origin = 0
-        }
+    action end_name {
+        uuid_origin = 0;
+        uuid_scheme = UUID_NAME;
     }
-
-    action start_uuid {
-        bare, full = true, false
-        i = uuid.Value
-        sign = uuid.Scheme()
-    }
-
 
     BASE = ( [0-9a-zA-Z~_] @int60_digit )+;
     PREFIX =  [([\{\}\])]  @int60_prefix;
@@ -64,11 +58,13 @@
     PBASE = PREFIX BASE?;
     INT = PBASE | BASE;
 
-    VALUE = INT %value ;
-    ORIGIN = INT %origin ;
+    VALUE = INT >start_value %end_value ;
+    ORIGIN = INT >start_origin %end_origin ;
+    PORIGIN = PBASE >start_origin %end_origin ;
+    NAME = BASE >start_value %end_value %end_name;
 
-    UUID =  ( VALUE SIGN ORIGIN? | SIGN ORIGIN? | VALUE (PBASE %origin)? )
-            >start_uuid %uuid
+    UUID =  ( NAME | VALUE ( SIGN ORIGIN? | PORIGIN? ) | SIGN ORIGIN? )
+            >start_uuid
            ;
 
 # main := UUID;

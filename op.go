@@ -36,12 +36,12 @@ func (a UUID) EarlierThan(b UUID) bool {
 	}
 }
 
-func (a UUID) Scheme() uint {
-	return uint(a.Origin >> 60)
+func (a UUID) Scheme() uint64 {
+	return a.Origin >> 60
 }
 
 func (a UUID) Sign() byte {
-	return uuidBits2Sep(a.Scheme())
+	return uuidBits2Sep(uint(a.Scheme()))
 }
 
 func (a UUID) Replica() uint64 {
@@ -246,6 +246,10 @@ func (uuid UUID) Derived() UUID {
 	} else {
 		return uuid
 	}
+}
+
+func NewUUID(scheme, time, origin uint64) UUID {
+	return UUID{ Value: time, Origin: (origin & INT60_ERROR) | (uint64(scheme)<<60) }
 }
 
 func NewEventUUID(time, origin uint64) UUID {

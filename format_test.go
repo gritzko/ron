@@ -1,8 +1,8 @@
 package RON
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 )
 
 func TestUUIDPrimitives(t *testing.T) {
@@ -36,8 +36,9 @@ func TestUUID_String(t *testing.T) {
 		{"A$B", "A-B", "-"},
 	}
 	for i, tri := range tests {
-		context, _ := ParseUUID([]byte(tri[0]), ZERO_UUID)
-		uuid, _ := ParseUUID([]byte(tri[1]), ZERO_UUID)
+		context, e1 := ParseUUID([]byte(tri[0]))
+		uuid, e2 := ParseUUID([]byte(tri[1]))
+		_, _ = e1, e2
 		zip := uuid.ZipString(context)
 		if zip != tri[2] {
 			t.Logf("case %d: %s must be %s (%s, %s)", i, zip, tri[2], uuid.String(), context.String())
@@ -64,7 +65,6 @@ func BenchmarkUnzip(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		uuids[i] = UUID{RandUint(), UUID_EVENT_UPPER_BITS | RandUint()}
 		//uuids[i] = UUID{uint64(i), '-', 100}
-		// FIXME optimize close ids - bench CT/RGA
 	}
 	//sort.Slice(uuids, func(i, j int) bool { return uuids[i].LessThan(uuids[j]) })
 	zipped := make([]byte, 0, b.N*22+22)
@@ -75,7 +75,7 @@ func BenchmarkUnzip(b *testing.B) {
 	zipped = append(zipped, ' ')
 	for i := 1; i < b.N; i++ {
 		zipped = append(zipped, uuids[i].ZipString(uuids[i-1])...)
-		lens[i] = len(zipped)-lens[i-1]
+		lens[i] = len(zipped) - lens[i-1]
 		zipped = append(zipped, ' ')
 	}
 
@@ -87,21 +87,21 @@ func BenchmarkUnzip(b *testing.B) {
 		ind := lens[j] //bytes.IndexByte(zipped[ro:], ' ')
 		//unzip, l := ParseUUID(zipped[ro:ro+ind], context)
 		unzip := context
-		l := XParseUUID(zipped[ro:ro+ind], &unzip)
-		if l < 0 {
-			b.Logf("parse fail at %d: %s should be %s context %s text '%s'",
-				j, unzip.String(), uuids[j].String(), context.String(), string(zipped[ro:]))
+		unzip, err := context.Parse(zipped[ro : ro+ind])
+		if err != nil {
+			b.Logf("parse fail at %d: %s should be %s context %s text '%s' err %s",
+				j, unzip.String(), uuids[j].String(), context.String(), string(zipped[ro:]), err.Error())
 			b.Fail()
 			break
 		}
 		if unzip != uuids[j] {
 			b.Logf("incorrect unzip at %d: %s should be %s context %s len %d segm %v\n",
 				j, unzip.String(), uuids[j].String(),
-				context.String(), l, string(zipped[ro:ro+l]))
+				context.String(), lens[j], string(zipped[ro:]))
 			b.Fail()
 			break
 		}
-		ro += l
+		ro += lens[j]
 		//fmt.Println(unzip.String())
 		ro += 1
 		context = unzip
@@ -114,7 +114,7 @@ func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
 	op, l := ParseOp([]byte(str), ZERO_OP)
-	if l!= len(str) {
+	if l != len(str) {
 		t.Fail()
 		t.Logf("misparsed %s", str)
 		return
@@ -124,7 +124,7 @@ func TestOp_String(t *testing.T) {
 	op.Spec[3].Value++
 	var frame Frame
 	frame.AppendOp(context)
-	le:=len(frame.Body)
+	le := len(frame.Body)
 	frame.AppendOp(op)
 	opstr := string(frame.Body[le:])
 	correct := "@)1:)1=1"
@@ -138,16 +138,16 @@ func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
 	frame := Frame{Body: make([]byte, 0, b.N*len(str)*2+100)}
-	frame.AppendOp (op)
+	frame.AppendOp(op)
 	for i := 0; i < b.N; i++ {
 		op.Spec[2].Value++
 		op.Spec[3].Value++
-		frame.AppendOp (op)
+		frame.AppendOp(op)
 	}
 }
 
 type sample struct {
-	flags int
+	flags   int
 	correct string
 }
 
@@ -161,7 +161,7 @@ func TestFormatOptions(t *testing.T) {
 	}
 	frame := ParseFrame([]byte(framestr))
 	for k, f := range formats {
-		var formatted = Frame{Format:f.flags}
+		var formatted = Frame{Format: f.flags}
 		i := frame.Begin()
 		for !i.IsEmpty() {
 			formatted.AppendOp(i.Op)
