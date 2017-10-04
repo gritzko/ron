@@ -25,7 +25,7 @@ type OpParserState struct {
 	// the RON frame (for the streaming mode, probably a bit less or a bit more)
 	data []byte
 	// parser position
-	p, prev int
+	p int
 	// ragel state
 	cs int
 	// ts, te, act int
@@ -3917,7 +3917,6 @@ func (it *Frame) Parse() error {
 	it.state.idx = idx
 	it.state.digit = digit
 	it.state.half = half
-	it.state.prev = it.state.p
 	it.state.p = p
 
 	if done {
@@ -3946,15 +3945,15 @@ func init() {
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line dfa.rl:123
-//line dfa.go:4117
+//line dfa.rl:122
+//line dfa.go:4116
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line dfa.rl:124
+//line dfa.rl:123
 	var i uint128 = ctx_uuid.uint128
 	digit := uint(0)
 	half := 0
@@ -3964,12 +3963,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	_ = eof
 	//_,_,_ = ts,te,act
 
-//line dfa.go:4138
+//line dfa.go:4137
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4143
+//line dfa.go:4142
 	{
 		if p == pe {
 			goto _test_eof
@@ -4059,7 +4058,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4238
+//line dfa.go:4237
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4152,7 +4151,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4332
+//line dfa.go:4331
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4202,7 +4201,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4382
+//line dfa.go:4381
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4284,7 +4283,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4461
+//line dfa.go:4460
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4356,7 +4355,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:48
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line dfa.go:4528
+//line dfa.go:4527
 			}
 		}
 
@@ -4365,7 +4364,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:142
+//line dfa.rl:141
 
 	if cs < UUID_first_final || digit > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

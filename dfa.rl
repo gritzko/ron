@@ -23,7 +23,7 @@ type OpParserState struct {
     // the RON frame (for the streaming mode, probably a bit less or a bit more)
     data []byte
     // parser position
-    p, prev int
+    p int
     // ragel state
     cs int
     // ts, te, act int
@@ -89,7 +89,6 @@ func (it *Frame) Parse() error {
     it.state.idx = idx;
     it.state.digit = digit;
     it.state.half = half;
-    it.state.prev = it.state.p;
     it.state.p = p;
 
     if done {
