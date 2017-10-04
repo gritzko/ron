@@ -47,30 +47,30 @@ func readFiles(inputs []string) [][]byte {
 // Usage:  ron file1 file2 > file3 (reduces k frames)
 //			ron <stdin, double-newline separated>
 func main() {
+	/*
+		flag.Parse()
+		inputs := flag.Args()
+		var bufs [][]byte
 
-	flag.Parse()
-	inputs := flag.Args()
-	var bufs [][]byte
+		if len(inputs) > 0 {
+			bufs = readFiles(inputs)
+		} else {
+			bufs = readStdin()
+		}
 
-	if len(inputs) > 0 {
-		bufs = readFiles(inputs)
-	} else {
-		bufs = readStdin()
-	}
+		var frames []Frame = make([]Frame, len(bufs))
+		for i, b := range bufs {
+			frames[i] = Frame{body: b}
+		}
 
-	var frames []Frame = make([]Frame, len(bufs))
-	for i, b := range bufs {
-		frames[i] = Frame{body: b}
-	}
+		omni := OmniReducer{}
 
-	omni := OmniReducer{}
+		result, err := omni.ReduceAll(frames)
 
-	result, err := omni.ReduceAll(frames)
-
-	if err != ZERO_UUID {
-		fmt.Fprintf(os.Stderr, "reducer error: %s", err.String)
-	} else {
-		os.Stdout.Write(result.body)
-	}
-
+		if err != ZERO_UUID {
+			fmt.Fprintf(os.Stderr, "reducer error: %s", err.String)
+		} else {
+			os.Stdout.Write(result.body)
+		}
+	*/
 }

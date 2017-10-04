@@ -10,25 +10,18 @@ func ParseUUID(data []byte) (uuid UUID, err error) {
 	return ZERO_UUID.Parse(data)
 }
 
-func ParseOp(data []byte, context Op) (op Op, length int) {
-	op = context
-	// FIXME length = XParseOp(data, &op, context)
-	return
+func ParseOp(data []byte) (Op, error) {
+	f, err := OpenFrame(data)
+	return f.Op, err
 }
 
-func ParseFrame(data []byte) (ret Frame) {
-	ret.body = data
-	return
+func ParseFrame(data []byte) Frame { // TODO swap with OpenFrame
+	frame, _ := OpenFrame(data)
+	return frame
 }
 
 func ParseFrameString(frame string) Frame {
 	return ParseFrame([]byte(frame))
-}
-
-func Parse(str string) (Frame, error) {
-	ret := Frame{body: []byte(str)}
-	_ = ret.Begin() // FIXME iterator - errors
-	return ret, nil
 }
 
 // SplitMultiframe scans a frame detecting any headers; all resulting
@@ -37,23 +30,18 @@ func Parse(str string) (Frame, error) {
 // op, on error the function aborts (all the completed frames still
 // in the slice).
 func (frame Frame) SplitMultiframe(sanity Checker) (ret []Frame, err error) {
-	from := frame.Begin()
-	till := from
-	for !till.IsEmpty() {
+	for !frame.IsEmpty() {
 		if sanity != nil {
-			err = sanity.Check(till)
+			err = sanity.Check(frame)
 			if err != nil {
 				return
 			}
 		}
-		prev := till // FIXME!!!
-		till.Next()
-		if !till.IsEmpty() && till.IsHeader() {
-			next := MakeFrame(128)
-			next.AppendRange(from, prev)
-			//			ret = append(ret, next)
-			from = till
+		if frame.IsHeader() {
+			ret = append(ret, Frame{})
 		}
+		ret[len(ret)-1].AppendOp(frame.Op)
+		frame.Next()
 	}
 	return
 	// TODO make slice frames (head op not in the body), avoid copy

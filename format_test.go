@@ -1,6 +1,7 @@
 package RON
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -104,8 +105,8 @@ func BenchmarkUnzip(b *testing.B) {
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
-	op, l := ParseOp([]byte(str), ZERO_OP)
-	if l != len(str) {
+	op, err := ParseOp([]byte(str))
+	if err != nil || op.Atoms.Count() != 1 {
 		t.Fail()
 		t.Logf("misparsed %s", str)
 		return
@@ -115,9 +116,9 @@ func TestOp_String(t *testing.T) {
 	op.uuids[3].uint128[0]++
 	cur := MakeFrame(1024)
 	cur.AppendOp(context)
-	le := len(cur.body)
+	le := cur.Len()
 	cur.AppendOp(op)
-	opstr := string(cur.body[le:])
+	opstr := string(cur.Body()[le:])
 	correct := "@)1:)1=1"
 	if opstr != correct {
 		t.Logf("incorrect: '%s' != '%s'", opstr, correct)
@@ -127,7 +128,7 @@ func TestOp_String(t *testing.T) {
 
 func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
-	op, _ := ParseOp([]byte(str), ZERO_OP)
+	op, _ := ParseOp([]byte(str))
 	frame := MakeFrame(b.N*len(str)*2 + 100)
 	frame.AppendOp(op)
 	for i := 0; i < b.N; i++ {
@@ -150,13 +151,17 @@ func TestFormatOptions(t *testing.T) {
 			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more:a=1;",
 		},
 	}
-	frame := ParseFrame([]byte(framestr))
+	frame, err := OpenFrame([]byte(framestr))
+	if err != nil {
+		t.Fail()
+		return
+	}
 	for k, f := range formats {
 		formatted := MakeFormattedFrame(f.flags, 1024)
-		i := frame.Begin()
-		for !i.IsEmpty() {
-			formatted.AppendOp(i.Op)
-			i.Next()
+		for !frame.IsEmpty() {
+			fmt.Println("cs", frame.state.cs)
+			formatted.AppendOp(frame.Op)
+			frame.Next()
 		}
 		if formatted.String() != f.correct {
 			t.Fail()

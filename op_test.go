@@ -22,7 +22,7 @@ func TestOp_Event(t *testing.T) {
 func TestParseOp(t *testing.T) {
 	t.Log("Parser")
 	var frame = "*lww#test-author@(time-origin:loc=1''>test"
-	iter := NewStringIterator(frame)
+	iter := ParseFrameString(frame)
 	if iter.Spec.Type().String() != "lww" {
 		t.Logf("'%s' %v != '%s'\n", iter.Type().String(), []byte(iter.Type().String()), "lww")
 		t.Fail()
@@ -46,7 +46,7 @@ func BenchmarkParseOp(b *testing.B) {
 		frames = append(frames, []byte(frame)...)
 	}
 	origin, _ := ParseUUID([]byte("1-origin"))
-	iter := NewBufferIterator(frames)
+	iter := ParseFrame(frames)
 	var off int
 	var op Op
 	for i := 0; i < b.N; i++ {

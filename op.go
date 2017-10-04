@@ -61,11 +61,10 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 }
 
 func (frame Frame) Stamp(clock Clock) Frame {
-	cur := MakeFrame(len(frame.body) + 20)
+	cur := MakeFrame(frame.Len() + 20)
 	stamps := map[uint64]UUID{}
-	i := frame.Begin()
-	for !i.IsEmpty() {
-		op := i.Op
+	for !frame.IsEmpty() {
+		op := frame.Op
 		for t := uint(0); t < 4; t++ {
 			uuid := op.UUID(t)
 			if uuid.IsTemplate() {
@@ -78,7 +77,7 @@ func (frame Frame) Stamp(clock Clock) Frame {
 			}
 		}
 		cur.AppendOp(op)
-		i.Next()
+		frame.Next()
 	}
 	return cur.Close()
 }
@@ -99,5 +98,5 @@ func (spec *Op) isZero() bool {
 func (op Op) String() string {
 	cur := MakeFrame(128)
 	cur.AppendOp(op)
-	return string(cur.body)
+	return string(cur.Body())
 }

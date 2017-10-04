@@ -108,6 +108,14 @@ func NewName(name string) UUID {
 	return nam
 }
 
+func NewError(name string) UUID {
+	nam, err := ParseUUIDString(name)
+	if err != nil {
+		panic("bad error name")
+	}
+	return NewNameUUID(nam.Value(), INT60_ERROR)
+}
+
 func (uuid UUID) IsTemplate() bool {
 	return uuid.Sign() == UUID_NAME && uuid.Value() == 0 && uuid.Origin() != 0
 }
@@ -121,7 +129,7 @@ func (uuid UUID) IsZero() bool {
 }
 
 func (uuid UUID) IsError() bool {
-	return uuid.Value() == INT60_ERROR
+	return uuid.Origin() == INT60_ERROR
 }
 
 func (uuid UUID) ZipString(context UUID) string {
@@ -147,4 +155,8 @@ func (uuid UUID) prefixWith(context UUID) (ret int) {
 		ret--
 	}
 	return
+}
+
+func (uuid UUID) Error() string {
+	return uuid.String()
 }

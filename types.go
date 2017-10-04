@@ -29,30 +29,14 @@ type Op struct { // ~128 bytes
 // Immutable RON op Frame; the first op is pre-parsed
 type Frame struct {
 	Op
-	body   []byte
-	offset int
-}
-
-// Iterator is a mutable iterator over a frame; each position is an op.
-type Iterator struct {
-	Op
-	state OpParserState
-}
-
-type Cursor struct {
-	first  Op
-	last   Op
-	new    Op
-	body   []byte
-	seq    int
+	state  OpParserState
 	Format uint
-	prep   bool
 }
 
 // Checker performs sanity checks on incoming data. Note that a Checker
 // may accumulate data, e.g. keep a max timestamp seen.
 type Checker interface {
-	Check(iterator Iterator) error
+	Check(frame Frame) error
 }
 
 // Frame Open Q
@@ -103,6 +87,7 @@ type Checker interface {
 // [ ] parser: proper UTF-8 CHAR pattern
 // [ ] AppendRange, Iterator.offset, IsEmpty()
 // [ ] Frame.Header() parsed header fast access
+// [ ] Parsers: err = SMOE_ERROR
 // [ ] FRAME IS A SLICE
 //      [ ] no *Frame
 //      [ ] fr = fr.Append(...)

@@ -97,29 +97,28 @@ func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 
 // TODO FormatInt Float String
 
-func (cur *Cursor) appendUUID(uuid UUID, context UUID) {
-	if 0 != cur.Format&FORMAT_UNZIP {
-		cur.body = FormatUUID(cur.body, uuid)
+func (frame *Frame) appendUUID(uuid UUID, context UUID) {
+	if 0 != frame.Format&FORMAT_UNZIP {
+		frame.state.data = FormatUUID(frame.state.data, uuid)
 	} else if uuid != context {
-		cur.body = FormatZipUUID(cur.body, uuid, context)
+		frame.state.data = FormatZipUUID(frame.state.data, uuid, context)
 	}
 }
 
-func (cur *Cursor) appendSpec(spec, context Spec) {
-	buf := cur.body
-	start := len(buf)
-	flags := cur.Format
+func (frame *Frame) appendSpec(spec, context Spec) {
+	start := len(frame.state.data)
+	flags := frame.Format
 	for t := 0; t < 4; t++ {
 		if 0 != flags&FORMAT_GRID {
-			rest := t*22 - (len(buf) - start)
-			buf = append(buf, SPACES88[:rest]...)
+			rest := t*22 - (len(frame.state.data) - start)
+			frame.state.data = append(frame.state.data, SPACES88[:rest]...)
 		} else if 0 != flags&FORMAT_SPACE && t > 0 {
-			buf = append(buf, ' ')
+			frame.state.data = append(frame.state.data, ' ')
 		}
 		if (spec.uuids[t] == context.uuids[t]) && (0 == flags&FORMAT_NOSKIP) {
 			continue
 		}
-		buf = append(buf, specBits2Sep(uint(t)))
+		frame.state.data = append(frame.state.data, specBits2Sep(uint(t)))
 		if t > 0 && 0 != flags&FORMAT_REDEFAULT {
 			ctxAt := 0
 			ctxUUID := spec.uuids[t-1]
@@ -133,116 +132,110 @@ func (cur *Cursor) appendSpec(spec, context Spec) {
 				}
 			}
 			if ctxAt != t {
-				buf = append(buf, redefBits2Sep(uint(ctxAt)))
+				frame.state.data = append(frame.state.data, redefBits2Sep(uint(ctxAt)))
 			}
-			cur.appendUUID(spec.uuids[t], ctxUUID)
+			frame.appendUUID(spec.uuids[t], ctxUUID)
 		} else {
-			cur.appendUUID(spec.uuids[t], context.uuids[t])
+			frame.appendUUID(spec.uuids[t], context.uuids[t])
 		}
 	}
-	cur.body = buf
 }
 
-func (cur *Cursor) appendAtoms(a Atoms) {
+func (frame *Frame) appendAtoms(a Atoms) {
 	for i := 0; i < a.Count(); i++ {
 		switch a.AType(i) {
 		case ATOM_INT:
 			{
-				cur.body = append(cur.body, ATOM_INT_SEP)
+				frame.state.data = append(frame.state.data, ATOM_INT_SEP)
 				s := fmt.Sprint(a.atoms[i][0])
-				cur.body = append(cur.body, []byte(s)...)
+				frame.state.data = append(frame.state.data, []byte(s)...)
 			}
 		case ATOM_STRING:
 			{
-				cur.body = append(cur.body, ATOM_STRING_SEP)
+				frame.state.data = append(frame.state.data, ATOM_STRING_SEP)
 				ft := a.atoms[i]
-				cur.body = append(cur.body, a.frame[ft[0]&INT60_FULL:ft[1]&INT60_FULL]...)
-				cur.body = append(cur.body, ATOM_STRING_SEP)
+				frame.state.data = append(frame.state.data, a.frame[ft[0]&INT60_FULL:ft[1]&INT60_FULL]...)
+				frame.state.data = append(frame.state.data, ATOM_STRING_SEP)
 			}
 		case ATOM_FLOAT:
 			{
-				cur.body = append(cur.body, ATOM_FLOAT_SEP)
+				frame.state.data = append(frame.state.data, ATOM_FLOAT_SEP)
 				s := fmt.Sprint(a.atoms[i][0])
-				cur.body = append(cur.body, []byte(s)...)
-				cur.body = append(cur.body, '.')
+				frame.state.data = append(frame.state.data, []byte(s)...)
+				frame.state.data = append(frame.state.data, '.')
 			}
 		case ATOM_UUID:
 			{
-				cur.body = append(cur.body, ATOM_UUID_SEP)
-				cur.appendUUID(UUID{a.atoms[i]}, ZERO_UUID)
+				frame.state.data = append(frame.state.data, ATOM_UUID_SEP)
+				frame.appendUUID(UUID{a.atoms[i]}, ZERO_UUID)
 			}
 		}
 	}
 }
 
-func (cur *Cursor) AppendOp(op Op) {
+func (frame *Frame) AppendOp(op Op) {
 
-	if cur.seq == 0 {
-		cur.first = op
-	}
-	flags := cur.Format
-	start := len(cur.body)
-	if len(cur.body) > 0 && (0 != flags&FORMAT_OP_LINES || (0 != flags&FORMAT_FRAME_LINES && !op.IsFramed())) {
-		cur.body = append(cur.body, '\n')
+	flags := frame.Format
+	start := len(frame.state.data)
+	if len(frame.state.data) > 0 && (0 != flags&FORMAT_OP_LINES || (0 != flags&FORMAT_FRAME_LINES && !op.IsFramed())) {
+		frame.state.data = append(frame.state.data, '\n')
 		if 0 != flags&FORMAT_INDENT && !op.IsHeader() {
-			cur.body = append(cur.body, "    "...)
+			frame.state.data = append(frame.state.data, "    "...)
 		}
-	} else if 0 != flags&FORMAT_HEADER_SPACE && cur.last.IsHeader() {
-		cur.body = append(cur.body, ' ')
+	} else if 0 != flags&FORMAT_HEADER_SPACE && frame.Op.IsHeader() {
+		frame.state.data = append(frame.state.data, ' ')
 	}
 
-	cur.appendSpec(op.Spec, cur.last.Spec)
+	frame.appendSpec(op.Spec, frame.Op.Spec)
 
 	if 0 != flags&FORMAT_GRID {
-		rest := 4*22 - (len(cur.body) - start)
-		cur.body = append(cur.body, SPACES88[:rest]...)
+		rest := 4*22 - (len(frame.state.data) - start)
+		frame.state.data = append(frame.state.data, SPACES88[:rest]...)
 	}
 
-	cur.appendAtoms(op.Atoms)
+	frame.appendAtoms(op.Atoms)
 
-	if op.IsHeader() || (op.IsRaw() && !cur.last.IsRaw()) || op.Atoms.Count() == 0 {
-		cur.body = append(cur.body, termBits2Sep(op.term))
+	if op.IsHeader() || (op.IsRaw() && !frame.Op.IsRaw()) || op.Atoms.Count() == 0 {
+		frame.state.data = append(frame.state.data, termBits2Sep(op.term))
 	}
 
-	cur.seq++
-	cur.prep = false
-	cur.last = op
+	frame.Op = op
 }
 
-func (cur *Cursor) AppendSpecAtomsFlags(spec Spec, atoms Atoms, flags uint) {
-	cur.AppendOp(Op{spec, atoms, flags})
+func (frame *Frame) AppendSpecAtomsFlags(spec Spec, atoms Atoms, flags uint) {
+	frame.AppendOp(Op{spec, atoms, flags})
 }
 
-func (cur *Cursor) AppendReduced(spec Spec, atoms Atoms) {
-	cur.AppendOp(Op{spec, atoms, TERM_REDUCED})
+func (frame *Frame) AppendReduced(spec Spec, atoms Atoms) {
+	frame.AppendOp(Op{spec, atoms, TERM_REDUCED})
 }
 
-func (cur *Cursor) AppendRaw(spec Spec, atoms Atoms) {
-	cur.AppendOp(Op{spec, atoms, TERM_RAW})
+func (frame *Frame) AppendRaw(spec Spec, atoms Atoms) {
+	frame.AppendOp(Op{spec, atoms, TERM_RAW})
 }
 
-func (cur *Cursor) AppendStateHeader(spec Spec) {
-	cur.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_HEADER)
+func (frame *Frame) AppendStateHeader(spec Spec) {
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_HEADER)
 }
 
-func (cur *Cursor) AppendQueryHeader(spec Spec) {
-	cur.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_QUERY)
+func (frame *Frame) AppendQueryHeader(spec Spec) {
+	frame.AppendSpecAtomsFlags(spec, NO_ATOMS, TERM_QUERY)
 }
 
-func (cur *Cursor) AppendSpecInt(spec Spec, i int64) {
+func (frame *Frame) AppendSpecInt(spec Spec, i int64) {
 	a := NewAtoms()
 	a.AddInteger(i)
-	cur.AppendSpecAtomsFlags(spec, a, TERM_REDUCED)
+	frame.AppendSpecAtomsFlags(spec, a, TERM_REDUCED)
 }
 
-func (cur *Cursor) AppendSpecUUID(spec Spec, uuid UUID) {
+func (frame *Frame) AppendSpecUUID(spec Spec, uuid UUID) {
 	a := NewAtoms()
 	a.AddUUID(uuid)
-	cur.AppendSpecAtomsFlags(spec, a, TERM_REDUCED)
+	frame.AppendSpecAtomsFlags(spec, a, TERM_REDUCED)
 }
 
 //
-//func (frame *Cursor) AppendRange(i, j Iterator) {
+//func (frame *Frame) AppendRange(i, j Frame) {
 //	if !i.IsEmpty() && !j.IsEmpty() && i.offset >= j.offset {
 //		return
 //	}
@@ -261,69 +254,31 @@ func (cur *Cursor) AppendSpecUUID(spec Spec, uuid UUID) {
 //	}
 //}
 
-func (cur *Cursor) Append() {
-	if !cur.prep {
-		panic("no prepping")
-	}
-	cur.AppendOp(cur.new)
-	cur.new.Reset()
-}
-
-func (cur *Cursor) AppendAll(i Iterator) {
+func (frame *Frame) AppendAll(i Frame) {
 	if i.IsEmpty() {
 		return
 	}
 	for ; !i.IsEmpty(); i.Next() {
-		cur.AppendOp(i.Op)
+		frame.AppendOp(i.Op)
 	}
 }
 
-func (cur *Cursor) AppendRange(i, j Iterator) {
+func (frame *Frame) AppendRange(i, j Frame) {
 	for ; !i.IsEmpty() && !i.IsSame(j.Spec); i.Next() {
-		cur.AppendOp(i.Op)
+		frame.AppendOp(i.Op)
 	}
 }
 
-func (cur *Cursor) AppendFrame(second Frame) {
-	cur.AppendAll(second.Begin())
+func (frame *Frame) AppendFrame(second Frame) {
+	frame.AppendAll(second)
 }
 
-func (cur *Cursor) Close() Frame {
-	return Frame{Op: cur.first, body: cur.body}
+func (frame *Frame) Close() Frame {
+	return ParseFrame(frame.state.data)
 }
 
 func MakeQueryFrame(headerSpec Spec) Frame {
 	cur := MakeFrame(128)
 	cur.AppendQueryHeader(headerSpec)
 	return cur.Close()
-}
-
-func (cur *Cursor) Prepare() {
-	if !cur.prep {
-		cur.prep = true
-		cur.new = cur.last
-	}
-}
-
-func (cur *Cursor) AddInteger(i int64) {
-	cur.Prepare()
-	cur.new.AddInteger(i)
-}
-
-func (cur *Cursor) AddString(s string) {
-	cur.Prepare()
-	// TODO JSON escape
-	cur.new.AddString(s)
-}
-
-func MakeFormattedFrame(format uint, prealloc_bytes int) Cursor {
-	return Cursor{body: make([]byte, format, prealloc_bytes)}
-}
-
-func MakeFrame(prealloc_bytes int) Cursor {
-	return Cursor{body: make([]byte, 0, prealloc_bytes)}
-}
-
-func (cur Cursor) String() string {
-	return string(cur.body)
 }

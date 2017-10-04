@@ -10,14 +10,20 @@
     }
 
     action toel_start {
-        n = specSep2Bits(fc) << 1
-        if n <= idx {
+        fmt.Println("UUID", it.state.data[p-1]);
+        n = specSep2Bits(it.state.data[p-1])
+        if n < idx {
             fbreak;
         }
         idx = n
+        i = it.uuids[idx].uint128;
+        digit = 0;
     }
 
     action toel_uuid {
+        fmt.Println("UUID#", idx);
+        it.uuids[idx] = UUID{uint128:i};
+        idx++;
     }
 
     action atom_start {
@@ -26,6 +32,7 @@
     }
     action atom_end {
         // TODO max size for int/float/string
+        fmt.Println("ADDING", i);
         it.AddAtom(i);
     }
 
@@ -54,6 +61,7 @@
         i[0] = uint64(p);
     }
     action string_atom_end {
+        fmt.Println("STRING");
         i[1] = uint64(p) | ATOM_STRING_62;
     }
 
@@ -64,22 +72,35 @@
     }
 
     action atoms_start {
+        idx = 0;
     }
     action atoms {
     }
 
     action opterm {
+        fmt.Println("TERM", fc);
         it.term = termSep2Bits(fc)
     }
 
     action op_end {
+        fmt.Println("END", it.state.cs)
         done = true
+        idx = 0;
         fbreak;
+    }
+
+    action spec_end {
+        if it.term!=TERM_RAW {
+            it.term = TERM_REDUCED;
+        }
+        it.Reset();
+        it.frame = it.state.data;
     }
 
     # one of op spec UUIDs: type, object, event id or a reference 
     REDEF = "`" @redef_uuid;
-    SPEC_UUID = [*#@:] @toel_start space* REDEF? UUID %toel_uuid space*;
+    QUANT = [*#@:] %toel_start ;
+    SPEC_UUID = QUANT space* REDEF? UUID %toel_uuid space*;
 
     # 64-bit signed integer 
     INT_ATOM = ([\-+]? @int_sign [0-9]+ @int_digit) %int_atom_end >int_atom_start;
@@ -107,7 +128,7 @@
     OPTERM = [,;!?] @opterm space*;
 
     # a RON op; types: (0) raw op (1) reduced op (2) frame header (3) query header 
-    OP = space* SPEC_UUID* ( OPTERM | ATOMS OPTERM? ) %op_end;
+    OP = space* ( SPEC_UUID+ %spec_end ) ( OPTERM | ATOMS OPTERM? ) %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
     DOT = "." space*;

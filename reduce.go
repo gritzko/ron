@@ -3,8 +3,7 @@ package RON
 type EmptyReducer struct {
 }
 
-func (r EmptyReducer) Reduce(a, b Frame) (frame Frame, err UUID) {
-	ai, bi := a.Begin(), b.Begin()
+func (r EmptyReducer) Reduce(ai, bi Frame) (frame Frame, err UUID) {
 	loc := ai.Ref()
 	if !ai.IsHeader() {
 		loc = ai.Event()
@@ -48,12 +47,12 @@ func (omni OmniReducer) pickReducer(t UUID) Reducer {
 // Reduce picks a reducer function, performs all the sanity checks,
 // creates the header, invokes the reducer, returns the result
 func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
-	r := omni.pickReducer(a.Begin().Spec.Type())
+	r := omni.pickReducer(a.Type())
 	return r.Reduce(a, b)
 }
 
 func (omni OmniReducer) ReduceAll(inputs []Frame) (result Frame, err UUID) {
-	r := omni.pickReducer(inputs[0].Begin().Spec.Type())
+	r := omni.pickReducer(inputs[0].Type())
 	// TODO sanity checks
 	return r.ReduceAll(inputs)
 }

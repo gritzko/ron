@@ -7,7 +7,7 @@ package RON
 type IHeap struct {
 	// Most of the time, a heap has 2 elements, optimize for that.
 	// Sometimes, it can get millions of elements, ensure that is O(NlogN)
-	iters               []*Iterator
+	iters               []*Frame
 	primary, secondary  int
 	prim_desc, sec_desc bool
 }
@@ -27,7 +27,7 @@ const (
 )
 
 func MakeIHeap(mode, size int) (ret IHeap) {
-	ret.iters = make([]*Iterator, 1, size+1)
+	ret.iters = make([]*Frame, 1, size+1)
 	ret.prim_desc = (mode & PRIM_DESC) != 0
 	ret.sec_desc = (mode & SEC_DESC) != 0
 	ret.primary = mode & 3
@@ -82,7 +82,7 @@ func (h IHeap) swap(i, j int) {
 	h.iters[i], h.iters[j] = h.iters[j], h.iters[i]
 }
 
-func (h *IHeap) Put(i *Iterator) {
+func (h *IHeap) Put(i *Frame) {
 	if !i.IsEmpty() {
 		at := len(h.iters)
 		h.iters = append(h.iters, i)
@@ -144,8 +144,7 @@ func (h *IHeap) NextPrim() (op *Op) {
 }
 
 func (h *IHeap) PutFrame(frame Frame) {
-	b := frame.Begin()
-	h.Put(&b)
+	h.Put(&frame)
 }
 
 func (h *IHeap) IsEmpty() bool {

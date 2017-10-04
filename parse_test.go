@@ -1,6 +1,7 @@
 package RON
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"testing"
@@ -170,7 +171,8 @@ func TestParseFrame(t *testing.T) {
 	}
 	t.Logf(frame.String())
 	// recover, compare
-	iter := frame.Close().Begin()
+	fmt.Println("===RESTART===")
+	iter := frame.Restart_()
 	for k := 0; k < ops; k++ {
 		if iter.IsEmpty() {
 			t.Fail()
@@ -182,7 +184,7 @@ func TestParseFrame(t *testing.T) {
 			uuid := iter.uuids[u]
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed at %d, '%s' should be '%s' context: '%s' op: '%s'", u, k, iter.uuids[u].String(), uuids[at+u].String(), uuids[at+u-4].String(), string(iter.Op.String()))
+				t.Logf("uuid %d decoding failed in op#%d, '%s' should be '%s'", u, k, iter.uuids[u].String(), uuids[at+u].String())
 			}
 		}
 		iter.Next()

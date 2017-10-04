@@ -23,7 +23,7 @@ type OpParserState struct {
     // the RON frame (for the streaming mode, probably a bit less or a bit more)
     data []byte
     // parser position
-    p int
+    p, prev int
     // ragel state
     cs int
     // ts, te, act int
@@ -33,27 +33,19 @@ type OpParserState struct {
     streaming bool
 }
 
-/*func (state *OpParserState) atom_slice () (ret []byte) {
-    if len(cur_atom) > 0 {
-        return append(cur_atom, data[:p])
-    } else {
-        return data[atom_start:p]
-    }
-}*/
-
-const (
-        PARSED_ERROR = iota
-        PARSED_OP
-        PARSED_INCOMPLETE
-        PARSED_EOF
-      )
+var SYNTAX_ERROR = NewError("BadSyntax")
+var LIMIT_ERROR = NewError("SyntxLimit")
+var EOF_ERROR = NewError("EOF")
+var INCOMPLETE_ERROR = NewError("Incomplete")
 
 // Parse consumes one op, unless the buffer ends earlier.
-func (it *Iterator) Parse() int {
+func (it *Frame) Parse() error {
+
+    fmt.Println("GO");
 
     if it.IsLast() {
         it.Op = ZERO_OP
-        return PARSED_EOF
+        return EOF_ERROR
     }
 
     %% machine RON;
@@ -61,11 +53,10 @@ func (it *Iterator) Parse() int {
     %% access it.state.;
 
     if it.state.cs==0 {
-        it.Reset()
-        it.frame = it.state.data;
-        if it.term!=TERM_RAW {
-            it.term = TERM_REDUCED
-        }
+        fmt.Println("INIT");
+	    %% write init;
+    } else if it.state.cs>=RON_first_final {
+        it.state.cs = RON_start
     }
 
 	p, pe, eof := it.state.p, len(it.state.data), len(it.state.data)
@@ -73,6 +64,7 @@ func (it *Iterator) Parse() int {
     done := false
     _ = done
     _ = eof
+    _ = pe // FIXME kill
 
     if it.state.streaming {
         eof = -1
@@ -82,30 +74,33 @@ func (it *Iterator) Parse() int {
     idx := it.state.idx;
     half := it.state.half;
     digit := it.state.digit;
+    fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p]);
 
 	%%{
 
         include FRAME "./op-grammar.rl";
         main := FRAME ;
 
-	    write init;
 	    write exec;
 	}%%
+    fmt.Println("DONE", it.state.cs, "at", p);
 
     it.state.incomplete = i;
     it.state.idx = idx;
     it.state.digit = digit;
     it.state.half = half;
+    it.state.prev = it.state.p;
     it.state.p = p;
 
-    if it.state.cs == RON_error {
-        return PARSED_ERROR
-    } else if it.state.cs >= RON_first_final {
-        return PARSED_EOF
-    } else if p < pe {
-        return PARSED_OP
-    } else {
-        return PARSED_INCOMPLETE
+    if done {
+        return nil
+    } else if it.state.cs == RON_error {
+        fmt.Println("DONE1", p);
+        it.Op = ZERO_OP;
+        return SYNTAX_ERROR
+    } else  {
+        fmt.Println("DONE2", p);
+        return INCOMPLETE_ERROR
     }
 }
 
