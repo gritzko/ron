@@ -5,19 +5,6 @@ import (
 	"testing"
 )
 
-func TestUUIDPrimitives(t *testing.T) {
-	var p, r uint8
-	var l int
-	p, l = unzipPrefixSeparator([]byte("[abc"))
-	if p != 5 || l != 1 {
-		t.Fail()
-	}
-	r, l = unzipPrefixSeparator([]byte("abc"))
-	if r != 0 || l != 0 {
-		t.Fail()
-	}
-}
-
 func TestUUID_String(t *testing.T) {
 	tests := [][]string{
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
@@ -27,18 +14,22 @@ func TestUUID_String(t *testing.T) {
 		{"1time01-src", "1time02+src", "{2+"},
 		{"0$author", "name$author2", "name{2"},
 		{"hash%here", "hash%there", "%there"},
-		{"1", ")1", "0000000001"}, //5
+		{"1", ")1", "0000000001"}, //7
 		{"0", "name$0", "name"},
 		{"time+orig", "time1+orig2", "(1(2"},
 		{"time-orig", "time1+orig2", "(1+(2"},
 		{"[1s9L3-[Wj8oO", "[1s9L3-(2Biejq", "-(2Biejq"},
-		{"}DcR-}L8w", "}IYI-", "}IYI}"}, //10
+		{"}DcR-}L8w", "}IYI-", "}IYI}"}, //12
 		{"A$B", "A-B", "-"},
 	}
 	for i, tri := range tests {
 		context, e1 := ParseUUID([]byte(tri[0]))
 		uuid, e2 := ParseUUID([]byte(tri[1]))
-		_, _ = e1, e2
+		if e1 != nil || e2 != nil {
+			t.Fail()
+			t.Log(e1, e2)
+			break
+		}
 		zip := uuid.ZipString(context)
 		if zip != tri[2] {
 			t.Logf("case %d: %s must be %s (%s, %s)", i, zip, tri[2], uuid.String(), context.String())
@@ -63,7 +54,7 @@ func BenchmarkUnzip(b *testing.B) {
 	uuids := make([]UUID, b.N)
 	const m32 = 0xffffffff
 	for i := 0; i < b.N; i++ {
-		uuids[i] = UUID{RandUint(), UUID_EVENT_UPPER_BITS | RandUint()}
+		uuids[i] = NewEventUUID(RandUint(), RandUint())
 		//uuids[i] = UUID{uint64(i), '-', 100}
 	}
 	//sort.Slice(uuids, func(i, j int) bool { return uuids[i].LessThan(uuids[j]) })
@@ -120,13 +111,13 @@ func TestOp_String(t *testing.T) {
 		return
 	}
 	context := op
-	op.Spec[2].Value++
-	op.Spec[3].Value++
-	var frame Frame
-	frame.AppendOp(context)
-	le := len(frame.Body)
-	frame.AppendOp(op)
-	opstr := string(frame.Body[le:])
+	op.uuids[2].uint128[0]++
+	op.uuids[3].uint128[0]++
+	cur := MakeFrame(1024)
+	cur.AppendOp(context)
+	le := len(cur.body)
+	cur.AppendOp(op)
+	opstr := string(cur.body[le:])
 	correct := "@)1:)1=1"
 	if opstr != correct {
 		t.Logf("incorrect: '%s' != '%s'", opstr, correct)
@@ -137,17 +128,17 @@ func TestOp_String(t *testing.T) {
 func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
 	op, _ := ParseOp([]byte(str), ZERO_OP)
-	frame := Frame{Body: make([]byte, 0, b.N*len(str)*2+100)}
+	frame := MakeFrame(b.N*len(str)*2 + 100)
 	frame.AppendOp(op)
 	for i := 0; i < b.N; i++ {
-		op.Spec[2].Value++
-		op.Spec[3].Value++
+		op.uuids[2].uint128[0]++
+		op.uuids[3].uint128[0]++
 		frame.AppendOp(op)
 	}
 }
 
 type sample struct {
-	flags   int
+	flags   uint
 	correct string
 }
 
@@ -161,7 +152,7 @@ func TestFormatOptions(t *testing.T) {
 	}
 	frame := ParseFrame([]byte(framestr))
 	for k, f := range formats {
-		var formatted = Frame{Format: f.flags}
+		formatted := MakeFormattedFrame(f.flags, 1024)
 		i := frame.Begin()
 		for !i.IsEmpty() {
 			formatted.AppendOp(i.Op)

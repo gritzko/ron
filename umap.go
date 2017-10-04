@@ -5,6 +5,7 @@ type UUID2Map struct {
 	// avoid allocating lots of small slices, allocate larger slabs
 	slab []UUID
 }
+
 // min RAM use per object: 16b key, 16b slice, 16*2b on the slab = 64
 
 const U2M_DEFAULT_SLICE_SIZE = 2
@@ -36,7 +37,7 @@ func (um UUID2Map) List(key UUID) []UUID {
 }
 
 func (um *UUID2Map) Put(key UUID, values []UUID) {
-	if len(values)>0 {
+	if len(values) > 0 {
 		um.subs[key] = values
 	} else {
 		delete(um.subs, key)
@@ -48,9 +49,9 @@ func (um *UUID2Map) Remove(key UUID, value UUID) {
 	if !ok {
 		return
 	}
-	for i:=0; i<len(values); i++ {
-		if values[i]==value {
-			l1 := len(values)-1
+	for i := 0; i < len(values); i++ {
+		if values[i] == value {
+			l1 := len(values) - 1
 			values[i] = values[l1]
 			values = values[:l1]
 			i--

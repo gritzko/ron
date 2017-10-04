@@ -46,7 +46,7 @@ func TestIHeap_Merge(t *testing.T) {
 	heap.PutFrame(ParseFrame([]byte(frameA)))
 	heap.PutFrame(ParseFrame([]byte(frameB)))
 	heap.PutFrame(ParseFrame([]byte(frameC)))
-	var res Frame
+	res := MakeFrame(128)
 	for !heap.IsEmpty() {
 		res.AppendOp(*heap.Op())
 		heap.NextPrim()

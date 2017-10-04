@@ -1,54 +1,52 @@
 package RON
 
-const (
-	PREFIX10 = (1<<60 - 1) - (1<<(iota*6) - 1)
-	PREFIX9
-	PREFIX8
-	PREFIX7
-	PREFIX6
-	PREFIX5
-	PREFIX4
-	PREFIX3
-	PREFIX2
-	PREFIX1
-)
-
 const INT60LEN = 10
 const MAX_ATOMS = 8
 
+type uint128 [2]uint64
+
 type UUID struct {
-	Value  uint64
-	Origin uint64
+	uint128
 }
 
-type Spec [4]UUID
+type Spec struct {
+	uuids [4]UUID
+}
 
 type Atoms struct {
-	Count   uint
-	Types   uint
-	Offsets [MAX_ATOMS]uint
-	Body    []byte
+	_atoms [2]uint128
+	atoms  []uint128
+	frame  []byte
 }
 
 // OP is an immutable atomic operation object - no write access
 type Op struct { // ~128 bytes
 	Spec
 	Atoms
-	Term uint
+	term uint
 }
 
-// Frame... mutable, but append-only
+// Immutable RON op Frame; the first op is pre-parsed
 type Frame struct {
-	Body        []byte
-	first, last Op
-	Format      int
+	Op
+	body   []byte
+	offset int
 }
 
 // Iterator is a mutable iterator over a frame; each position is an op.
 type Iterator struct {
 	Op
-	frame  *Frame
-	offset int
+	state OpParserState
+}
+
+type Cursor struct {
+	first  Op
+	last   Op
+	new    Op
+	body   []byte
+	seq    int
+	Format uint
+	prep   bool
 }
 
 // Checker performs sanity checks on incoming data. Note that a Checker
@@ -134,7 +132,9 @@ type Checker interface {
 // [ ] ron.Writer
 // [ ] Frame, Reader, Writer inherit Op (see C++)
 // [ ] type Batch []Frame, type Flow chan Batch
-// [ ] kill ABC? bench
+// [ ] auto-gen ABC! (base64: take from the file)
+// [ ] Cursor API:  SetObject(uuid), AddInteger(int), Append()
+//                  AppendFrame(), AppendAll(), AppendRange()
 //
 // [ ] reducer registry
 // [ ] reducer flags (at least, formatting)
@@ -155,8 +155,8 @@ type Checker interface {
 // [x] reducers to ignore empty frames
 // [ ] Frame.Realloc() // put valuues on a new slab, release old slices
 // [x] clock.Authority, clock.See() bool
-// [ ] ParseUUID sig
-// [ ] far future: 64 bit uuid, 2bit type, 2bit 1..4 bytes of origin
+// [x] ParseUUID sig
+// [-] far future: 64 bit uuid, 2bit type, 2bit 1..4 bytes of origin
 //
 // [x] formatting options
 // 		[x] indenting
@@ -191,62 +191,35 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-var NO_ATOMS = Atoms{}
-
 type RawUUID []byte
 
 type Environment map[uint64]UUID
 
 const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~"
 
-var base64 = []byte(BASE64)
 var ABC [256]int8
-
-func (op Op) Type() UUID {
-	return op.Spec[SPEC_TYPE]
-}
-
-func (op Op) Object() UUID {
-	return op.Spec[SPEC_OBJECT]
-}
-
-func (op Op) Event() UUID {
-	return op.Spec[SPEC_EVENT]
-}
-
-func (op Op) Ref() UUID {
-	return op.Spec[SPEC_REF]
-}
-
-const OP_UPDATE_BIT = 1
-const OP_STATE_BIT = 2
-const OP_QUERY_BIT = 4
 
 // FIXME bracket order to match the numeric order!!!!   }{][)(
 
 const INT60_FULL uint64 = 1<<60 - 1
 const INT60_ERROR = INT60_FULL
 const INT60_INFINITY = 63 << (6 * 9)
-const UUID_NAME_UPPER_BITS uint64 = UUID_NAME << 60
-const UUID_EVENT_UPPER_BITS uint64 = UUID_EVENT << 60
-const UUID_DERIVED_UPPER_BITS uint64 = UUID_DERIVED << 60
-const UUID_HASH_UPPER_BITS uint64 = UUID_HASH << 60
-const UUID_UPPER_BITS uint64 = 3 << 60
+const INT60_FLAGS = uint64(15) << 60
 
-var ZERO_UUID = UUID{0, UUID_NAME_UPPER_BITS}
+const UUID_NAME_UPPER_BITS = uint64(UUID_NAME) << 60
 
-var NEVER_UUID = UUID{INT60_INFINITY, UUID_NAME_UPPER_BITS}
+var ZERO_UUID = NewNameUUID(0, 0)
 
-var ERROR_UUID = UUID{INT60_ERROR, UUID_NAME_UPPER_BITS}
+var NEVER_UUID = NewNameUUID(INT60_INFINITY, 0)
+
+var ERROR_UUID = NewNameUUID(INT60_ERROR, 0)
 
 var ZERO_OP = Op{}
 
-var EMPTY_FRAME Frame
-
-var TYPE_MISMATCH_ERROR_UUID UUID
-var UNKNOWN_TYPE_ERROR_UUID UUID
+var NO_ATOMS = Atoms{}
 
 func init() {
+	// TODO move to bitsep.go
 	for i := 0; i < len(ABC); i++ {
 		ABC[i] = -1
 	}
@@ -268,6 +241,4 @@ func init() {
 	for i := 0; i < len(TERM_PUNCT); i++ {
 		ABC[TERM_PUNCT[i]] = -5
 	}
-	TYPE_MISMATCH_ERROR_UUID, _ = ParseUUIDString("type_msmch$~~~~~~~~~~")
-	UNKNOWN_TYPE_ERROR_UUID, _ = ParseUUIDString("type_unknw$~~~~~~~~~~")
 }

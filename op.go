@@ -1,88 +1,51 @@
 package RON
 
 import (
-	"github.com/pkg/errors"
-	//	"fmt"
+//	"fmt"
 )
 
-func Compare(a, b UUID) int {
-	diff := int64(a.Value) - int64(b.Value)
-	if diff == 0 {
-		diff = int64(a.Origin) - int64(b.Origin)
-	}
-	if diff < 0 {
-		return -1
-	} else if diff > 0 {
-		return 1
-	} else {
-		return 0
-	}
+func (a Spec) IsSame(b Spec) bool {
+	return a.Event() == b.Event() && a.Object() == b.Object() && a.Ref() == b.Ref() && a.Type() == b.Type()
 }
 
-func (a UUID) LaterThan(b UUID) bool {
-	if a.Value == b.Value {
-		return a.Origin > b.Origin
-	} else {
-		return a.Value > b.Value
-	}
+func (spec Spec) UUID(i uint) UUID {
+	return spec.uuids[i]
 }
 
-func (a UUID) EarlierThan(b UUID) bool {
-	// FIXME define through Compare
-	if a.Value == b.Value {
-		return a.Origin < b.Origin
-	} else {
-		return a.Value < b.Value
-	}
+func (spec Spec) Type() UUID {
+	return spec.uuids[SPEC_TYPE]
 }
 
-func (a UUID) Scheme() uint64 {
-	return a.Origin >> 60
+func (spec Spec) Object() UUID {
+	return spec.uuids[SPEC_OBJECT]
 }
 
-func (a UUID) Sign() byte {
-	return uuidBits2Sep(uint(a.Scheme()))
+func (spec Spec) Event() UUID {
+	return spec.uuids[SPEC_EVENT]
 }
 
-func (a UUID) Replica() uint64 {
-	return a.Origin & PREFIX10
+func (spec Spec) Ref() UUID {
+	return spec.uuids[SPEC_REF]
 }
 
-func (a UUID) SameAs(b UUID) bool {
-	if a.Value != b.Value {
-		return false
-	} else if a.Origin == b.Origin {
-		return true
-	} else if (a.Origin^b.Origin)&PREFIX10 != 0 {
-		return false
-	} else {
-		return a.Origin&UUID_UPPER_BITS == b.Origin&UUID_UPPER_BITS
-	}
+func (op Op) Term() uint {
+	return op.term
 }
-
-func (a Op) Same(b *Op) bool {
-	return a.Spec == b.Spec
-}
-
-//
-//func (op Op) Term() byte {
-//	return termBits2Sep(op.Term)
-//}
 
 func (op Op) IsQuery() bool {
-	return op.Term == TERM_QUERY
+	return op.Term() == TERM_QUERY
 }
 
 func (op Op) IsHeader() bool {
-	return op.Term == TERM_HEADER
+	return op.Term() == TERM_HEADER
 }
 
 func (op Op) IsFramed() bool {
-	return op.Term == TERM_INNER
+	return op.Term() == TERM_REDUCED
 }
 
 func (op Op) IsRaw() bool {
-	return op.Term == TERM_LAST
+	return op.Term() == TERM_RAW
 }
 
 func (op Op) IsOn() bool {
@@ -93,211 +56,48 @@ func (op Op) IsOff() bool {
 	return op.IsQuery() && op.Ref() == NEVER_UUID
 }
 
-// not good - op is detached from a frame here
-func CreateOp(rdtype, object, event, location UUID, value string) (ret Op, err error) {
-	l := XParseOp([]byte(value), &ret, ZERO_OP)
-	if l <= 0 {
-		err = errors.New("invalid atom string")
-		return
-	}
-	ret.Spec = Spec{rdtype, object, event, location}
-	return
-}
-
 func CreateFrame(rdtype, object, event, location, value string) Frame {
 	return Frame{}
 }
 
-func (i *Iterator) Next() bool {
-
-	if i.offset != 0 && i.IsEmpty() { // FIXME test corner cases more
-		return false
-	} else if i.IsLast() {
-		i.Op = ZERO_OP
-		return false
-	}
-	var prev Op = i.Op
-	l := XParseOp(i.frame.Body[i.offset:], &i.Op, prev)
-
-	if l > 0 {
-		//fmt.Printf("PARSED [ %s ] REST [ %s ]\n", string(i.frame.Body[i.offset:i.offset+l]), string(i.frame.Body[i.offset+l:]))
-		i.offset += l
-		return true
-	} else {
-		i.Op = ZERO_OP
-		i.offset = l - i.offset
-		return false
-	}
-}
-
-func (uuid UUID) IsTemplate() bool {
-	return uuid.Sign() == UUID_NAME && uuid.Value == 0 && uuid.Origin != 0
-}
-
-func (frame Frame) Stamp(clock Clock) (ret Frame) {
+func (frame Frame) Stamp(clock Clock) Frame {
+	cur := MakeFrame(len(frame.body) + 20)
 	stamps := map[uint64]UUID{}
 	i := frame.Begin()
 	for !i.IsEmpty() {
 		op := i.Op
-		for t := 0; t < 4; t++ {
-			uuid := op.Spec[t]
+		for t := uint(0); t < 4; t++ {
+			uuid := op.UUID(t)
 			if uuid.IsTemplate() {
-				stamp, ok := stamps[uuid.Origin]
+				stamp, ok := stamps[uuid.Origin()]
 				if !ok {
 					stamp = clock.Time()
-					stamps[uuid.Origin] = stamp
+					stamps[uuid.Origin()] = stamp
 				}
-				op.Spec[t] = stamp
+				op.uuids[t] = stamp
 			}
 		}
-		ret.AppendOp(op)
+		cur.AppendOp(op)
 		i.Next()
 	}
-	return
+	return cur.Close()
 }
 
 func (op Op) IsEmpty() bool {
-	return op.Spec[0] == ZERO_UUID && op.Spec[1] == ZERO_UUID && op.Spec[2] == ZERO_UUID && op.Spec[3] == ZERO_UUID
-}
-
-func (frame *Frame) Begin() (i Iterator) {
-	i.frame = frame
-	i.offset = 0
-	if frame.first.IsEmpty() {
-		i.Op = ZERO_OP
-		i.Next()
-	} else {
-		i.Op = frame.first
-	}
-	return
-}
-
-// TODO optimize
-func (frame *Frame) Head() Op {
-	return frame.Begin().Op
-}
-
-func (frame *Frame) End() Iterator {
-	return Iterator{frame: frame, offset: len(frame.Body)}
-}
-
-// A frame's end position is an op having a value of !!! and UUIDs from
-// the last valid op (zeroes for an empty frame).
-// The end op may be explicit, i.e. actually exist in the frame.
-// An explicit end op can not be abbreviated.
-//func (i Iterator) AtEnd() bool {
-//	return i.offset>0 && i.Count==0
-//	//i.AtomTypes[0] == '!' && i.AtomTypes[1] == '!' && i.AtomTypes[2] == '!'
-//}
-
-func (i Iterator) IsLast() bool {
-	return i.offset >= len(i.frame.Body)
-}
-
-func MakeFrame(prealloc_bytes int) Frame {
-	var buf = make([]byte, 0, prealloc_bytes)
-	return Frame{Body: buf}
-}
-
-func (op *Spec) GetUUIDp(i int) *UUID {
-	return &op[i]
-}
-
-func (op *Spec) GetUUID(i int) UUID {
-	return op[i]
-}
-
-func (uuid UUID) IsZero() bool {
-	return uuid.Value == 0 && uuid.Origin == 0
-}
-
-func (uuid UUID) IsError() bool {
-	return uuid.Value == INT60_ERROR
+	return op.IsSame(ZERO_OP.Spec)
 }
 
 func (spec *Op) isZero() bool {
 	for t := 0; t < 4; t++ {
-		if !spec.Spec[t].IsZero() {
+		if !spec.uuids[t].IsZero() {
 			return false
 		}
 	}
 	return true
 }
 
-func (i Iterator) Offset() int {
-	return i.offset
-}
-
-func (a Atoms) Type(i uint) uint {
-	return (a.Types >> (i << 1)) & 3
-}
-
-func (a Atoms) IsEmpty() bool {
-	return a.Count == 0
-}
-
-func (uuid UUID) IsName() bool {
-	return uuid.Origin>>60 == UUID_NAME
-}
-
-func (uuid UUID) Derived() UUID {
-	if uuid.Scheme() == UUID_EVENT {
-		return UUID{Value: uuid.Value, Origin: uuid.Replica() | UUID_DERIVED_UPPER_BITS}
-	} else {
-		return uuid
-	}
-}
-
-func NewUUID(scheme, time, origin uint64) UUID {
-	return UUID{ Value: time, Origin: (origin & INT60_ERROR) | (uint64(scheme)<<60) }
-}
-
-func NewEventUUID(time, origin uint64) UUID {
-	return UUID{Value: time, Origin: (origin & INT60_ERROR) | UUID_EVENT_UPPER_BITS}
-}
-
-func NewNameUUID(time, origin uint64) UUID {
-	return UUID{Value: time, Origin: (origin & INT60_ERROR) | UUID_NAME_UPPER_BITS}
-}
-
-// use for static strings only - panics on error
-func NewName(name string) UUID {
-	nam, err := ParseUUIDString(name)
-	if err != nil {
-		panic("bad name")
-	}
-	return nam
-}
-
-func (frame *Frame) Fill(clock Clock, env Environment) Frame {
-	ret := MakeFrame(len(frame.Body) << 1)
-	now := clock.Time()
-	i := frame.Begin()
-	for !i.IsEmpty() {
-		spec := i.Spec
-		if spec[SPEC_EVENT] == ZERO_UUID {
-			spec[SPEC_EVENT] = now
-		}
-		// TODO implement env fill
-		ret.AppendSpecAtomsFlags(spec, i.Atoms, i.Term)
-		i.Next()
-	}
-	return ret
-}
-
-func (frame Frame) Reformat(format int) Frame {
-	ret := MakeFrame(len(frame.Body))
-	ret.Format = format
-	i := frame.Begin()
-	for !i.IsEmpty() {
-		ret.AppendOp(i.Op)
-		i.Next()
-	}
-	return ret
-}
-
-func (uuid UUID) SetScheme(scheme uint) UUID {
-	orig := uint64(scheme) << 60
-	orig |= uuid.Replica()
-	return UUID{Value: uuid.Value, Origin: orig}
+func (op Op) String() string {
+	cur := MakeFrame(128)
+	cur.AppendOp(op)
+	return string(cur.body)
 }

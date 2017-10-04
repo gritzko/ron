@@ -6,6 +6,8 @@ $commit = `git log -n 1`;
 $commit =~ s/^(.*)$/\/\/ $1/gm;
 print $commit . "\n";
 
+print "\nvar PUNCT, BITS [128]int8\n\n";
+
 while (<> =~ /^(\w+)\s+([^\s]+)\s+(.*)$/) {
     my $name = $1;
     my $seps = $2;

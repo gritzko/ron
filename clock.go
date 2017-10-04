@@ -19,8 +19,8 @@ const (
 var MAX_BIT_GRAB uint64 = 1 << 20
 
 func NewClock(replica uint64, mode, minLen int) Clock {
-	origin := (replica & INT60_FULL) | UUID_EVENT_UPPER_BITS
-	return Clock{lastSeen: UUID{0, origin}, Mode: mode, MinLength: minLen}
+	origin := (replica & INT60_FULL) | UUID_UPPER_BITS[UUID_EVENT]
+	return Clock{lastSeen: NewEventUUID(0, origin), Mode: mode, MinLength: minLen}
 }
 
 func time2uint(t time.Time) (i uint64) {
@@ -46,28 +46,16 @@ func time2uint(t time.Time) (i uint64) {
 }
 
 func trim_time(full, last uint64) uint64 {
-	if full&PREFIX6 > last {
-		if full&PREFIX5 > last {
-			return full & PREFIX5
-		} else {
-			return full & PREFIX6
-		}
-	} else {
-		if full&PREFIX8 > last {
-			if full&PREFIX7 > last {
-				return full & PREFIX7
-			} else {
-				return full & PREFIX8
-			}
-		} else {
-			return full
-		}
+	i := 5
+	for i < 10 && full&PREFIX_MASKS[i] > last {
+		i++
 	}
+	return full & PREFIX_MASKS[i-1]
 }
 
 func (clock *Clock) Time() UUID {
 	var val uint64
-	last := clock.lastSeen.Value
+	last := clock.lastSeen.Value()
 	switch clock.Mode {
 	case CLOCK_CALENDAR:
 		t := time.Now().Add(clock.offset).UTC()
@@ -83,14 +71,14 @@ func (clock *Clock) Time() UUID {
 	} else {
 		val = trim_time(val, last)
 	}
-	ret := NewEventUUID(val, clock.lastSeen.Origin)
+	ret := NewEventUUID(val, clock.lastSeen.Origin())
 	clock.See(ret)
 	return ret
 }
 
 func (clock *Clock) See(uuid UUID) bool {
-	if clock.lastSeen.Value < uuid.Value {
-		clock.lastSeen.Value = uuid.Value
+	if clock.lastSeen.Value() < uuid.Value() {
+		clock.lastSeen = NewEventUUID(uuid.Value(), clock.lastSeen.Origin())
 		return true
 	} else {
 		return false
@@ -100,7 +88,7 @@ func (clock *Clock) See(uuid UUID) bool {
 func (clock Clock) IsSane(uuid UUID) bool {
 	switch clock.Mode {
 	case CLOCK_LAMPORT:
-		return clock.lastSeen.Value+MAX_BIT_GRAB > uuid.Value
+		return clock.lastSeen.Value()+MAX_BIT_GRAB > uuid.Value()
 	default:
 		return true
 	}

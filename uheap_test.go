@@ -35,7 +35,7 @@ func TestUHeap_TakeUUID(t *testing.T) {
 func BenchmarkUHeap_TakeUUID(b *testing.B) {
 	h := MakeUHeap(false, b.N)
 	for i := 0; i < b.N; i++ {
-		h.Put(UUID{uint64(rand.Int63()), 0})
+		h.Put(NewEventUUID(rand.Uint64(), 0))
 	}
 	b.ResetTimer()
 	var bogus uint64 = 0

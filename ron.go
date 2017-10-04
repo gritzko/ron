@@ -60,7 +60,7 @@ func main() {
 
 	var frames []Frame = make([]Frame, len(bufs))
 	for i, b := range bufs {
-		frames[i] = Frame{Body: b}
+		frames[i] = Frame{body: b}
 	}
 
 	omni := OmniReducer{}
@@ -70,7 +70,7 @@ func main() {
 	if err != ZERO_UUID {
 		fmt.Fprintf(os.Stderr, "reducer error: %s", err.String)
 	} else {
-		os.Stdout.Write(result.Body)
+		os.Stdout.Write(result.body)
 	}
 
 }

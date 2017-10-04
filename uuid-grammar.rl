@@ -3,66 +3,74 @@
     machine UUID;
 
     action start_uuid {
-        uuid_value = ctx_uuid.Value;
-        uuid_scheme = ctx_uuid.Scheme()
-        uuid_origin = ctx_uuid.Replica();
+        half = 0;
     }
 
 
     action int60_prefix {
-        digits = prefixSep2Bits(fc)+4;
-        i &= PREFIX_MASKS[digits];
+        digit = prefixSep2Bits(fc)+4;
+        i[half] &= INT60_FLAGS | PREFIX_MASKS[digit];
     }
 
     action int60_digit {
-        if digits==0 {
-            i = 0;
-        } else if digits>9 {
-            digits++
+        i[half] |= uint64(ABC[fc]) << DIGIT_OFFSETS[digit]
+        digit++
+        if (digit>10) {
             fbreak;
         }
-        i |= uint64(baseSep2Bits(fc)) << DIGIT_OFFSETS[digits]
-        digits++
+    }
+
+    action start_full_int {
+        i[half] &= INT60_FLAGS;
     }
 
     action start_value {
-        i = ctx_uuid.Value
-        digits = 0
     }
 
     action start_origin {
-        i = ctx_uuid.Replica()
-        digits = 0
+        digit = 0;
+        half |= 1;
     }
 
     action end_value {
-        uuid_value = i
     }
 
     action end_origin {
-        uuid_origin = i
     }
 
     action uuid_sep {
-        uuid_scheme = uint64(uuidSep2Bits(fc))
+        half |= 1;
+        i[half] &= INT60_FULL;
+        i[half] |= uint64(uuidSep2Bits(fc))<<60;
     }
 
     action end_name {
-        uuid_origin = 0;
-        uuid_scheme = UUID_NAME;
+        i[1] = UUID_NAME_UPPER_BITS;
     }
 
+    # Base64 value
     BASE = ( [0-9a-zA-Z~_] @int60_digit )+;
+    # prefix compression 
     PREFIX =  [([\{\}\])]  @int60_prefix;
-    SIGN = [\-+\$%] @uuid_sep;
+    # UUID type: name, hash, event or derived event 
+    SIGN = [\$\%\+\-] @uuid_sep;
+    # prefix-compressed int (half of UUID) 
     PBASE = PREFIX BASE?;
-    INT = PBASE | BASE;
+    # full int 
+    FBASE = BASE >start_full_int;
+    # int, either compressed or not 
+    INT = PBASE | FBASE;
 
+    # first half of an UUID 
     VALUE = INT >start_value %end_value ;
+    # second half of an UUID 
     ORIGIN = INT >start_origin %end_origin ;
+    # prefix-compressed 2nd half 
     PORIGIN = PBASE >start_origin %end_origin ;
-    NAME = BASE >start_value %end_value %end_name;
+    # global name UUID, e.g. "lww" (aka transcendent constant) 
+    NAME = FBASE >start_value %end_value %end_name;
 
+    # RON 128 bit UUID 
     UUID =  ( NAME | VALUE ( SIGN ORIGIN? | PORIGIN? ) | SIGN ORIGIN? )
             >start_uuid
            ;

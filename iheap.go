@@ -36,9 +36,9 @@ func MakeIHeap(mode, size int) (ret IHeap) {
 }
 
 func (h IHeap) less(i, j int) bool {
-	c := Compare(h.iters[i].Spec[h.primary], h.iters[j].Spec[h.primary])
+	c := Compare(h.iters[i].uuids[h.primary], h.iters[j].uuids[h.primary])
 	if c == 0 {
-		c = Compare(h.iters[i].Spec[h.secondary], h.iters[j].Spec[h.secondary])
+		c = Compare(h.iters[i].uuids[h.secondary], h.iters[j].uuids[h.secondary])
 		if h.sec_desc {
 			c = -c
 		}
@@ -94,8 +94,8 @@ func (h *IHeap) Op() (op *Op) {
 	if len(h.iters) > 1 {
 		op = &h.iters[1].Op
 	} else {
-        op = &ZERO_OP
-    }
+		op = &ZERO_OP
+	}
 	return
 }
 
@@ -120,7 +120,7 @@ func (h *IHeap) Next() (op *Op) {
 }
 
 func (h *IHeap) nexteq(i int, uuid UUID) {
-	if h.iters[i].Spec[h.primary] == uuid {
+	if h.iters[i].uuids[h.primary] == uuid {
 		j := i << 1
 		if j < len(h.iters) {
 			if j+1 < len(h.iters) { // FIXME rightmost first!
@@ -129,7 +129,7 @@ func (h *IHeap) nexteq(i int, uuid UUID) {
 			h.nexteq(j, uuid)
 		}
 		h.next(i)
-		for i<len(h.iters) &&  h.iters[i].Spec[h.primary] == uuid {
+		for i < len(h.iters) && h.iters[i].uuids[h.primary] == uuid {
 			h.next(i) // FIXME this fix (recheck after removal)
 		}
 	}
@@ -137,7 +137,7 @@ func (h *IHeap) nexteq(i int, uuid UUID) {
 
 func (h *IHeap) NextPrim() (op *Op) {
 	if !h.IsEmpty() {
-		event := h.iters[1].Spec[h.primary]
+		event := h.iters[1].uuids[h.primary]
 		h.nexteq(1, event)
 	}
 	return h.Op()
@@ -152,12 +152,13 @@ func (h *IHeap) IsEmpty() bool {
 	return len(h.iters) == 1
 }
 
-func (h *IHeap) Frame() (ret Frame) {
+func (h *IHeap) Frame() Frame {
+	cur := MakeFrame(128)
 	for !h.IsEmpty() {
-		ret.AppendOp(*h.Op())
+		cur.AppendOp(*h.Op())
 		h.Next()
 	}
-	return
+	return cur.Close()
 }
 
 func (h *IHeap) Clear() {
