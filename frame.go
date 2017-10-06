@@ -1,10 +1,10 @@
 package RON
 
-func OpenFrame(data []byte) (Frame, error) {
+func OpenFrame(data []byte) Frame {
 	frame := Frame{}
 	frame.state.data = data
-	err := frame.Parse()
-	return frame, err
+	frame.Parse()
+	return frame
 }
 
 func MakeFormattedFrame(format uint, prealloc_bytes int) (ret Frame) {
@@ -85,3 +85,54 @@ func (frame Frame) Restart_() Frame { /// FIXME ret new
 func (frame Frame) Len() int {
 	return len(frame.state.data)
 }
+
+
+type OpParserPos struct {
+	// int60 idx, base64 digit idx
+	idx, half, digit uint
+}
+
+type OpParserState struct {
+	OpParserPos
+	// the RON frame (for the streaming mode, probably a bit less or a bit more)
+	data []byte
+	// parser position
+	p int
+	// ragel state
+	cs int
+	// ts, te, act int
+	// incomplete uuid/atom data
+	incomplete uint128
+	// streaming mode switch
+	streaming bool
+	// current op position in the frame
+	cur_op int
+}
+
+
+func (frame Frame) EOF () bool {
+	return frame.state.cs == RON_error
+}
+
+func (frame Frame) Offset () int {
+	return frame.state.p
+}
+
+func (frame Frame) IsComplete () bool {
+	return frame.state.cs == RON_start ||
+		(!frame.state.streaming && frame.state.p>=len(frame.state.data))
+}
+
+var DIGIT_OFFSETS [11]uint8
+var PREFIX_MASKS [11]uint64
+
+func init () {
+	var one uint64 = 1
+	for i:=0; i<11; i++ {
+		var bitoff uint8 = uint8(60 - i*6)
+		DIGIT_OFFSETS[i] = bitoff - 6
+		PREFIX_MASKS[i] = ((one<<60)-1) - ((one<<bitoff)-1)
+	}
+}
+
+

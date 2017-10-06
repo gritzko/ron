@@ -10,14 +10,12 @@ func ParseUUID(data []byte) (uuid UUID, err error) {
 	return ZERO_UUID.Parse(data)
 }
 
-func ParseOp(data []byte) (Op, error) {
-	f, err := OpenFrame(data)
-	return f.Op, err
+func ParseOp(data []byte) Op {
+	return OpenFrame(data).Op
 }
 
 func ParseFrame(data []byte) Frame { // TODO swap with OpenFrame
-	frame, _ := OpenFrame(data)
-	return frame
+	return OpenFrame(data)
 }
 
 func ParseFrameString(frame string) Frame {

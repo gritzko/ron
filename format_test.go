@@ -104,8 +104,8 @@ func BenchmarkUnzip(b *testing.B) {
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
-	op, err := ParseOp([]byte(str))
-	if err != nil || op.Atoms.Count() != 1 {
+    op := ParseOp([]byte(str))
+	if op.Atoms.Count() != 1 {
 		t.Fail()
 		t.Logf("misparsed %s", str)
 		return
@@ -127,7 +127,7 @@ func TestOp_String(t *testing.T) {
 
 func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
-	op, _ := ParseOp([]byte(str))
+	op := ParseOp([]byte(str))
 	frame := MakeFrame(b.N*len(str)*2 + 100)
 	frame.AppendOp(op)
 	for i := 0; i < b.N; i++ {
@@ -150,14 +150,14 @@ func TestFormatOptions(t *testing.T) {
 			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more:a=1;",
 		},
 	}
-	frame, err := OpenFrame([]byte(framestr))
-	if err != nil {
+	frame := OpenFrame([]byte(framestr))
+	if frame.EOF() {
 		t.Fail()
 		return
 	}
 	for k, f := range formats {
 		formatted := MakeFormattedFrame(f.flags, 1024)
-		for !frame.IsEmpty() {
+		for !frame.EOF() {
 			formatted.AppendOp(frame.Op)
 			frame.Next()
 		}

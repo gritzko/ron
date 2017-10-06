@@ -35,11 +35,12 @@
     }
     action atom_end {
         // TODO max size for int/float/string
-        //fmt.Println("ADDING", i);
+        //fmt.Println("ADD ATOM", i);
         it.AddAtom(i);
     }
 
     action int_atom_start {
+        //fmt.Println("INT START");
     }
     action int_sign {
         if fc=='-' {
@@ -47,10 +48,12 @@
         }
     }
     action int_digit {
+        //fmt.Println("INT DGT", p, fc);
         i[0] *= 10;
         i[0] += uint64(int(fc) - int('0'));
     }
     action int_atom_end {
+        //fmt.Println("INT END");
         i[1] |= ATOM_INT_62;
     }
 
@@ -83,22 +86,22 @@
     action opterm {
         //fmt.Println("TERM", fc, it.state.cs, "AT", p);
         it.term = termSep2Bits(fc)
-
-            fbreak;
     }
 
     action op_start {
+        //fmt.Println("OP START", it.state.cs, "AT", p)
         idx = 0;
-    }
-
-    action op_end {
-        //fmt.Println("END", it.state.cs, "AT", p)
-        if p<pe {
+        if had_end {
             //fmt.Println("BACK")
             p--;
             fnext *RON_start;
             fbreak;
         }
+    }
+
+    action op_end {
+        had_end = true
+        //fmt.Println("OP END", it.state.cs, "AT", p)
     }
 
     action spec_end {
@@ -109,16 +112,21 @@
         it.frame = it.state.data;
     }
 
+    action frame_end {
+        //fmt.Println("FRAME END")
+        it.state.streaming = false
+    }
+
     # one of op spec UUIDs: type, object, event id or a reference 
     REDEF = "`" @redef_uuid;
     QUANT = [*#@:] %toel_start ;
     SPEC_UUID = QUANT space* REDEF? UUID %toel_uuid space*;
 
     # 64-bit signed integer 
-    INT_ATOM = ([\-+]? @int_sign [0-9]+ @int_digit) %int_atom_end >int_atom_start;
+    INT_ATOM = ([\-+]? @int_sign ( digit @int_digit )+ ) %int_atom_end >int_atom_start;
 
     # 64-bit (double) float 
-    FLOAT_ATOM = [\-+]? [0-9]+ ("." digit+)? ([eE][\-+]?digit+)? >float_atom_start %float_atom_end ;
+    FLOAT_ATOM = [\-+]? [0-9]+ ("." digit+) ([eE][\-+]?digit+)? >float_atom_start %float_atom_end ;
 
     # JSON-escaped string 
     UNIESC = "\\u" [0-9a-fA-F]{4};
@@ -140,12 +148,12 @@
     OPTERM = [,;!?] @opterm space*;
 
     # a RON op; types: (0) raw op (1) reduced op (2) frame header (3) query header 
-    OP = space* ( SPEC_UUID+ %spec_end ) ( ATOMS OPTERM? | OPTERM ) >op_start %op_end;
+    OP = space* ( SPEC_UUID+ >op_start %spec_end ) ( ATOMS OPTERM? | OPTERM ) %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
-    DOT = "." space*;
+    DOT = 46 @frame_end;
 
     # RON frame, including multiframes (those have more headers inside) 
-    FRAME = OP+ DOT*;
+    FRAME = OP* DOT? ;
 
 }%%

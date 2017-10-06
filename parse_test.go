@@ -195,21 +195,20 @@ func TestParseFrame(t *testing.T) {
 }
 
 func TestFrame_Next(t *testing.T) {
-	// [ ] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
-	// [ ] frame.State() OP PART ERROR
-	//     for frame:=ParseFrame(); !frame.IsEmpty(); frame.Next() {}
-	// [ ] IsEmpty - trailing space test
 	ops := []string{"*a!", "*b=1", "*c=1!", "*d,", "*e,"}
+	// "*a!*b=1*c=1!*d,*e,"
 	frameStr := strings.Join(ops, "") + "."
 	t.Log(frameStr)
 	frame := ParseFrame([]byte(frameStr))
 	i, l := 0, 0
 	for !frame.EOF() {
 		l += len(ops[i])
+		if i==len(ops)-1 {
+			l++ //? ragel
+		}
 		if frame.Offset()!=l {
 			t.Fail()
 			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
-			break
 		} else {
 			t.Logf("OK %d %s", i, frame.Type().String())
 		}
@@ -226,7 +225,7 @@ func TestFrame_Next(t *testing.T) {
 func TestXParseOpWhitespace(t *testing.T) {
 	str := " #test ;\n#next?"
 	frame := ParseFrameString(str)
-	if str[frame.Offset()] != '\n' {
+	if str[frame.Offset()-1] != '\n' {
 		t.Fail()
 	}
 	frame.Next()
@@ -343,6 +342,25 @@ func TestParse_Errors(t *testing.T) {
 			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, frame.Offset())
 			break
 		}
+	}
+}
+
+func TestFrame_ParseStream (t *testing.T) {
+	str := "*op1=123*op2!*op3!."
+	var frame Frame
+	frame.state.streaming = true
+	count := 0
+	for i:=0; i<len(str); i++ {
+		frame.state.data = append(frame.state.data, str[i])
+		frame.Parse()
+		//fmt.Println(frame.state.cs, "AT", frame.Offset(), frame.Op.String())
+		if frame.IsComplete() {
+			//fmt.Println("TADAAM", frame.Op.String(), frame.Atoms.Count(), "\n")
+			count++
+		}
+	}
+	if count!=3 {
+		t.Fail()
 	}
 }
 
