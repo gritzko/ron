@@ -10,15 +10,6 @@ func TestOp_Event(t *testing.T) {
 	}
 }
 
-// Op parser TODO
-// [x] pointer based sigs
-// [ ] term (next op, eof exit)  +length
-// [ ] error handling  -length
-// [x] pointer shifting (.#@:)
-// [x] values/atoms
-// [ ] strconv -- value parsing methods
-// [ ] Iterator!!!
-
 func TestParseOp(t *testing.T) {
 	t.Log("Parser")
 	var frame = "*lww#test-author@(time-origin:loc=1''>test"
@@ -31,6 +22,7 @@ func TestParseOp(t *testing.T) {
 		t.Logf("'%s' %v != '%s'\n", iter.Type().String(), []byte(iter.Object().String()), "test-author")
 		t.Fail()
 	}
+	t.Log(iter.Op.String())
 	i := iter.Integer(0)
 	if i != 1 {
 		t.Logf("int parse fails: %d", iter)

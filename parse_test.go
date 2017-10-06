@@ -1,10 +1,10 @@
 package RON
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
 	"testing"
+	"strings"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -171,7 +171,6 @@ func TestParseFrame(t *testing.T) {
 	}
 	t.Logf(frame.String())
 	// recover, compare
-	fmt.Println("===RESTART===")
 	iter := frame.Restart_()
 	for k := 0; k < ops; k++ {
 		if iter.IsEmpty() {
@@ -195,16 +194,43 @@ func TestParseFrame(t *testing.T) {
 	}
 }
 
-/*
-func TestXParseOpWhitespace(t *testing.T) {
-	str := []byte(" #test ;\n#next?")
-	var op Op
-	l := XParseOp(str, &op, ZERO_OP)
-	if l != bytes.IndexByte(str, '\n')+1 {
+func TestFrame_Next(t *testing.T) {
+	// [ ] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
+	// [ ] frame.State() OP PART ERROR
+	//     for frame:=ParseFrame(); !frame.IsEmpty(); frame.Next() {}
+	// [ ] IsEmpty - trailing space test
+	ops := []string{"*a!", "*b=1", "*c=1!", "*d,", "*e,"}
+	frameStr := strings.Join(ops, "") + "."
+	t.Log(frameStr)
+	frame := ParseFrame([]byte(frameStr))
+	i, l := 0, 0
+	for !frame.EOF() {
+		l += len(ops[i])
+		if frame.Offset()!=l {
+			t.Fail()
+			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
+			break
+		} else {
+			t.Logf("OK %d %s", i, frame.Type().String())
+		}
+		i++
+		frame.Parse()
+	}
+	if i != len(ops) {
+		t.Logf("bad end: %d not %d, at %d", i, len(ops), frame.Offset())
 		t.Fail()
 	}
-	l2 := XParseOp(str[l:], &op, ZERO_OP)
-	if l+l2 != len(str) {
+}
+
+
+func TestXParseOpWhitespace(t *testing.T) {
+	str := " #test ;\n#next?"
+	frame := ParseFrameString(str)
+	if str[frame.Offset()] != '\n' {
+		t.Fail()
+	}
+	frame.Next()
+	if frame.Offset() != len(str) {
 		t.Fail()
 	}
 }
@@ -224,21 +250,22 @@ func TestXParseMalformedOp(t *testing.T) {
 		"#repeat #uuids =1",
 	}
 	for i, str := range tests {
-		var op Op
-		l := XParseOp([]byte(str), &op, ZERO_OP)
-		if l > 0 {
-			t.Logf("parsed %d but invalid: '%s' (%d)", i, str, l)
+		frame := ParseFrameString(str)
+		if !frame.EOF() && frame.Offset()>=len(str) {
+			t.Logf("parsed %d but invalid: '%s' (%d)", i, str, frame.Offset())
 			t.Fail()
+			break
 		}
 	}
 }
 
+/*
 func TestOp_ParseFloat(t *testing.T) {
 	var tests = []string{
-		"^3.1415",
-		"^1.0e6",
-		"^1.2345e6",
-		"^0",
+		"*a^3.1415",
+		"*a^1.0e6",
+		"*a^1.2345e6",
+		"*a^0",
 	}
 	var correct = []float64{
 		3.1415,
@@ -247,41 +274,39 @@ func TestOp_ParseFloat(t *testing.T) {
 		0,
 	}
 	for i, str := range tests {
-		var op Op
-		l := XParseOp([]byte(str), &op, ZERO_OP)
-		if l != len(str) {
+		frame := ParseFrameString(str)
+		if frame.Offset() != len(str) {
 			t.Logf("not parsed %d: '%s' (%d)", i, str, l)
 			t.Fail()
 			break
 		}
-		val, _ := op.ParseFloat(0)
+		val := frame.Float(0)
 		if val != correct[i] {
 			t.Logf("misparsed %d: '%e' (%e)", i, val, correct[i])
 			t.Fail()
 		}
 	}
-}
+}*/
 
 func TestOp_ParseAtoms(t *testing.T) {
 	var tests = [5][2]string{
-		{">0>1>2>3", ">>>>"},
-		{">0>0,#next>0>0", ">>"},
-		{",", ""},
-		{"=1^2.0", "=^"},
-		{"'str''quoted \\'mid\\' str'", "''"},
+		{"*a>0>1>2>3", ">>>>"},
+		{"*a>0>0,#next>0>0", ">>"},
+		{"*a,", ""},
+		{"*a=1^2.0", "=^"},
+		{"*a'str''quoted \\'mid\\' str'", "''"},
 	}
 	for i := 0; i < len(tests); i++ {
-		var op Op
 		str := tests[i][0]
-		l := XParseOp([]byte(str), &op, ZERO_OP)
-		if l <= 0 {
-			t.Logf("not parsed %d: '%s' (%d)", i, str, l)
+		frame := ParseFrameString(str)
+		if frame.EOF() {
+			t.Logf("not parsed %d: '%s' (%d)", i, str, frame.Offset())
 			t.Fail()
 			break
 		}
 		types := ""
-		for a := uint(0); a < op.Atoms.Count; a++ {
-			types += string(atomBits2Sep(op.Atoms.AType(a)))
+		for a := 0; a < frame.Atoms.Count(); a++ {
+			types += string(atomBits2Sep(frame.Atoms.AType(a)))
 		}
 		if types != tests[i][1] {
 			t.Logf("misparsed %d: '%s' (%s)", i, types, tests[i][1])
@@ -290,12 +315,20 @@ func TestOp_ParseAtoms(t *testing.T) {
 	}
 }
 
+func TestParse_SpecOnly(t *testing.T) {
+	str := "#test#test#test"
+	frame := ParseFrameString(str)
+	if !frame.EOF() {
+		t.Fail()
+	}
+}
+
 func TestParse_Errors(t *testing.T) {
 	frames := []string{
 		"#test>linkмусор",
 		"#string'unfinishe",
 		"#id#id#id",
-		"#bad@term??",
+		"#bad@term",
 		"#no-term",
 		"#notfloat^a",
 		"#notesc'\\'",
@@ -304,15 +337,16 @@ func TestParse_Errors(t *testing.T) {
 	}
 	for k, f := range frames {
 		buf := []byte(f)
-		var op Op
-		l := XParseOp(buf, &op, ZERO_OP)
-		if l > 0 {
+		frame := ParseFrame(buf)
+		if !frame.EOF() {
 			t.Fail()
-			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, l)
+			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, frame.Offset())
+			break
 		}
 	}
 }
 
+/*
 func TestFrame_SplitMultiframe(t *testing.T) {
 	splits := []string{
 		"*lww#test!:a=1#best:0!:b=2:c=3:d=4;",

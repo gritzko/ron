@@ -1,5 +1,7 @@
 package RON
 
+import "math"
+
 func NewAtoms() (ret Atoms) {
 	ret.atoms = ret._atoms[0:0:len(ret._atoms)]
 	return
@@ -46,7 +48,7 @@ func (a *Atoms) Reset() {
 	a.atoms = a.atoms[:0]
 }
 
-func (a *Atoms) Count() int {
+func (a Atoms) Count() int {
 	return len(a.atoms)
 }
 
@@ -62,6 +64,12 @@ func (a *Atoms) Integer(i int) int64 {
 	} else {
 		return -ret
 	}
+}
+
+func (a *Atoms) Float(i int) float64 {
+	num := a.atoms[i][0]
+	exp := a.atoms[i][1]
+	return math.Pow10(int(exp)) * float64(num)
 }
 
 func (a *Atoms) String(i int) string {

@@ -63,37 +63,41 @@ type Checker interface {
 // [x] multiframe (still atomic)   Frame.Split(iterator)
 //
 // cli FIXME
-// [ ] clean-up: uuid-grammar.rl (take from Java)
+// [x] clean-up: uuid-grammar.rl (take from Java)
 // [x] iterator - parse error
-// [ ] value parsing NEW DEAL - [2]uint64
+// [x] value parsing NEW DEAL - [2]uint64
 //		[ ] (all types - tables, safe ranges, length limits)
 //		[x] int
 //		[x] float
-//		[ ] string
-//		[ ] uuid (maybe same extension as hashes, ranges?)
+//		[x] string
+//		[x] uuid (maybe same extension as hashes, ranges?)
 //			?;,.!:
 //			UUID EXTENSION hash%start<hash%end, on-demand parse
 //			to UUIDVector, remember offsets, defaults to `
 //			Extension bit!!!
-//		[ ] int-in-uuid, float-in-uuid, string-in-uuid
+//		[x] int-in-uuid, float-in-uuid, string-in-uuid
 //			float is two ints: value and E? (read IEEE)
 //		[-] Spec -> QuadUUID, 4 values max
 //		[-] optionally, atom vectorization =1<2<3<4 OR arb number of atoms
-//		[ ] Cursor, aka atom iterator
+//		[-] Cursor, aka atom iterator
 // [x] lww - idempotency
 // [x] parse: imply . if no frame header seen previously (is_frame_open)
-// [ ] parse: get rid of the "NEXT" hack, check ragel docs
+// [x] parse: get rid of the "NEXT" hack, check ragel docs
 // [x] sorter: pre-detect errors, split multiframes, etc
 // [ ] parser: proper UTF-8 CHAR pattern
 // [ ] AppendRange, Iterator.offset, IsEmpty()
-// [ ] Frame.Header() parsed header fast access
-// [ ] Parsers: err = SMOE_ERROR
-// [ ] FRAME IS A SLICE
-//      [ ] no *Frame
-//      [ ] fr = fr.Append(...)
-//      [ ] first, last *Op
+// [x] Frame.Header() parsed header fast access
+// [x] Parsers: err = SMOE_ERROR
+// [x] FRAME IS A SLICE
+//      [x] no *Frame
+//      [x] fr = fr.Append(...)
+//      [x] first, last *Op
 // [x] MakeNameUUID("name")
 //
+// [ ] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
+// [ ] frame.State() OP PART ERROR
+//     for frame:=ParseFrame(); !frame.IsEmpty(); frame.Next() {}
+// [ ] IsEmpty - trailing space test
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -110,21 +114,21 @@ type Checker interface {
 // [x] @~! explicit frame terminator - or ;  frame.Close() frame.Join()
 // [ ] parser-private adaptor fns  _set_digit()
 // [ ] unified grammar files: Java, C++, Go
-// [ ] Op: 4 UUIDs, []byte atoms
+// [-] Op: 4 UUIDs, []byte atoms
 // [ ] Iterator, ret code, error/incomplete input
-// [ ] separate atom parser
-// [ ] reader.Next() reader.ReadInt()...
-// [ ] ron.Writer
-// [ ] Frame, Reader, Writer inherit Op (see C++)
+// [-] separate atom parser
+// [x] reader.Next() reader.ReadInt()...
+// [-] ron.Writer
+// [x] Frame, Reader, Writer inherit Op (see C++)
 // [ ] type Batch []Frame, type Flow chan Batch
 // [ ] auto-gen ABC! (base64: take from the file)
-// [ ] Cursor API:  SetObject(uuid), AddInteger(int), Append()
+// [x] Cursor API:  SetObject(uuid), AddInteger(int), Append()
 //                  AppendFrame(), AppendAll(), AppendRange()
 //
 // [ ] reducer registry
-// [ ] reducer flags (at least, formatting)
+// [x] reducer flags (at least, formatting)
 // [x] nice base64 constant definitions (ron ... // "comment")
-// [ ] error header   @~~~~~~~~~~:reference "error message" (to reduce)
+// [-] error header   @~~~~~~~~~~:reference "error message" (to reduce)
 // [-] copy generic reduction errors
 // [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
 // [x] prereduce - optional, may fail (RGA subtrees)
@@ -133,7 +137,7 @@ type Checker interface {
 // [x] consider ?!,; instead of !.,; and ?
 // [x]   insert ; or , depending on the prev op
 // [ ] test redefs!
-// [ ] test op term defaulting (Append, op before frame, etc)
+// [x] test op term defaulting (Append, op before frame, etc)
 // [ ] ron.go --> cmd_reduce.go
 // [x] go fmt hook
 // [ ] test/benchmark hook
@@ -148,6 +152,7 @@ type Checker interface {
 // 		[x] newlines
 // 		[x] trimming/zipping
 // 		[ ] redefs (bench - fast prefix - bit ops)
+//		[ ] tablist formatting!!!
 // [x] kill 2 impl of zip UUID
 // [x] test formatting
 // [ ] test redefaults - BACKTICK ONLY (replaces the quant)

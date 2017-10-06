@@ -10,18 +10,21 @@
     }
 
     action toel_start {
-        fmt.Println("UUID", it.state.data[p-1]);
+        //fmt.Println("UUID", it.state.data[p-1]);
         n = specSep2Bits(it.state.data[p-1])
         if n < idx {
+            //fmt.Println("EARLY", n, idx, p)
+            fnext *RON_error;
             fbreak;
+        } else {
+            idx = n
+            i = it.uuids[idx].uint128;
+            digit = 0;
         }
-        idx = n
-        i = it.uuids[idx].uint128;
-        digit = 0;
     }
 
     action toel_uuid {
-        fmt.Println("UUID#", idx);
+        //fmt.Println("UUID#", idx);
         it.uuids[idx] = UUID{uint128:i};
         idx++;
     }
@@ -32,7 +35,7 @@
     }
     action atom_end {
         // TODO max size for int/float/string
-        fmt.Println("ADDING", i);
+        //fmt.Println("ADDING", i);
         it.AddAtom(i);
     }
 
@@ -61,7 +64,7 @@
         i[0] = uint64(p);
     }
     action string_atom_end {
-        fmt.Println("STRING");
+        //fmt.Println("STRING");
         i[1] = uint64(p) | ATOM_STRING_62;
     }
 
@@ -78,15 +81,24 @@
     }
 
     action opterm {
-        fmt.Println("TERM", fc);
+        //fmt.Println("TERM", fc, it.state.cs, "AT", p);
         it.term = termSep2Bits(fc)
+
+            fbreak;
+    }
+
+    action op_start {
+        idx = 0;
     }
 
     action op_end {
-        fmt.Println("END", it.state.cs)
-        done = true
-        idx = 0;
-        fbreak;
+        //fmt.Println("END", it.state.cs, "AT", p)
+        if p<pe {
+            //fmt.Println("BACK")
+            p--;
+            fnext *RON_start;
+            fbreak;
+        }
     }
 
     action spec_end {
@@ -128,7 +140,7 @@
     OPTERM = [,;!?] @opterm space*;
 
     # a RON op; types: (0) raw op (1) reduced op (2) frame header (3) query header 
-    OP = space* ( SPEC_UUID+ %spec_end ) ( OPTERM | ATOMS OPTERM? ) %op_end;
+    OP = space* ( SPEC_UUID+ %spec_end ) ( ATOMS OPTERM? | OPTERM ) >op_start %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
     DOT = "." space*;

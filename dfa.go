@@ -40,29 +40,29 @@ var LIMIT_ERROR = NewError("SyntxLimit")
 var EOF_ERROR = NewError("EOF")
 var INCOMPLETE_ERROR = NewError("Incomplete")
 
+//line dfa.rl:42
+//line dfa.go:47
+const RON_start int = 1
+const RON_first_final int = 20
+const RON_error int = 0
+
+const RON_en_main int = 1
+
+//line dfa.rl:43
+
+//line dfa.rl:44
 // Parse consumes one op, unless the buffer ends earlier.
 func (it *Frame) Parse() error {
 
-	fmt.Println("GO")
+	//fmt.Println("GO");
 
 	if it.IsLast() {
 		it.Op = ZERO_OP
 		return EOF_ERROR
 	}
 
-//line dfa.rl:52
-//line dfa.go:57
-	const RON_start int = 1
-	const RON_first_final int = 20
-	const RON_error int = 0
-
-	const RON_en_main int = 1
-
-//line dfa.rl:53
-
-//line dfa.rl:54
 	if it.state.cs == 0 {
-		fmt.Println("INIT")
+		//fmt.Println("INIT");
 
 //line dfa.go:72
 		{
@@ -76,8 +76,6 @@ func (it *Frame) Parse() error {
 
 	p, pe, eof := it.state.p, len(it.state.data), len(it.state.data)
 	n := uint(0)
-	done := false
-	_ = done
 	_ = eof
 	_ = pe // FIXME kill
 
@@ -89,13 +87,89 @@ func (it *Frame) Parse() error {
 	idx := it.state.idx
 	half := it.state.half
 	digit := it.state.digit
-	fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p])
+	//fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p]);
 
-//line dfa.go:100
+//line dfa.go:98
 	{
 		if p == pe {
 			goto _test_eof
 		}
+		goto _resume
+
+	_again:
+		switch it.state.cs {
+		case 1:
+			goto st1
+		case 0:
+			goto st0
+		case 2:
+			goto st2
+		case 3:
+			goto st3
+		case 4:
+			goto st4
+		case 5:
+			goto st5
+		case 20:
+			goto st20
+		case 21:
+			goto st21
+		case 6:
+			goto st6
+		case 7:
+			goto st7
+		case 22:
+			goto st22
+		case 23:
+			goto st23
+		case 8:
+			goto st8
+		case 9:
+			goto st9
+		case 24:
+			goto st24
+		case 10:
+			goto st10
+		case 25:
+			goto st25
+		case 26:
+			goto st26
+		case 11:
+			goto st11
+		case 12:
+			goto st12
+		case 27:
+			goto st27
+		case 28:
+			goto st28
+		case 29:
+			goto st29
+		case 13:
+			goto st13
+		case 14:
+			goto st14
+		case 30:
+			goto st30
+		case 31:
+			goto st31
+		case 32:
+			goto st32
+		case 15:
+			goto st15
+		case 16:
+			goto st16
+		case 17:
+			goto st17
+		case 18:
+			goto st18
+		case 19:
+			goto st19
+		}
+
+		if p++; p == pe {
+			goto _test_eof
+		}
+	_resume:
 		switch it.state.cs {
 		case 1:
 			goto st_case_1
@@ -191,8 +265,9 @@ func (it *Frame) Parse() error {
 		it.state.cs = 0
 		goto _out
 	tr15:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -200,8 +275,9 @@ func (it *Frame) Parse() error {
 	tr49:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -209,8 +285,9 @@ func (it *Frame) Parse() error {
 	tr57:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -221,198 +298,235 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
 		goto st2
 	tr74:
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+		it.state.cs = 2
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr79:
-//line ./op-grammar.rl:33
+		it.state.cs = 2
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr87:
-//line ./op-grammar.rl:77
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+		it.state.cs = 2
+//line ./op-grammar.rl:80
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr95:
-//line ./op-grammar.rl:50
+		it.state.cs = 2
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr105:
+		it.state.cs = 2
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr114:
-//line ./op-grammar.rl:54
-//line ./op-grammar.rl:56
+		it.state.cs = 2
+//line ./op-grammar.rl:57
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr125:
-//line ./op-grammar.rl:56
+		it.state.cs = 2
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr133:
+		it.state.cs = 2
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	tr144:
+		it.state.cs = 2
 //line ././uuid-grammar.rl:36
 
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 2
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st2
+		goto _again
 	st2:
 		if p++; p == pe {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:424
+//line dfa.go:534
 		switch it.state.data[p] {
 		case 32:
 			goto tr3
@@ -461,27 +575,31 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr3:
+		it.state.cs = 3
 //line ./op-grammar.rl:12
-		fmt.Println("UUID", it.state.data[p-1])
+
+		//fmt.Println("UUID", it.state.data[p-1]);
 		n = specSep2Bits(it.state.data[p-1])
 		if n < idx {
+			//fmt.Println("EARLY", n, idx, p)
+			it.state.cs = (RON_error)
 			{
 				p++
-				it.state.cs = 3
 				goto _out
 			}
+		} else {
+			idx = n
+			i = it.uuids[idx].uint128
+			digit = 0
 		}
-		idx = n
-		i = it.uuids[idx].uint128
-		digit = 0
 
-		goto st3
+		goto _again
 	st3:
 		if p++; p == pe {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:490
+//line dfa.go:604
 		switch it.state.data[p] {
 		case 32:
 			goto st3
@@ -530,22 +648,27 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr4:
+		it.state.cs = 4
 //line ./op-grammar.rl:12
-		fmt.Println("UUID", it.state.data[p-1])
+
+		//fmt.Println("UUID", it.state.data[p-1]);
 		n = specSep2Bits(it.state.data[p-1])
 		if n < idx {
+			//fmt.Println("EARLY", n, idx, p)
+			it.state.cs = (RON_error)
 			{
 				p++
-				it.state.cs = 4
 				goto _out
 			}
+		} else {
+			idx = n
+			i = it.uuids[idx].uint128
+			digit = 0
 		}
-		idx = n
-		i = it.uuids[idx].uint128
-		digit = 0
 
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:42
@@ -553,10 +676,10 @@ func (it *Frame) Parse() error {
 		i[half] &= INT60_FULL
 		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
 
-		goto st4
+		goto _again
 	tr9:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:42
@@ -578,7 +701,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:591
+//line dfa.go:709
 		switch it.state.data[p] {
 		case 32:
 			goto tr13
@@ -643,8 +766,9 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr13:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -652,8 +776,9 @@ func (it *Frame) Parse() error {
 	tr47:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -661,8 +786,9 @@ func (it *Frame) Parse() error {
 	tr55:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -673,8 +799,9 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
@@ -684,7 +811,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:705
+//line dfa.go:823
 		switch it.state.data[p] {
 		case 32:
 			goto st5
@@ -718,74 +845,113 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr14:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:90
+		idx = 0
+
+//line ./op-grammar.rl:83
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr23:
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:90
+		idx = 0
+
+//line ./op-grammar.rl:83
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr48:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:90
+		idx = 0
+
+//line ./op-grammar.rl:83
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr56:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:90
+		idx = 0
+
+//line ./op-grammar.rl:83
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr66:
@@ -794,28 +960,26 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:90
+		idx = 0
+
+//line ./op-grammar.rl:83
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
 
-		goto st20
-	tr73:
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
 		{
 			p++
 			it.state.cs = 20
@@ -823,105 +987,170 @@ func (it *Frame) Parse() error {
 		}
 
 		goto st20
+	tr73:
+		it.state.cs = 20
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		}
+
+		goto _again
 	tr78:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr86:
-//line ./op-grammar.rl:77
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr94:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr104:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr113:
-//line ./op-grammar.rl:54
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:57
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr124:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr132:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	tr143:
@@ -930,17 +1159,24 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
-
 //line ./op-grammar.rl:80
-		fmt.Println("TERM", it.state.data[p])
+
+//line ./op-grammar.rl:83
+
+		//fmt.Println("TERM", fc, it.state.cs, "AT", p);
 		it.term = termSep2Bits(it.state.data[p])
+
+		{
+			p++
+			it.state.cs = 20
+			goto _out
+		}
 
 		goto st20
 	st20:
@@ -948,7 +1184,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:1014
+//line dfa.go:1182
 		switch it.state.data[p] {
 		case 32:
 			goto tr73
@@ -968,191 +1204,227 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr75:
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+		it.state.cs = 21
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr81:
-//line ./op-grammar.rl:33
+		it.state.cs = 21
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr89:
-//line ./op-grammar.rl:77
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+		it.state.cs = 21
+//line ./op-grammar.rl:80
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr97:
-//line ./op-grammar.rl:50
+		it.state.cs = 21
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr107:
+		it.state.cs = 21
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr122:
-//line ./op-grammar.rl:54
-//line ./op-grammar.rl:56
+		it.state.cs = 21
+//line ./op-grammar.rl:57
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr127:
-//line ./op-grammar.rl:56
+		it.state.cs = 21
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr137:
+		it.state.cs = 21
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	tr146:
+		it.state.cs = 21
 //line ././uuid-grammar.rl:36
 
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 21
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st21
+		goto _again
 	st21:
 		if p++; p == pe {
 			goto _test_eof21
 		}
 	st_case_21:
-//line dfa.go:1213
+//line dfa.go:1417
 		switch it.state.data[p] {
 		case 32:
 			goto st21
@@ -1164,38 +1436,45 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr16:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr24:
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1203,22 +1482,26 @@ func (it *Frame) Parse() error {
 	tr50:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1226,22 +1509,26 @@ func (it *Frame) Parse() error {
 	tr59:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1252,53 +1539,57 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr80:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr88:
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr96:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1306,43 +1597,43 @@ func (it *Frame) Parse() error {
 	tr106:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr115:
-//line ./op-grammar.rl:54
+//line ./op-grammar.rl:57
 
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st6
 	tr126:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1350,13 +1641,13 @@ func (it *Frame) Parse() error {
 	tr135:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1367,13 +1658,13 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1383,7 +1674,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1487
+//line dfa.go:1711
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1396,7 +1687,7 @@ func (it *Frame) Parse() error {
 		}
 		goto tr28
 	tr28:
-//line ./op-grammar.rl:60
+//line ./op-grammar.rl:63
 		i[0] = uint64(p)
 
 		goto st7
@@ -1405,7 +1696,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:1510
+//line dfa.go:1734
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1418,17 +1709,17 @@ func (it *Frame) Parse() error {
 		}
 		goto st7
 	tr29:
-//line ./op-grammar.rl:60
+//line ./op-grammar.rl:63
 		i[0] = uint64(p)
 
-//line ./op-grammar.rl:63
-		fmt.Println("STRING")
+//line ./op-grammar.rl:66
+		//fmt.Println("STRING");
 		i[1] = uint64(p) | ATOM_STRING_62
 
 		goto st22
 	tr32:
-//line ./op-grammar.rl:63
-		fmt.Println("STRING")
+//line ./op-grammar.rl:66
+		//fmt.Println("STRING");
 		i[1] = uint64(p) | ATOM_STRING_62
 
 		goto st22
@@ -1437,7 +1728,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:1545
+//line dfa.go:1769
 		switch it.state.data[p] {
 		case 32:
 			goto tr77
@@ -1473,180 +1764,212 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr77:
-//line ./op-grammar.rl:33
+		it.state.cs = 23
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr85:
-//line ./op-grammar.rl:77
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+		it.state.cs = 23
+//line ./op-grammar.rl:80
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr93:
-//line ./op-grammar.rl:50
+		it.state.cs = 23
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr103:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr112:
-//line ./op-grammar.rl:54
-//line ./op-grammar.rl:56
+		it.state.cs = 23
+//line ./op-grammar.rl:57
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr123:
-//line ./op-grammar.rl:56
+		it.state.cs = 23
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr131:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	tr142:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:36
 
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 23
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st23
+		goto _again
 	st23:
 		if p++; p == pe {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:1751
+//line dfa.go:2007
 		switch it.state.data[p] {
 		case 32:
 			goto tr85
@@ -1682,38 +2005,45 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr19:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr25:
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1721,22 +2051,26 @@ func (it *Frame) Parse() error {
 	tr52:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1744,22 +2078,26 @@ func (it *Frame) Parse() error {
 	tr62:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1770,53 +2108,57 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr82:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr90:
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr98:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1824,43 +2166,43 @@ func (it *Frame) Parse() error {
 	tr109:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr117:
-//line ./op-grammar.rl:54
+//line ./op-grammar.rl:57
 
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st8
 	tr128:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1868,13 +2210,13 @@ func (it *Frame) Parse() error {
 	tr139:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1885,13 +2227,13 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -1901,7 +2243,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2049
+//line dfa.go:2325
 		switch it.state.data[p] {
 		case 32:
 			goto st8
@@ -1920,9 +2262,9 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr35:
-//line ./op-grammar.rl:39
+//line ./op-grammar.rl:42
 
-//line ./op-grammar.rl:41
+//line ./op-grammar.rl:44
 		if it.state.data[p] == '-' {
 			i[1] |= 1
 		}
@@ -1933,21 +2275,21 @@ func (it *Frame) Parse() error {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2083
+//line dfa.go:2359
 		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
 			goto tr37
 		}
 		goto st0
 	tr36:
-//line ./op-grammar.rl:39
+//line ./op-grammar.rl:42
 
-//line ./op-grammar.rl:46
+//line ./op-grammar.rl:49
 		i[0] *= 10
 		i[0] += uint64(int(it.state.data[p]) - int('0'))
 
 		goto st24
 	tr37:
-//line ./op-grammar.rl:46
+//line ./op-grammar.rl:49
 		i[0] *= 10
 		i[0] += uint64(int(it.state.data[p]) - int('0'))
 
@@ -1957,7 +2299,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:2110
+//line dfa.go:2386
 		switch it.state.data[p] {
 		case 32:
 			goto tr93
@@ -1998,38 +2340,45 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr20:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr26:
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2037,22 +2386,26 @@ func (it *Frame) Parse() error {
 	tr53:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2060,22 +2413,26 @@ func (it *Frame) Parse() error {
 	tr63:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2086,53 +2443,57 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr83:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr91:
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr99:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2140,43 +2501,43 @@ func (it *Frame) Parse() error {
 	tr110:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr118:
-//line ./op-grammar.rl:54
+//line ./op-grammar.rl:57
 
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st10
 	tr129:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2184,13 +2545,13 @@ func (it *Frame) Parse() error {
 	tr140:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2201,13 +2562,13 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2217,7 +2578,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:2413
+//line dfa.go:2709
 		switch it.state.data[p] {
 		case 32:
 			goto st10
@@ -2267,7 +2628,8 @@ func (it *Frame) Parse() error {
 		goto st0
 	tr39:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:42
@@ -2289,7 +2651,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:2490
+//line dfa.go:2786
 		switch it.state.data[p] {
 		case 32:
 			goto tr77
@@ -2415,7 +2777,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2617
+//line dfa.go:2913
 		switch it.state.data[p] {
 		case 32:
 			goto tr103
@@ -2469,38 +2831,45 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr21:
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr27:
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2508,22 +2877,26 @@ func (it *Frame) Parse() error {
 	tr54:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2531,22 +2904,26 @@ func (it *Frame) Parse() error {
 	tr64:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2557,53 +2934,57 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:23
-		fmt.Println("UUID#", idx)
+//line ./op-grammar.rl:26
+
+		//fmt.Println("UUID#", idx);
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:92
+//line ./op-grammar.rl:104
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
 		it.frame = it.state.data
 
-//line ./op-grammar.rl:74
+//line ./op-grammar.rl:90
 		idx = 0
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:77
+		idx = 0
+
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr84:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr92:
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr100:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 		i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2611,43 +2992,43 @@ func (it *Frame) Parse() error {
 	tr111:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr120:
-//line ./op-grammar.rl:54
+//line ./op-grammar.rl:57
 
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
 		goto st11
 	tr130:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2655,13 +3036,13 @@ func (it *Frame) Parse() error {
 	tr141:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2672,13 +3053,13 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 		i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:29
+//line ./op-grammar.rl:32
 		digit = 0
 		i = uint128{0, 0}
 
@@ -2688,7 +3069,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof11
 		}
 	st_case_11:
-//line dfa.go:2933
+//line dfa.go:3249
 		switch it.state.data[p] {
 		case 32:
 			goto st11
@@ -2764,35 +3145,39 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr116:
-//line ./op-grammar.rl:54
+		it.state.cs = 28
+//line ./op-grammar.rl:57
 
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 		i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 		// TODO max size for int/float/string
-		fmt.Println("ADDING", i)
+		//fmt.Println("ADDING", i);
 		it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-		fmt.Println("END", it.state.cs)
-		done = true
-		idx = 0
-		{
-			p++
-			it.state.cs = 28
-			goto _out
+//line ./op-grammar.rl:94
+
+		//fmt.Println("END", it.state.cs, "AT", p)
+		if p < pe {
+			//fmt.Println("BACK")
+			p--
+			it.state.cs = (RON_start)
+			{
+				p++
+				goto _out
+			}
 		}
 
-		goto st28
+		goto _again
 	st28:
 		if p++; p == pe {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:3038
+//line dfa.go:3358
 		switch it.state.data[p] {
 		case 32:
 			goto st21
@@ -2857,7 +3242,7 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr119:
-//line ./op-grammar.rl:54
+//line ./op-grammar.rl:57
 
 		goto st13
 	st13:
@@ -2865,7 +3250,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof13
 		}
 	st_case_13:
-//line dfa.go:3112
+//line dfa.go:3432
 		switch it.state.data[p] {
 		case 43:
 			goto st14
@@ -2931,7 +3316,8 @@ func (it *Frame) Parse() error {
 		goto st0
 	tr40:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -2959,7 +3345,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3206
+//line dfa.go:3526
 		switch it.state.data[p] {
 		case 32:
 			goto tr131
@@ -3035,7 +3421,8 @@ func (it *Frame) Parse() error {
 		goto st0
 	tr41:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -3073,7 +3460,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3317
+//line dfa.go:3637
 		switch it.state.data[p] {
 		case 32:
 			goto tr142
@@ -3148,7 +3535,7 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr30:
-//line ./op-grammar.rl:60
+//line ./op-grammar.rl:63
 		i[0] = uint64(p)
 
 		goto st15
@@ -3157,7 +3544,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof15
 		}
 	st_case_15:
-//line dfa.go:3402
+//line dfa.go:3722
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -3225,7 +3612,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3471
+//line dfa.go:3791
 		switch it.state.data[p] {
 		case 32:
 			goto tr47
@@ -3277,22 +3664,27 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr5:
+		it.state.cs = 17
 //line ./op-grammar.rl:12
-		fmt.Println("UUID", it.state.data[p-1])
+
+		//fmt.Println("UUID", it.state.data[p-1]);
 		n = specSep2Bits(it.state.data[p-1])
 		if n < idx {
+			//fmt.Println("EARLY", n, idx, p)
+			it.state.cs = (RON_error)
 			{
 				p++
-				it.state.cs = 17
 				goto _out
 			}
+		} else {
+			idx = n
+			i = it.uuids[idx].uint128
+			digit = 0
 		}
-		idx = n
-		i = it.uuids[idx].uint128
-		digit = 0
 
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -3301,10 +3693,10 @@ func (it *Frame) Parse() error {
 		digit = prefixSep2Bits(it.state.data[p]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
-		goto st17
+		goto _again
 	tr10:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -3332,7 +3724,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3578
+//line dfa.go:3902
 		switch it.state.data[p] {
 		case 32:
 			goto tr55
@@ -3405,22 +3797,27 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr6:
+		it.state.cs = 18
 //line ./op-grammar.rl:12
-		fmt.Println("UUID", it.state.data[p-1])
+
+		//fmt.Println("UUID", it.state.data[p-1]);
 		n = specSep2Bits(it.state.data[p-1])
 		if n < idx {
+			//fmt.Println("EARLY", n, idx, p)
+			it.state.cs = (RON_error)
 			{
 				p++
-				it.state.cs = 18
 				goto _out
 			}
+		} else {
+			idx = n
+			i = it.uuids[idx].uint128
+			digit = 0
 		}
-		idx = n
-		i = it.uuids[idx].uint128
-		digit = 0
 
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -3434,15 +3831,14 @@ func (it *Frame) Parse() error {
 		if digit > 10 {
 			{
 				p++
-				it.state.cs = 18
 				goto _out
 			}
 		}
 
-		goto st18
+		goto _again
 	tr11:
 //line ././uuid-grammar.rl:5
-		fmt.Println("START")
+		//fmt.Println("START");
 		half = 0
 
 //line ././uuid-grammar.rl:28
@@ -3480,7 +3876,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:3720
+//line dfa.go:4048
 		switch it.state.data[p] {
 		case 32:
 			goto tr65
@@ -3553,26 +3949,30 @@ func (it *Frame) Parse() error {
 		}
 		goto st0
 	tr7:
+		it.state.cs = 19
 //line ./op-grammar.rl:12
-		fmt.Println("UUID", it.state.data[p-1])
+
+		//fmt.Println("UUID", it.state.data[p-1]);
 		n = specSep2Bits(it.state.data[p-1])
 		if n < idx {
+			//fmt.Println("EARLY", n, idx, p)
+			it.state.cs = (RON_error)
 			{
 				p++
-				it.state.cs = 19
 				goto _out
 			}
+		} else {
+			idx = n
+			i = it.uuids[idx].uint128
+			digit = 0
 		}
-		idx = n
-		i = it.uuids[idx].uint128
-		digit = 0
 
 //line ./op-grammar.rl:6
 		if idx != 0 {
 			it.uuids[idx] = it.uuids[idx-1]
 		}
 
-		goto st19
+		goto _again
 	tr12:
 //line ./op-grammar.rl:6
 		if idx != 0 {
@@ -3585,7 +3985,7 @@ func (it *Frame) Parse() error {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:3824
+//line dfa.go:4156
 		switch it.state.data[p] {
 		case 43:
 			goto tr9
@@ -3731,128 +4131,156 @@ func (it *Frame) Parse() error {
 		if p == eof {
 			switch it.state.cs {
 			case 20:
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 23:
-//line ./op-grammar.rl:77
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:80
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 22, 25:
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 31:
 //line ././uuid-grammar.rl:36
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 26:
 //line ././uuid-grammar.rl:39
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 24:
-//line ./op-grammar.rl:50
+//line ./op-grammar.rl:53
 				i[1] |= ATOM_INT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 30:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
 				i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 32:
@@ -3861,47 +4289,55 @@ func (it *Frame) Parse() error {
 //line ././uuid-grammar.rl:48
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
 			case 27, 29:
-//line ./op-grammar.rl:54
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:57
+//line ./op-grammar.rl:59
 				i[1] |= ATOM_FLOAT_62
 
-//line ./op-grammar.rl:33
+//line ./op-grammar.rl:36
 				// TODO max size for int/float/string
-				fmt.Println("ADDING", i)
+				//fmt.Println("ADDING", i);
 				it.AddAtom(i)
 
-//line ./op-grammar.rl:77
+//line ./op-grammar.rl:80
 
-//line ./op-grammar.rl:85
-				fmt.Println("END", it.state.cs)
-				done = true
-				idx = 0
-				{
-					p++
-					it.state.cs = 0
-					goto _out
+//line ./op-grammar.rl:94
+
+				//fmt.Println("END", it.state.cs, "AT", p)
+				if p < pe {
+					//fmt.Println("BACK")
+					p--
+					it.state.cs = (RON_start)
+					{
+						p++
+						it.state.cs = 0
+						goto _out
+					}
 				}
 
-//line dfa.go:4069
+//line dfa.go:4428
 			}
 		}
 
@@ -3910,8 +4346,9 @@ func (it *Frame) Parse() error {
 		}
 	}
 
-//line dfa.rl:85
-	fmt.Println("DONE", it.state.cs, "at", p)
+//line dfa.rl:83
+
+	//fmt.Println("DONE", it.state.cs, "at", p);
 
 	it.state.incomplete = i
 	it.state.idx = idx
@@ -3919,16 +4356,29 @@ func (it *Frame) Parse() error {
 	it.state.half = half
 	it.state.p = p
 
-	if done {
+	if p >= pe && !it.state.streaming && it.state.cs != RON_start && it.state.cs < RON_first_final {
+		it.state.cs = RON_error
+		//fmt.Println("BAD", p, pe, it.state.cs)
+	}
+
+	if it.state.cs == RON_start || it.state.cs >= RON_first_final || p == pe {
 		return nil
 	} else if it.state.cs == RON_error {
-		fmt.Println("DONE1", p)
+		//fmt.Println("DONE1", p);
 		it.Op = ZERO_OP
 		return SYNTAX_ERROR
 	} else {
-		fmt.Println("DONE2", p)
+		//fmt.Println("DONE2", p);
 		return INCOMPLETE_ERROR
 	}
+}
+
+func (frame Frame) EOF() bool {
+	return frame.state.cs == RON_error
+}
+
+func (frame Frame) Offset() int {
+	return frame.state.p
 }
 
 var DIGIT_OFFSETS [11]uint8
@@ -3945,15 +4395,15 @@ func init() {
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line dfa.rl:122
-//line dfa.go:4116
+//line dfa.rl:133
+//line dfa.go:4488
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line dfa.rl:123
+//line dfa.rl:134
 	var i uint128 = ctx_uuid.uint128
 	digit := uint(0)
 	half := 0
@@ -3963,12 +4413,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	_ = eof
 	//_,_,_ = ts,te,act
 
-//line dfa.go:4137
+//line dfa.go:4509
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4142
+//line dfa.go:4514
 	{
 		if p == pe {
 			goto _test_eof
@@ -4036,7 +4486,8 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto _out
 	tr0:
 //line ./uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ./uuid-grammar.rl:42
@@ -4058,7 +4509,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4237
+//line dfa.go:4609
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4151,7 +4602,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4331
+//line dfa.go:4703
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4173,7 +4624,8 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto st0
 	tr2:
 //line ./uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ./uuid-grammar.rl:28
@@ -4201,7 +4653,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4381
+//line dfa.go:4753
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4245,7 +4697,8 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto st0
 	tr3:
 //line ./uuid-grammar.rl:5
-		fmt.Println("START")
+
+		//fmt.Println("START");
 		half = 0
 
 //line ./uuid-grammar.rl:28
@@ -4283,7 +4736,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4460
+//line dfa.go:4832
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4355,7 +4808,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:48
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line dfa.go:4527
+//line dfa.go:4899
 			}
 		}
 
@@ -4364,7 +4817,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:141
+//line dfa.rl:152
 
 	if cs < UUID_first_final || digit > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

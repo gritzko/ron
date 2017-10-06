@@ -38,22 +38,22 @@ var LIMIT_ERROR = NewError("SyntxLimit")
 var EOF_ERROR = NewError("EOF")
 var INCOMPLETE_ERROR = NewError("Incomplete")
 
+%% machine RON;
+%% write data;
+%% access it.state.;
+
 // Parse consumes one op, unless the buffer ends earlier.
 func (it *Frame) Parse() error {
 
-    fmt.Println("GO");
+    //fmt.Println("GO");
 
     if it.IsLast() {
         it.Op = ZERO_OP
         return EOF_ERROR
     }
 
-    %% machine RON;
-    %% write data;
-    %% access it.state.;
-
     if it.state.cs==0 {
-        fmt.Println("INIT");
+        //fmt.Println("INIT");
 	    %% write init;
     } else if it.state.cs>=RON_first_final {
         it.state.cs = RON_start
@@ -61,8 +61,6 @@ func (it *Frame) Parse() error {
 
 	p, pe, eof := it.state.p, len(it.state.data), len(it.state.data)
     n := uint(0)
-    done := false
-    _ = done
     _ = eof
     _ = pe // FIXME kill
 
@@ -74,7 +72,7 @@ func (it *Frame) Parse() error {
     idx := it.state.idx;
     half := it.state.half;
     digit := it.state.digit;
-    fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p]);
+    //fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p]);
 
 	%%{
 
@@ -83,7 +81,7 @@ func (it *Frame) Parse() error {
 
 	    write exec;
 	}%%
-    fmt.Println("DONE", it.state.cs, "at", p);
+    //fmt.Println("DONE", it.state.cs, "at", p);
 
     it.state.incomplete = i;
     it.state.idx = idx;
@@ -91,16 +89,29 @@ func (it *Frame) Parse() error {
     it.state.half = half;
     it.state.p = p;
 
-    if done {
+    if p>=pe && !it.state.streaming && it.state.cs!=RON_start && it.state.cs<RON_first_final {
+        it.state.cs = RON_error
+        //fmt.Println("BAD", p, pe, it.state.cs)
+    }
+
+    if it.state.cs == RON_start || it.state.cs>=RON_first_final || p==pe {
         return nil
     } else if it.state.cs == RON_error {
-        fmt.Println("DONE1", p);
+        //fmt.Println("DONE1", p);
         it.Op = ZERO_OP;
         return SYNTAX_ERROR
     } else  {
-        fmt.Println("DONE2", p);
+        //fmt.Println("DONE2", p);
         return INCOMPLETE_ERROR
     }
+}
+
+func (frame Frame) EOF () bool {
+    return frame.state.cs == RON_error
+}
+
+func (frame Frame) Offset () int {
+    return frame.state.p
 }
 
 var DIGIT_OFFSETS [11]uint8

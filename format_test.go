@@ -1,7 +1,6 @@
 package RON
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -159,7 +158,6 @@ func TestFormatOptions(t *testing.T) {
 	for k, f := range formats {
 		formatted := MakeFormattedFrame(f.flags, 1024)
 		for !frame.IsEmpty() {
-			fmt.Println("cs", frame.state.cs)
 			formatted.AppendOp(frame.Op)
 			frame.Next()
 		}
