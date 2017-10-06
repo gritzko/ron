@@ -9,22 +9,22 @@
         }
     }
 
-    action toel_start {
-        //fmt.Println("UUID", it.state.data[p-1]);
-        n = specSep2Bits(it.state.data[p-1])
-        if n < idx {
-            //fmt.Println("EARLY", n, idx, p)
+    action spec_uuid_start {
+        n = specSep2Bits(it.state.data[p])
+        if n < idx { 
+            // wrong UUID order; must be type-object-event-ref
             fnext *RON_error;
             fbreak;
-        } else {
+        } else { 
+            // start parsing the UUID
             idx = n
             i = it.uuids[idx].uint128;
             digit = 0;
         }
     }
 
-    action toel_uuid {
-        //fmt.Println("UUID#", idx);
+    action spec_uuid_end {
+        // OK, save the UUID
         it.uuids[idx] = UUID{uint128:i};
         idx++;
     }
@@ -35,12 +35,10 @@
     }
     action atom_end {
         // TODO max size for int/float/string
-        //fmt.Println("ADD ATOM", i);
         it.AddAtom(i);
     }
 
     action int_atom_start {
-        //fmt.Println("INT START");
     }
     action int_sign {
         if fc=='-' {
@@ -48,12 +46,10 @@
         }
     }
     action int_digit {
-        //fmt.Println("INT DGT", p, fc);
         i[0] *= 10;
         i[0] += uint64(int(fc) - int('0'));
     }
     action int_atom_end {
-        //fmt.Println("INT END");
         i[1] |= ATOM_INT_62;
     }
 
@@ -67,7 +63,6 @@
         i[0] = uint64(p);
     }
     action string_atom_end {
-        //fmt.Println("STRING");
         i[1] = uint64(p) | ATOM_STRING_62;
     }
 
@@ -84,15 +79,14 @@
     }
 
     action opterm {
-        //fmt.Println("TERM", fc, it.state.cs, "AT", p);
         it.term = termSep2Bits(fc)
     }
 
     action op_start {
-        //fmt.Println("OP START", it.state.cs, "AT", p)
         idx = 0;
         if had_end {
-            //fmt.Println("BACK")
+            // one op is done, so stop parsing for now
+            // make sure the parser restarts with the next op
             p--;
             fnext *RON_start;
             fbreak;
@@ -101,7 +95,6 @@
 
     action op_end {
         had_end = true
-        //fmt.Println("OP END", it.state.cs, "AT", p)
     }
 
     action spec_end {
@@ -109,18 +102,18 @@
             it.term = TERM_REDUCED;
         }
         it.Reset();
+        // not that necessary: op refs its frame
         it.frame = it.state.data;
     }
 
     action frame_end {
-        //fmt.Println("FRAME END")
         it.state.streaming = false
     }
 
     # one of op spec UUIDs: type, object, event id or a reference 
     REDEF = "`" @redef_uuid;
-    QUANT = [*#@:] %toel_start ;
-    SPEC_UUID = QUANT space* REDEF? UUID %toel_uuid space*;
+    QUANT = [*#@:] @spec_uuid_start ;
+    SPEC_UUID = QUANT space* REDEF? UUID %spec_uuid_end space*;
 
     # 64-bit signed integer 
     INT_ATOM = ([\-+]? @int_sign ( digit @int_digit )+ ) %int_atom_end >int_atom_start;
@@ -151,7 +144,7 @@
     OP = space* ( SPEC_UUID+ >op_start %spec_end ) ( ATOMS OPTERM? | OPTERM ) %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
-    DOT = 46 @frame_end;
+    DOT = "." @frame_end;
 
     # RON frame, including multiframes (those have more headers inside) 
     FRAME = OP* DOT? ;

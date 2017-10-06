@@ -11,8 +11,6 @@ import "errors"
 // Parse consumes one op, unless the buffer ends earlier.
 func (it *Frame) Parse() {
 
-    //fmt.Println("GO");
-
     if it.state.p>=len(it.state.data) {
         if !it.state.streaming {
             it.Op = ZERO_OP
@@ -39,7 +37,6 @@ func (it *Frame) Parse() {
     idx := it.state.idx;
     half := it.state.half;
     digit := it.state.digit;
-    //fmt.Println("GO!", it.state.cs, "at", p, "with", it.state.data[p]);
 
 	%%{
 
@@ -48,7 +45,6 @@ func (it *Frame) Parse() {
 
 	    write exec;
 	}%%
-    //fmt.Println("DONE", it.state.cs, "at", p);
 
     it.state.incomplete = i;
     it.state.idx = idx;

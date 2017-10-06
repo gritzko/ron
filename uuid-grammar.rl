@@ -3,7 +3,6 @@
     machine UUID;
 
     action start_uuid {
-        //fmt.Println("START");
         half = 0;
     }
 
