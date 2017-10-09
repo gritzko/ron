@@ -32,22 +32,21 @@ func TestParseOp(t *testing.T) {
 
 func BenchmarkParseOp(b *testing.B) {
 	//var frame= "*lww#test-author@(time-origin:loc=1''>test\n"
-	var frame = "@(time-origin:loc=1"
-	var frames []byte = make([]byte, 0, len(frame)*b.N+10)
+	var framestr = "@(time-origin:loc=1"
+	var frames []byte = make([]byte, 0, len(framestr)*b.N+10)
 	for i := 0; i < b.N; i++ {
-		frames = append(frames, []byte(frame)...)
+		frames = append(frames, []byte(framestr)...)
 	}
 	origin, _ := ParseUUID([]byte("1-origin"))
-	iter := ParseFrame(frames)
+	frame := ParseFrame(frames)
 	var off int
-	var op Op
 	for i := 0; i < b.N; i++ {
-		if op.Event().Origin() != origin.Origin() || op.Atoms.Count() != 1 || op.Atoms.AType(0) != ATOM_INT {
-			b.Logf("parse fail: off %d len %d '%s'", off, len(frame), string(frames[off:]))
+		if frame.Event().Origin() != origin.Origin() || frame.Atoms.Count() != 1 || frame.Atoms.AType(0) != ATOM_INT {
+			b.Logf("parse fail: off %d len %d '%s'", off, len(framestr), frame.Op.String())
 			b.Fail()
 			break
 		}
-		iter.Next()
+		frame.Next()
 	}
 }
 

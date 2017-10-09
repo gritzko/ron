@@ -8,11 +8,10 @@ import (
 
 func TestIMultiMap_Take(t *testing.T) {
 	frame := RON.ParseFrame([]byte("*rga#test@2:1'B'"))
-	b := frame.Begin()
-	mm := MakeMultiMap()
-	mm.Put(RON.ZERO_UUID, &b)
+	mm := MakeUUIDFrameMultiMap()
+	mm.Put(RON.ZERO_UUID, &frame)
 	b2, next := mm.Take(RON.ZERO_UUID)
-	if &b != b2 || next != RON.ZERO_UUID {
+	if &frame != b2 || next != RON.ZERO_UUID {
 		t.Fail()
 	}
 }
@@ -81,16 +80,19 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@1:4'A'@3:0'C'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@2:5'B'",
 	},
+	// TODo concurrent, eclipsed removes
+	// TODO: real mess, trees and orphans
 }
 
 func TestRGA_Reduce(t *testing.T) {
 	for i := 0; i < len(rga_3_tests); i++ {
 		test := rga_3_tests[i]
 		C := test[2]
-		frameA, _ := RON.Parse(test[0])
-		frameB, _ := RON.Parse(test[1])
-		var rga RGA
+		frameA := RON.ParseFrameString(test[0])
+		frameB := RON.ParseFrameString(test[1])
+		rga := MakeRGAReducer()
 		frameC, err := rga.Reduce(frameA, frameB)
+		fmt.Println(frameA.String(), frameB.String(), frameC.String())
 		if err != RON.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())

@@ -4,6 +4,14 @@ import (
 //	"fmt"
 )
 
+func NewSpec (rdtype, object, event, ref UUID) Spec {
+	return Spec{uuids:[4]UUID{rdtype, object, event, ref}}
+}
+
+func (spec *Spec) SetUUID (idx int, uuid UUID) {
+	spec.uuids[idx] = uuid
+}
+
 func (a Spec) IsSame(b Spec) bool {
 	return a.Event() == b.Event() && a.Object() == b.Object() && a.Ref() == b.Ref() && a.Type() == b.Type()
 }

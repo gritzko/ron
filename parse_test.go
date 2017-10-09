@@ -3,8 +3,8 @@ package RON
 import (
 	"math/rand"
 	"os"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -171,7 +171,7 @@ func TestParseFrame(t *testing.T) {
 	}
 	t.Logf(frame.String())
 	// recover, compare
-	iter := frame.Restart_()
+	iter := frame.Restart()
 	for k := 0; k < ops; k++ {
 		if iter.IsEmpty() {
 			t.Fail()
@@ -200,27 +200,28 @@ func TestFrame_Next(t *testing.T) {
 	frameStr := strings.Join(ops, "") + "."
 	t.Log(frameStr)
 	frame := ParseFrame([]byte(frameStr))
+	names := ""
 	i, l := 0, 0
 	for !frame.EOF() {
 		l += len(ops[i])
-		if i==len(ops)-1 {
+		if i == len(ops)-1 {
 			l++ //? ragel
 		}
-		if frame.Offset()!=l {
+		if frame.Offset() != l {
 			t.Fail()
 			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
 		} else {
 			t.Logf("OK %d %s", i, frame.Type().String())
 		}
 		i++
+		names += frame.Type().String()
 		frame.Parse()
 	}
-	if i != len(ops) {
+	if i != len(ops) || names != "abcde" {
 		t.Logf("bad end: %d not %d, at %d", i, len(ops), frame.Offset())
 		t.Fail()
 	}
 }
-
 
 func TestXParseOpWhitespace(t *testing.T) {
 	str := " #test ;\n#next?"
@@ -250,7 +251,7 @@ func TestXParseMalformedOp(t *testing.T) {
 	}
 	for i, str := range tests {
 		frame := ParseFrameString(str)
-		if !frame.EOF() && frame.Offset()>=len(str) {
+		if !frame.EOF() && frame.Offset() >= len(str) {
 			t.Logf("parsed %d but invalid: '%s' (%d)", i, str, frame.Offset())
 			t.Fail()
 			break
@@ -345,12 +346,12 @@ func TestParse_Errors(t *testing.T) {
 	}
 }
 
-func TestFrame_ParseStream (t *testing.T) {
+func TestFrame_ParseStream(t *testing.T) {
 	str := "*op1=123*op2!*op3!."
 	var frame Frame
 	frame.state.streaming = true
 	count := 0
-	for i:=0; i<len(str); i++ {
+	for i := 0; i < len(str); i++ {
 		frame.state.data = append(frame.state.data, str[i])
 		frame.Parse()
 		//fmt.Println(frame.state.cs, "AT", frame.Offset(), frame.Op.String())
@@ -359,7 +360,7 @@ func TestFrame_ParseStream (t *testing.T) {
 			count++
 		}
 	}
-	if count!=3 {
+	if count != 3 {
 		t.Fail()
 	}
 }

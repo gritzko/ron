@@ -2,9 +2,9 @@ package RON
 
 //import "github.com/gritzko/RON"
 
-// IHeap is an iterator heap - gives the minimum available element
+// FrameHeap is an iterator heap - gives the minimum available element
 // at every step. Useful for merge sort like algorithms.
-type IHeap struct {
+type FrameHeap struct {
 	// Most of the time, a heap has 2 elements, optimize for that.
 	// Sometimes, it can get millions of elements, ensure that is O(NlogN)
 	iters               []*Frame
@@ -26,7 +26,7 @@ const (
 	SEC_LOCATION  = SPEC_REF << 3
 )
 
-func MakeIHeap(mode, size int) (ret IHeap) {
+func MakeFrameHeap(mode, size int) (ret FrameHeap) {
 	ret.iters = make([]*Frame, 1, size+1)
 	ret.prim_desc = (mode & PRIM_DESC) != 0
 	ret.sec_desc = (mode & SEC_DESC) != 0
@@ -35,7 +35,7 @@ func MakeIHeap(mode, size int) (ret IHeap) {
 	return
 }
 
-func (h IHeap) less(i, j int) bool {
+func (h FrameHeap) less(i, j int) bool {
 	c := Compare(h.iters[i].uuids[h.primary], h.iters[j].uuids[h.primary])
 	if c == 0 {
 		c = Compare(h.iters[i].uuids[h.secondary], h.iters[j].uuids[h.secondary])
@@ -49,7 +49,7 @@ func (h IHeap) less(i, j int) bool {
 	return c < 0
 }
 
-func (h *IHeap) sink(i int) {
+func (h *FrameHeap) sink(i int) {
 	to := i
 	j := i << 1
 	if j < len(h.iters) && h.less(j, i) {
@@ -65,7 +65,7 @@ func (h *IHeap) sink(i int) {
 	}
 }
 
-func (h *IHeap) raise(i int) {
+func (h *FrameHeap) raise(i int) {
 	j := i >> 1
 	if j > 0 && h.less(i, j) {
 		h.swap(i, j)
@@ -75,14 +75,14 @@ func (h *IHeap) raise(i int) {
 	}
 }
 
-func (h IHeap) Len() int { return len(h.iters) - 1 }
+func (h FrameHeap) Len() int { return len(h.iters) - 1 }
 
-func (h IHeap) swap(i, j int) {
+func (h FrameHeap) swap(i, j int) {
 	//fmt.Printf("SWAP %d %d\n", i, j)
 	h.iters[i], h.iters[j] = h.iters[j], h.iters[i]
 }
 
-func (h *IHeap) Put(i *Frame) {
+func (h *FrameHeap) Put(i *Frame) {
 	if !i.IsEmpty() {
 		at := len(h.iters)
 		h.iters = append(h.iters, i)
@@ -90,7 +90,7 @@ func (h *IHeap) Put(i *Frame) {
 	}
 }
 
-func (h *IHeap) Op() (op *Op) {
+func (h *FrameHeap) Op() (op *Op) {
 	if len(h.iters) > 1 {
 		op = &h.iters[1].Op
 	} else {
@@ -99,13 +99,13 @@ func (h *IHeap) Op() (op *Op) {
 	return
 }
 
-func (h *IHeap) remove(i int) {
+func (h *FrameHeap) remove(i int) {
 	h.iters[i] = h.iters[len(h.iters)-1]
 	h.iters = h.iters[:len(h.iters)-1]
 	h.sink(i)
 }
 
-func (h *IHeap) next(i int) {
+func (h *FrameHeap) next(i int) {
 	h.iters[i].Next()
 	if h.iters[i].IsEmpty() {
 		h.remove(i)
@@ -114,12 +114,12 @@ func (h *IHeap) next(i int) {
 	}
 }
 
-func (h *IHeap) Next() (op *Op) {
+func (h *FrameHeap) Next() (op *Op) {
 	h.next(1)
 	return h.Op()
 }
 
-func (h *IHeap) nexteq(i int, uuid UUID) {
+func (h *FrameHeap) nexteq(i int, uuid UUID) {
 	if h.iters[i].uuids[h.primary] == uuid {
 		j := i << 1
 		if j < len(h.iters) {
@@ -135,7 +135,7 @@ func (h *IHeap) nexteq(i int, uuid UUID) {
 	}
 }
 
-func (h *IHeap) NextPrim() (op *Op) {
+func (h *FrameHeap) NextPrim() (op *Op) {
 	if !h.IsEmpty() {
 		event := h.iters[1].uuids[h.primary]
 		h.nexteq(1, event)
@@ -143,15 +143,15 @@ func (h *IHeap) NextPrim() (op *Op) {
 	return h.Op()
 }
 
-func (h *IHeap) PutFrame(frame Frame) {
+func (h *FrameHeap) PutFrame(frame Frame) {
 	h.Put(&frame)
 }
 
-func (h *IHeap) IsEmpty() bool {
+func (h *FrameHeap) IsEmpty() bool {
 	return len(h.iters) == 1
 }
 
-func (h *IHeap) Frame() Frame {
+func (h *FrameHeap) Frame() Frame {
 	cur := MakeFrame(128)
 	for !h.IsEmpty() {
 		cur.AppendOp(*h.Op())
@@ -160,6 +160,6 @@ func (h *IHeap) Frame() Frame {
 	return cur.Close()
 }
 
-func (h *IHeap) Clear() {
+func (h *FrameHeap) Clear() {
 	h.iters = h.iters[:1]
 }

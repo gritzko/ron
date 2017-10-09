@@ -94,10 +94,10 @@ type Checker interface {
 //      [x] first, last *Op
 // [x] MakeNameUUID("name")
 //
-// [ ] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
-// [ ] frame.State() OP PART ERROR
+// [x] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
+// [x] frame.State() OP PART ERROR
 //     for frame:=ParseFrame(); !frame.IsEmpty(); frame.Next() {}
-// [ ] IsEmpty - trailing space test
+// [ ] trailing space test, Rest(), multiframes
 //
 // [ ] RGA reducer (fn, errors)
 //		[x] Reduce()
@@ -107,15 +107,15 @@ type Checker interface {
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
 // [ ] LWW: out-of-order entries - restart the algo (with alloc)
-// [ ] iheap: seek the loop - reimpl (see UHeap), bench
+// [ ] iheap: seek the loop - reimpl (see UUIDHeap), bench
 // [ ] LWW: 1000x1000 array test
 //
 // ## NEW ORDER ##
 // [x] @~! explicit frame terminator - or ;  frame.Close() frame.Join()
-// [ ] parser-private adaptor fns  _set_digit()
+// [-] parser-private adaptor fns  _set_digit()
 // [ ] unified grammar files: Java, C++, Go
 // [-] Op: 4 UUIDs, []byte atoms
-// [ ] Iterator, ret code, error/incomplete input
+// [x] Iterator, ret code, error/incomplete input
 // [-] separate atom parser
 // [x] reader.Next() reader.ReadInt()...
 // [-] ron.Writer
@@ -124,6 +124,8 @@ type Checker interface {
 // [ ] auto-gen ABC! (base64: take from the file)
 // [x] Cursor API:  SetObject(uuid), AddInteger(int), Append()
 //                  AppendFrame(), AppendAll(), AppendRange()
+//
+// [ ] Minimize copying in Frame.Parse()
 //
 // [ ] reducer registry
 // [x] reducer flags (at least, formatting)
@@ -185,7 +187,7 @@ type RawUUID []byte
 
 type Environment map[uint64]UUID
 
-const BASE64 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~"
+const BASE64 = BASE_PUNCT
 
 var ABC [256]int8
 

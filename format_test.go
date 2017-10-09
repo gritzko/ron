@@ -104,7 +104,7 @@ func BenchmarkUnzip(b *testing.B) {
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
-    op := ParseOp([]byte(str))
+	op := ParseOp([]byte(str))
 	if op.Atoms.Count() != 1 {
 		t.Fail()
 		t.Logf("misparsed %s", str)

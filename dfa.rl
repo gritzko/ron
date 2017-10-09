@@ -69,9 +69,7 @@ func (ctx_uuid UUID) Parse (data []byte) (UUID, error) {
     half := 0
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
-	//var ts, te, act int
     _ = eof
-    //_,_,_ = ts,te,act
 
 
 	%%{ 

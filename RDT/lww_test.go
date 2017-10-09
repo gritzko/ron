@@ -39,10 +39,11 @@ func TestLWW_Reduce(t *testing.T) {
 	for i := 0; i < len(lww_3_tests); i++ {
 		test := lww_3_tests[i]
 		C := test[2]
-		frameA, _ := RON.Parse(test[0])
-		frameB, _ := RON.Parse(test[1])
+		frameA := RON.ParseFrameString(test[0])
+		frameB := RON.ParseFrameString(test[1])
 		var lww LWW
 		frameC, err := lww.Reduce(frameA, frameB)
+		fmt.Println(frameA.String(), frameB.String(), frameC.String())
 		if err != RON.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())

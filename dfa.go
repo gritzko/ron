@@ -69,14 +69,14 @@ func (it *Frame) Parse() {
 			goto st1
 		case 2:
 			goto st2
-		case 3:
-			goto st3
-		case 4:
-			goto st4
 		case 22:
 			goto st22
 		case 23:
 			goto st23
+		case 3:
+			goto st3
+		case 4:
+			goto st4
 		case 5:
 			goto st5
 		case 6:
@@ -142,14 +142,14 @@ func (it *Frame) Parse() {
 			goto st_case_1
 		case 2:
 			goto st_case_2
-		case 3:
-			goto st_case_3
-		case 4:
-			goto st_case_4
 		case 22:
 			goto st_case_22
 		case 23:
 			goto st_case_23
+		case 3:
+			goto st_case_3
+		case 4:
+			goto st_case_4
 		case 5:
 			goto st_case_5
 		case 6:
@@ -282,7 +282,14 @@ func (it *Frame) Parse() {
 		}
 
 		goto _again
-	tr10:
+	tr3:
+//line ./op-grammar.rl:26
+		// OK, save the UUID
+		it.uuids[idx] = UUID{uint128: i}
+		idx++
+
+		goto st2
+	tr5:
 		it.state.cs = 2
 //line ./op-grammar.rl:26
 		// OK, save the UUID
@@ -797,221 +804,79 @@ func (it *Frame) Parse() {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:790
+//line dfa.go:798
 		switch it.state.data[p] {
 		case 32:
-			goto st2
-		case 43:
+			goto tr3
+		case 33:
 			goto tr4
-		case 45:
-			goto tr4
-		case 91:
+		case 35:
 			goto tr5
-		case 93:
-			goto tr5
-		case 96:
+		case 39:
 			goto tr7
+		case 42:
+			goto tr5
+		case 44:
+			goto tr4
+		case 58:
+			goto tr5
+		case 59:
+			goto tr4
+		case 61:
+			goto tr10
+		case 62:
+			goto tr11
+		case 63:
+			goto tr4
+		case 64:
+			goto tr5
+		case 91:
+			goto tr8
+		case 93:
+			goto tr8
+		case 94:
+			goto tr12
+		case 96:
+			goto tr13
 		case 123:
-			goto tr5
+			goto tr8
 		case 125:
-			goto tr5
+			goto tr8
 		case 126:
-			goto tr6
+			goto tr9
 		}
 		switch {
-		case it.state.data[p] < 40:
+		case it.state.data[p] < 43:
 			switch {
-			case it.state.data[p] > 13:
-				if 36 <= it.state.data[p] && it.state.data[p] <= 37 {
-					goto tr4
+			case it.state.data[p] < 36:
+				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+					goto tr3
 				}
-			case it.state.data[p] >= 9:
-				goto st2
-			}
-		case it.state.data[p] > 41:
-			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
-					goto tr6
-				}
-			case it.state.data[p] > 90:
-				if 95 <= it.state.data[p] && it.state.data[p] <= 122 {
-					goto tr6
+			case it.state.data[p] > 37:
+				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+					goto tr8
 				}
 			default:
 				goto tr6
 			}
+		case it.state.data[p] > 45:
+			switch {
+			case it.state.data[p] < 65:
+				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+					goto tr9
+				}
+			case it.state.data[p] > 90:
+				if 95 <= it.state.data[p] && it.state.data[p] <= 122 {
+					goto tr9
+				}
+			default:
+				goto tr9
+			}
 		default:
-			goto tr5
+			goto tr6
 		}
 		goto st0
 	tr4:
-//line ././uuid-grammar.rl:5
-		half = 0
-
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
-
-		goto st3
-	tr56:
-//line ././uuid-grammar.rl:35
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
-
-		goto st3
-	st3:
-		if p++; p == pe {
-			goto _test_eof3
-		}
-	st_case_3:
-//line dfa.go:866
-		switch it.state.data[p] {
-		case 32:
-			goto tr8
-		case 33:
-			goto tr9
-		case 35:
-			goto tr10
-		case 39:
-			goto tr11
-		case 42:
-			goto tr10
-		case 44:
-			goto tr9
-		case 58:
-			goto tr10
-		case 59:
-			goto tr9
-		case 61:
-			goto tr14
-		case 62:
-			goto tr15
-		case 63:
-			goto tr9
-		case 64:
-			goto tr10
-		case 91:
-			goto tr12
-		case 93:
-			goto tr12
-		case 94:
-			goto tr16
-		case 95:
-			goto tr13
-		case 123:
-			goto tr12
-		case 125:
-			goto tr12
-		case 126:
-			goto tr13
-		}
-		switch {
-		case it.state.data[p] < 48:
-			switch {
-			case it.state.data[p] > 13:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
-					goto tr12
-				}
-			case it.state.data[p] >= 9:
-				goto tr8
-			}
-		case it.state.data[p] > 57:
-			switch {
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
-					goto tr13
-				}
-			case it.state.data[p] >= 65:
-				goto tr13
-			}
-		default:
-			goto tr13
-		}
-		goto st0
-	tr8:
-//line ./op-grammar.rl:26
-
-		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
-
-		goto st4
-	tr45:
-//line ././uuid-grammar.rl:38
-
-//line ./op-grammar.rl:26
-
-		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
-
-		goto st4
-	tr53:
-//line ././uuid-grammar.rl:35
-
-//line ./op-grammar.rl:26
-
-		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
-
-		goto st4
-	tr63:
-//line ././uuid-grammar.rl:35
-
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
-
-//line ./op-grammar.rl:26
-
-		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
-
-		goto st4
-	st4:
-		if p++; p == pe {
-			goto _test_eof4
-		}
-	st_case_4:
-//line dfa.go:980
-		switch it.state.data[p] {
-		case 32:
-			goto st4
-		case 33:
-			goto tr18
-		case 35:
-			goto tr19
-		case 39:
-			goto tr20
-		case 42:
-			goto tr19
-		case 44:
-			goto tr18
-		case 58:
-			goto tr19
-		case 59:
-			goto tr18
-		case 61:
-			goto tr21
-		case 62:
-			goto tr22
-		case 63:
-			goto tr18
-		case 64:
-			goto tr19
-		case 94:
-			goto tr23
-		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
-			goto st4
-		}
-		goto st0
-	tr9:
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
@@ -1023,7 +888,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
@@ -1036,7 +901,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
@@ -1057,7 +922,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
@@ -1078,7 +943,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
@@ -1102,7 +967,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
@@ -1224,7 +1089,7 @@ func (it *Frame) Parse() {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:1271
+//line dfa.go:1128
 		switch it.state.data[p] {
 		case 32:
 			goto tr72
@@ -1390,9 +1255,175 @@ func (it *Frame) Parse() {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:1478
+//line dfa.go:1335
 		goto st0
-	tr11:
+	tr6:
+//line ././uuid-grammar.rl:5
+		half = 0
+
+//line ././uuid-grammar.rl:41
+		half |= 1
+		i[half] &= INT60_FULL
+		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+
+		goto st3
+	tr56:
+//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:41
+		half |= 1
+		i[half] &= INT60_FULL
+		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+
+		goto st3
+	st3:
+		if p++; p == pe {
+			goto _test_eof3
+		}
+	st_case_3:
+//line dfa.go:1365
+		switch it.state.data[p] {
+		case 32:
+			goto tr14
+		case 33:
+			goto tr4
+		case 35:
+			goto tr5
+		case 39:
+			goto tr7
+		case 42:
+			goto tr5
+		case 44:
+			goto tr4
+		case 58:
+			goto tr5
+		case 59:
+			goto tr4
+		case 61:
+			goto tr10
+		case 62:
+			goto tr11
+		case 63:
+			goto tr4
+		case 64:
+			goto tr5
+		case 91:
+			goto tr15
+		case 93:
+			goto tr15
+		case 94:
+			goto tr12
+		case 95:
+			goto tr16
+		case 123:
+			goto tr15
+		case 125:
+			goto tr15
+		case 126:
+			goto tr16
+		}
+		switch {
+		case it.state.data[p] < 48:
+			switch {
+			case it.state.data[p] > 13:
+				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+					goto tr15
+				}
+			case it.state.data[p] >= 9:
+				goto tr14
+			}
+		case it.state.data[p] > 57:
+			switch {
+			case it.state.data[p] > 90:
+				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+					goto tr16
+				}
+			case it.state.data[p] >= 65:
+				goto tr16
+			}
+		default:
+			goto tr16
+		}
+		goto st0
+	tr14:
+//line ./op-grammar.rl:26
+
+		// OK, save the UUID
+		it.uuids[idx] = UUID{uint128: i}
+		idx++
+
+		goto st4
+	tr45:
+//line ././uuid-grammar.rl:38
+
+//line ./op-grammar.rl:26
+
+		// OK, save the UUID
+		it.uuids[idx] = UUID{uint128: i}
+		idx++
+
+		goto st4
+	tr53:
+//line ././uuid-grammar.rl:35
+
+//line ./op-grammar.rl:26
+
+		// OK, save the UUID
+		it.uuids[idx] = UUID{uint128: i}
+		idx++
+
+		goto st4
+	tr63:
+//line ././uuid-grammar.rl:35
+
+//line ././uuid-grammar.rl:47
+		i[1] = UUID_NAME_UPPER_BITS
+
+//line ./op-grammar.rl:26
+
+		// OK, save the UUID
+		it.uuids[idx] = UUID{uint128: i}
+		idx++
+
+		goto st4
+	st4:
+		if p++; p == pe {
+			goto _test_eof4
+		}
+	st_case_4:
+//line dfa.go:1479
+		switch it.state.data[p] {
+		case 32:
+			goto st4
+		case 33:
+			goto tr18
+		case 35:
+			goto tr19
+		case 39:
+			goto tr20
+		case 42:
+			goto tr19
+		case 44:
+			goto tr18
+		case 58:
+			goto tr19
+		case 59:
+			goto tr18
+		case 61:
+			goto tr21
+		case 62:
+			goto tr22
+		case 63:
+			goto tr18
+		case 64:
+			goto tr19
+		case 94:
+			goto tr23
+		}
+		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			goto st4
+		}
+		goto st0
+	tr7:
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
@@ -1404,7 +1435,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1421,7 +1452,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1446,7 +1477,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1471,7 +1502,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1499,7 +1530,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1614,7 +1645,7 @@ func (it *Frame) Parse() {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:1741
+//line dfa.go:1773
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1636,7 +1667,7 @@ func (it *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1764
+//line dfa.go:1796
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1666,7 +1697,7 @@ func (it *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:1797
+//line dfa.go:1829
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -1812,7 +1843,7 @@ func (it *Frame) Parse() {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:1972
+//line dfa.go:2004
 		switch it.state.data[p] {
 		case 32:
 			goto tr83
@@ -1847,7 +1878,7 @@ func (it *Frame) Parse() {
 			goto tr83
 		}
 		goto st0
-	tr14:
+	tr10:
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
@@ -1859,7 +1890,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1876,7 +1907,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1901,7 +1932,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1926,7 +1957,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -1954,7 +1985,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2069,7 +2100,7 @@ func (it *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:2268
+//line dfa.go:2300
 		switch it.state.data[p] {
 		case 32:
 			goto st7
@@ -2101,7 +2132,7 @@ func (it *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2302
+//line dfa.go:2334
 		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
 			goto tr33
 		}
@@ -2125,7 +2156,7 @@ func (it *Frame) Parse() {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2329
+//line dfa.go:2361
 		switch it.state.data[p] {
 		case 32:
 			goto tr91
@@ -2165,7 +2196,7 @@ func (it *Frame) Parse() {
 			goto tr91
 		}
 		goto st0
-	tr15:
+	tr11:
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
@@ -2177,7 +2208,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2194,7 +2225,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2219,7 +2250,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2244,7 +2275,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2272,7 +2303,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2387,7 +2418,7 @@ func (it *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2630
+//line dfa.go:2662
 		switch it.state.data[p] {
 		case 32:
 			goto st9
@@ -2458,7 +2489,7 @@ func (it *Frame) Parse() {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:2706
+//line dfa.go:2738
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -2584,7 +2615,7 @@ func (it *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:2833
+//line dfa.go:2865
 		switch it.state.data[p] {
 		case 32:
 			goto tr101
@@ -2637,7 +2668,7 @@ func (it *Frame) Parse() {
 			goto tr106
 		}
 		goto st0
-	tr16:
+	tr12:
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
@@ -2649,7 +2680,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2666,7 +2697,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2691,7 +2722,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2716,7 +2747,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2744,7 +2775,7 @@ func (it *Frame) Parse() {
 			it.term = TERM_REDUCED
 		}
 		it.Reset()
-		// not that necessary: op refs the frame
+		// not that necessary: op refs its frame
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:75
@@ -2859,7 +2890,7 @@ func (it *Frame) Parse() {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:3147
+//line dfa.go:3179
 		switch it.state.data[p] {
 		case 32:
 			goto st10
@@ -2964,7 +2995,7 @@ func (it *Frame) Parse() {
 			goto _test_eof14
 		}
 	st_case_14:
-//line dfa.go:3253
+//line dfa.go:3285
 		switch it.state.data[p] {
 		case 43:
 			goto st15
@@ -3057,7 +3088,7 @@ func (it *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3346
+//line dfa.go:3378
 		switch it.state.data[p] {
 		case 32:
 			goto tr127
@@ -3170,7 +3201,7 @@ func (it *Frame) Parse() {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3456
+//line dfa.go:3488
 		switch it.state.data[p] {
 		case 32:
 			goto tr138
@@ -3254,7 +3285,7 @@ func (it *Frame) Parse() {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3541
+//line dfa.go:3573
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -3262,7 +3293,7 @@ func (it *Frame) Parse() {
 			goto st0
 		}
 		goto st6
-	tr12:
+	tr15:
 //line ././uuid-grammar.rl:30
 		digit = 0
 		half |= 1
@@ -3272,7 +3303,7 @@ func (it *Frame) Parse() {
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st17
-	tr13:
+	tr16:
 //line ././uuid-grammar.rl:30
 		digit = 0
 		half |= 1
@@ -3322,7 +3353,7 @@ func (it *Frame) Parse() {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3610
+//line dfa.go:3642
 		switch it.state.data[p] {
 		case 32:
 			goto tr45
@@ -3373,7 +3404,7 @@ func (it *Frame) Parse() {
 			goto tr49
 		}
 		goto st0
-	tr5:
+	tr8:
 //line ././uuid-grammar.rl:5
 		half = 0
 
@@ -3402,7 +3433,7 @@ func (it *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:3690
+//line dfa.go:3722
 		switch it.state.data[p] {
 		case 32:
 			goto tr53
@@ -3474,7 +3505,7 @@ func (it *Frame) Parse() {
 			goto tr56
 		}
 		goto st0
-	tr6:
+	tr9:
 //line ././uuid-grammar.rl:5
 		half = 0
 
@@ -3513,7 +3544,7 @@ func (it *Frame) Parse() {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:3798
+//line dfa.go:3830
 		switch it.state.data[p] {
 		case 32:
 			goto tr63
@@ -3585,7 +3616,7 @@ func (it *Frame) Parse() {
 			goto tr56
 		}
 		goto st0
-	tr7:
+	tr13:
 //line ./op-grammar.rl:6
 		if idx != 0 {
 			it.uuids[idx] = it.uuids[idx-1]
@@ -3597,43 +3628,73 @@ func (it *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:3883
+//line dfa.go:3915
 		switch it.state.data[p] {
-		case 43:
+		case 32:
+			goto tr14
+		case 33:
 			goto tr4
-		case 45:
+		case 35:
+			goto tr5
+		case 39:
+			goto tr7
+		case 42:
+			goto tr5
+		case 44:
 			goto tr4
+		case 58:
+			goto tr5
+		case 59:
+			goto tr4
+		case 61:
+			goto tr10
+		case 62:
+			goto tr11
+		case 63:
+			goto tr4
+		case 64:
+			goto tr5
 		case 91:
-			goto tr5
+			goto tr8
 		case 93:
-			goto tr5
+			goto tr8
+		case 94:
+			goto tr12
 		case 95:
-			goto tr6
+			goto tr9
 		case 123:
-			goto tr5
+			goto tr8
 		case 125:
-			goto tr5
+			goto tr8
 		case 126:
-			goto tr6
+			goto tr9
 		}
 		switch {
-		case it.state.data[p] < 48:
+		case it.state.data[p] < 43:
 			switch {
+			case it.state.data[p] < 36:
+				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+					goto tr14
+				}
 			case it.state.data[p] > 37:
 				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
-					goto tr5
+					goto tr8
 				}
-			case it.state.data[p] >= 36:
-				goto tr4
+			default:
+				goto tr6
 			}
-		case it.state.data[p] > 57:
+		case it.state.data[p] > 45:
 			switch {
+			case it.state.data[p] < 65:
+				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+					goto tr9
+				}
 			case it.state.data[p] > 90:
 				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
-					goto tr6
+					goto tr9
 				}
-			case it.state.data[p] >= 65:
-				goto tr6
+			default:
+				goto tr9
 			}
 		default:
 			goto tr6
@@ -3649,17 +3710,17 @@ func (it *Frame) Parse() {
 	_test_eof2:
 		it.state.cs = 2
 		goto _test_eof
-	_test_eof3:
-		it.state.cs = 3
-		goto _test_eof
-	_test_eof4:
-		it.state.cs = 4
-		goto _test_eof
 	_test_eof22:
 		it.state.cs = 22
 		goto _test_eof
 	_test_eof23:
 		it.state.cs = 23
+		goto _test_eof
+	_test_eof3:
+		it.state.cs = 3
+		goto _test_eof
+	_test_eof4:
+		it.state.cs = 4
 		goto _test_eof
 	_test_eof5:
 		it.state.cs = 5
@@ -3843,7 +3904,7 @@ func (it *Frame) Parse() {
 //line ./op-grammar.rl:96
 				had_end = true
 
-//line dfa.go:4094
+//line dfa.go:4156
 			}
 		}
 
@@ -3869,7 +3930,7 @@ func (it *Frame) Parse() {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:65
-//line dfa.go:4122
+//line dfa.go:4184
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
@@ -3882,16 +3943,14 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	half := 0
 
 	cs, p, pe, eof := 0, 0, len(data), len(data)
-	//var ts, te, act int
 	_ = eof
-	//_,_,_ = ts,te,act
 
-//line dfa.go:4143
+//line dfa.go:4203
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4148
+//line dfa.go:4208
 	{
 		if p == pe {
 			goto _test_eof
@@ -3980,7 +4039,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4242
+//line dfa.go:4302
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4073,7 +4132,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4336
+//line dfa.go:4396
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4122,7 +4181,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4385
+//line dfa.go:4445
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4203,7 +4262,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4463
+//line dfa.go:4523
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4275,7 +4334,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:47
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line dfa.go:4530
+//line dfa.go:4590
 			}
 		}
 
@@ -4284,7 +4343,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:84
+//line dfa.rl:82
 
 	if cs < UUID_first_final || digit > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

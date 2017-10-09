@@ -7,4 +7,5 @@ ragel -Z -G2 -e dfa.rl
 go fmt dfa.go
 go build
 go test -timeout 5s
-
+cd RDT
+go test -timeout 5s
