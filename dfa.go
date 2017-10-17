@@ -15,26 +15,32 @@ const RON_en_main int = 21
 //line dfa.rl:8
 
 //line dfa.rl:9
+const RON_EOF = -1
 
 // Parse consumes one op, unless the buffer ends earlier.
-func (it *Frame) Parse() {
+func (it *Frame) Parse() int {
 
 	if it.state.p >= len(it.state.data) {
 		if !it.state.streaming {
 			it.Op = ZERO_OP
 			it.state.cs = RON_error
 		}
-		return
+		return RON_error
+	}
+
+	if it.state.cs == RON_EOF {
+		it.state.cs = RON_error
+		return RON_error
 	}
 
 	if it.state.cs == 0 && it.state.p == 0 {
 
-//line dfa.go:38
+//line dfa.go:44
 		{
 			it.state.cs = RON_start
 		}
 
-//line dfa.rl:24
+//line dfa.rl:30
 	}
 
 	had_end := false
@@ -52,7 +58,7 @@ func (it *Frame) Parse() {
 	half := it.state.half
 	digit := it.state.digit
 
-//line dfa.go:62
+//line dfa.go:68
 	{
 		if p == pe {
 			goto _test_eof
@@ -263,6 +269,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -418,7 +426,7 @@ func (it *Frame) Parse() {
 		goto _again
 	tr73:
 		it.state.cs = 2
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -432,6 +440,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -460,7 +470,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -474,6 +484,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -497,7 +509,7 @@ func (it *Frame) Parse() {
 		it.state.cs = 2
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -511,6 +523,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -541,7 +555,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -555,6 +569,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -585,7 +601,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -599,6 +615,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -631,7 +649,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -645,6 +663,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -675,7 +695,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -689,6 +709,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -719,7 +741,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -733,6 +755,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -766,7 +790,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -780,6 +804,8 @@ func (it *Frame) Parse() {
 				p++
 				goto _out
 			}
+		} else {
+			it.state.s = p
 		}
 
 //line ./op-grammar.rl:12
@@ -804,7 +830,7 @@ func (it *Frame) Parse() {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:798
+//line dfa.go:824
 		switch it.state.data[p] {
 		case 32:
 			goto tr3
@@ -883,7 +909,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -896,7 +922,7 @@ func (it *Frame) Parse() {
 
 		goto st22
 	tr18:
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -917,7 +943,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -938,7 +964,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -962,7 +988,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -975,7 +1001,7 @@ func (it *Frame) Parse() {
 
 		goto st22
 	tr72:
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st22
@@ -1089,7 +1115,7 @@ func (it *Frame) Parse() {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:1128
+//line dfa.go:1154
 		switch it.state.data[p] {
 		case 32:
 			goto tr72
@@ -1109,42 +1135,51 @@ func (it *Frame) Parse() {
 		}
 		goto st0
 	tr71:
-//line ./op-grammar.rl:109
+		it.state.cs = 23
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr74:
-//line ./op-grammar.rl:96
+		it.state.cs = 23
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr79:
+		it.state.cs = 23
 //line ./op-grammar.rl:36
 		// TODO max size for int/float/string
 		it.AddAtom(i)
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr87:
+		it.state.cs = 23
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr95:
+		it.state.cs = 23
 //line ./op-grammar.rl:52
 		i[1] |= ATOM_INT_62
 
@@ -1154,14 +1189,16 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr105:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:38
 
 //line ./op-grammar.rl:36
@@ -1171,14 +1208,16 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr114:
+		it.state.cs = 23
 //line ./op-grammar.rl:56
 //line ./op-grammar.rl:58
 		i[1] |= ATOM_FLOAT_62
@@ -1189,14 +1228,16 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr123:
+		it.state.cs = 23
 //line ./op-grammar.rl:58
 		i[1] |= ATOM_FLOAT_62
 
@@ -1206,14 +1247,16 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr133:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:35
 
 //line ./op-grammar.rl:36
@@ -1223,14 +1266,16 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	tr142:
+		it.state.cs = 23
 //line ././uuid-grammar.rl:35
 
 //line ././uuid-grammar.rl:47
@@ -1243,19 +1288,20 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
-//line ./op-grammar.rl:109
+//line ./op-grammar.rl:111
 		it.state.streaming = false
+		it.state.cs = (RON_EOF)
 
-		goto st23
+		goto _again
 	st23:
 		if p++; p == pe {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:1335
+//line dfa.go:1381
 		goto st0
 	tr6:
 //line ././uuid-grammar.rl:5
@@ -1280,7 +1326,7 @@ func (it *Frame) Parse() {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:1365
+//line dfa.go:1411
 		switch it.state.data[p] {
 		case 32:
 			goto tr14
@@ -1390,7 +1436,7 @@ func (it *Frame) Parse() {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:1479
+//line dfa.go:1525
 		switch it.state.data[p] {
 		case 32:
 			goto st4
@@ -1430,7 +1476,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1447,7 +1493,7 @@ func (it *Frame) Parse() {
 
 		goto st5
 	tr20:
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1472,7 +1518,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1497,7 +1543,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1525,7 +1571,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1645,7 +1691,7 @@ func (it *Frame) Parse() {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:1773
+//line dfa.go:1819
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1667,7 +1713,7 @@ func (it *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1796
+//line dfa.go:1842
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1697,7 +1743,7 @@ func (it *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:1829
+//line dfa.go:1875
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -1740,13 +1786,13 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
 	tr83:
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1760,7 +1806,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1774,7 +1820,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1789,7 +1835,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1803,7 +1849,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1817,7 +1863,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1834,7 +1880,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 		had_end = true
 
 		goto st25
@@ -1843,7 +1889,7 @@ func (it *Frame) Parse() {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:2004
+//line dfa.go:2050
 		switch it.state.data[p] {
 		case 32:
 			goto tr83
@@ -1885,7 +1931,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1902,7 +1948,7 @@ func (it *Frame) Parse() {
 
 		goto st7
 	tr21:
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1927,7 +1973,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1952,7 +1998,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1980,7 +2026,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2100,7 +2146,7 @@ func (it *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:2300
+//line dfa.go:2346
 		switch it.state.data[p] {
 		case 32:
 			goto st7
@@ -2132,7 +2178,7 @@ func (it *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2334
+//line dfa.go:2380
 		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
 			goto tr33
 		}
@@ -2156,7 +2202,7 @@ func (it *Frame) Parse() {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2361
+//line dfa.go:2407
 		switch it.state.data[p] {
 		case 32:
 			goto tr91
@@ -2203,7 +2249,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2220,7 +2266,7 @@ func (it *Frame) Parse() {
 
 		goto st9
 	tr22:
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2245,7 +2291,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2270,7 +2316,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2298,7 +2344,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2418,7 +2464,7 @@ func (it *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2662
+//line dfa.go:2708
 		switch it.state.data[p] {
 		case 32:
 			goto st9
@@ -2489,7 +2535,7 @@ func (it *Frame) Parse() {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:2738
+//line dfa.go:2784
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -2615,7 +2661,7 @@ func (it *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:2865
+//line dfa.go:2911
 		switch it.state.data[p] {
 		case 32:
 			goto tr101
@@ -2675,7 +2721,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2692,7 +2738,7 @@ func (it *Frame) Parse() {
 
 		goto st10
 	tr23:
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2717,7 +2763,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2742,7 +2788,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2770,7 +2816,7 @@ func (it *Frame) Parse() {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:100
+//line ./op-grammar.rl:102
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2890,7 +2936,7 @@ func (it *Frame) Parse() {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:3179
+//line dfa.go:3225
 		switch it.state.data[p] {
 		case 32:
 			goto st10
@@ -2995,7 +3041,7 @@ func (it *Frame) Parse() {
 			goto _test_eof14
 		}
 	st_case_14:
-//line dfa.go:3285
+//line dfa.go:3331
 		switch it.state.data[p] {
 		case 43:
 			goto st15
@@ -3088,7 +3134,7 @@ func (it *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3378
+//line dfa.go:3424
 		switch it.state.data[p] {
 		case 32:
 			goto tr127
@@ -3201,7 +3247,7 @@ func (it *Frame) Parse() {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3488
+//line dfa.go:3534
 		switch it.state.data[p] {
 		case 32:
 			goto tr138
@@ -3285,7 +3331,7 @@ func (it *Frame) Parse() {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3573
+//line dfa.go:3619
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -3353,7 +3399,7 @@ func (it *Frame) Parse() {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3642
+//line dfa.go:3688
 		switch it.state.data[p] {
 		case 32:
 			goto tr45
@@ -3433,7 +3479,7 @@ func (it *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:3722
+//line dfa.go:3768
 		switch it.state.data[p] {
 		case 32:
 			goto tr53
@@ -3544,7 +3590,7 @@ func (it *Frame) Parse() {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:3830
+//line dfa.go:3876
 		switch it.state.data[p] {
 		case 32:
 			goto tr63
@@ -3628,7 +3674,7 @@ func (it *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:3915
+//line dfa.go:3961
 		switch it.state.data[p] {
 		case 32:
 			goto tr14
@@ -3804,12 +3850,12 @@ func (it *Frame) Parse() {
 		if p == eof {
 			switch it.state.cs {
 			case 22:
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 25:
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 24, 27:
@@ -3819,7 +3865,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 31:
@@ -3832,7 +3878,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 28:
@@ -3845,7 +3891,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 26:
@@ -3858,7 +3904,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 30:
@@ -3871,7 +3917,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 32:
@@ -3887,7 +3933,7 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
 			case 29:
@@ -3901,10 +3947,10 @@ func (it *Frame) Parse() {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:96
+//line ./op-grammar.rl:98
 				had_end = true
 
-//line dfa.go:4156
+//line dfa.go:4202
 			}
 		}
 
@@ -3913,7 +3959,7 @@ func (it *Frame) Parse() {
 		}
 	}
 
-//line dfa.rl:47
+//line dfa.rl:53
 
 	it.state.incomplete = i
 	it.state.idx = idx
@@ -3921,23 +3967,24 @@ func (it *Frame) Parse() {
 	it.state.half = half
 	it.state.p = p
 
-	if !it.state.streaming && it.state.cs < RON_first_final {
+	if !it.state.streaming && it.state.cs < RON_first_final && it.state.cs > 0 {
 		it.state.cs = RON_error
 	}
 
+	return it.state.cs
 }
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line dfa.rl:65
-//line dfa.go:4184
+//line dfa.rl:72
+//line dfa.go:4231
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line dfa.rl:66
+//line dfa.rl:73
 	var i uint128 = ctx_uuid.uint128
 	digit := uint(0)
 	half := 0
@@ -3945,12 +3992,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	_ = eof
 
-//line dfa.go:4203
+//line dfa.go:4250
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4208
+//line dfa.go:4255
 	{
 		if p == pe {
 			goto _test_eof
@@ -4039,7 +4086,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4302
+//line dfa.go:4349
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4132,7 +4179,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4396
+//line dfa.go:4443
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4181,7 +4228,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4445
+//line dfa.go:4492
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4262,7 +4309,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4523
+//line dfa.go:4570
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4334,7 +4381,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:47
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line dfa.go:4590
+//line dfa.go:4637
 			}
 		}
 
@@ -4343,7 +4390,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:82
+//line dfa.rl:89
 
 	if cs < UUID_first_final || digit > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

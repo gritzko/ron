@@ -6,17 +6,23 @@ import "errors"
 %% machine RON;
 %% write data;
 %% access it.state.;
+const RON_EOF = -1
 
 
 // Parse consumes one op, unless the buffer ends earlier.
-func (it *Frame) Parse() {
+func (it *Frame) Parse() int {
 
     if it.state.p>=len(it.state.data) {
         if !it.state.streaming {
             it.Op = ZERO_OP
             it.state.cs = RON_error
         }
-        return
+        return RON_error
+    }
+
+    if it.state.cs==RON_EOF {
+        it.state.cs = RON_error
+        return RON_error
     }
 
     if it.state.cs==0 && it.state.p==0 {
@@ -52,10 +58,11 @@ func (it *Frame) Parse() {
     it.state.half = half;
     it.state.p = p;
 
-    if !it.state.streaming && it.state.cs<RON_first_final {
+    if !it.state.streaming && it.state.cs<RON_first_final && it.state.cs>0 {
         it.state.cs = RON_error
     }
 
+    return it.state.cs
 }
 
 

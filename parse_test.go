@@ -198,7 +198,7 @@ func TestFrame_Next(t *testing.T) {
 	ops := []string{"*a!", "*b=1", "*c=1!", "*d,", "*e,"}
 	// "*a!*b=1*c=1!*d,*e,"
 	frameStr := strings.Join(ops, "") + "."
-	t.Log(frameStr)
+	//t.Log(frameStr)
 	frame := ParseFrame([]byte(frameStr))
 	names := ""
 	i, l := 0, 0
@@ -211,7 +211,7 @@ func TestFrame_Next(t *testing.T) {
 			t.Fail()
 			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
 		} else {
-			t.Logf("OK %d %s", i, frame.Type().String())
+			//t.Logf("OK %d %s", i, frame.Type().String())
 		}
 		i++
 		names += frame.Type().String()
@@ -220,6 +220,33 @@ func TestFrame_Next(t *testing.T) {
 	if i != len(ops) || names != "abcde" {
 		t.Logf("bad end: %d not %d, at %d", i, len(ops), frame.Offset())
 		t.Fail()
+	}
+}
+
+func TestFrame_EOF2(t *testing.T) {
+	multi := []byte("*a#A:1!:2=2:3=3.*b#B:1?:2=2.")
+	states := []int{RON_start, RON_start, RON_EOF, RON_start, RON_EOF}
+	o := 0
+	frame := MakeStreamedFrame(128)
+	for i := 0; i < len(multi); i++ {
+		frame.Append(multi[i : i+1])
+		if frame.Next() {
+			if states[o] != frame.ParserState() {
+				t.Fail()
+				t.Logf("state %d at pos %d op %d, expected %d", frame.ParserState(), frame.state.p, o, states[o])
+				break
+			} else {
+				t.Logf("OK state %d at pos %d op %d", frame.ParserState(), frame.state.p, o)
+			}
+			if frame.ParserState()==RON_EOF {
+				frame = frame.Rest()
+			}
+			o++
+		}
+	}
+	if o != len(states) {
+		t.Fail()
+		t.Logf("%d ops, needed %d", o, len(states))
 	}
 }
 

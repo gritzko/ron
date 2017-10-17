@@ -14,11 +14,12 @@ type RGA struct {
 
 var RGA_UUID = RON.NewName("rga")
 
-func MakeRGAReducer () (rga RGA) {
+func MakeRGAReducer () RON.Reducer {
+	var rga RGA
 	rga.active_ins = RON.MakeFrameHeap(RON.PRIM_EVENT|RON.PRIM_DESC|RON.SEC_LOCATION|RON.SEC_DESC, 2)
 	rga.waiting_ins = MakeUUIDFrameMultiMap()
 	rga.waiting_rms = make(map[RON.UUID]RON.UUID)
-	return
+	return rga
 }
 
 // [ ] multiframe handling:
@@ -183,4 +184,8 @@ func (imm UUIDFrameMultiMap) Unload(heap *RON.FrameHeap, key RON.UUID) (count in
 		}
 	}
 	return
+}
+
+func init () {
+	RON.RDTYPES[RGA_UUID] = MakeRGAReducer
 }

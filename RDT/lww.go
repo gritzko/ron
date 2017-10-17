@@ -48,3 +48,10 @@ func (lww LWW) ReduceAll(inputs []RON.Frame) (res RON.Frame, err RON.UUID) {
 	return
 }
 
+func MakeLWW () RON.Reducer {
+	return LWW{}
+}
+
+func init () {
+	RON.RDTYPES[LWW_UUID] = MakeLWW
+}

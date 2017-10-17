@@ -27,6 +27,7 @@ type Op struct { // ~128 bytes
 }
 
 // Immutable RON op Frame; the first op is pre-parsed
+// Iteration state machine:
 type Frame struct {
 	Op
 	state  OpParserState
@@ -120,14 +121,16 @@ type Checker interface {
 // [x] reader.Next() reader.ReadInt()...
 // [-] ron.Writer
 // [x] Frame, Reader, Writer inherit Op (see C++)
-// [ ] type Batch []Frame, type Flow chan Batch
+// [x] type Batch []Frame, type Flow chan Batch
 // [ ] auto-gen ABC! (base64: take from the file)
 // [x] Cursor API:  SetObject(uuid), AddInteger(int), Append()
 //                  AppendFrame(), AppendAll(), AppendRange()
+// [ ] Nice sigs, frame.read.stream, frame.write.format
+// [ ] No Rewind(), just Clone()
 //
 // [ ] Minimize copying in Frame.Parse()
 //
-// [ ] reducer registry
+// [x] reducer registry
 // [x] reducer flags (at least, formatting)
 // [x] nice base64 constant definitions (ron ... // "comment")
 // [-] error header   @~~~~~~~~~~:reference "error message" (to reduce)
@@ -183,6 +186,12 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
+type ReducerMaker func () Reducer
+
+var RDTYPES map[UUID]ReducerMaker
+
+type Batch []Frame
+
 type RawUUID []byte
 
 type Environment map[uint64]UUID
@@ -211,6 +220,9 @@ var ZERO_OP = Op{}
 var NO_ATOMS = Atoms{}
 
 func init() {
+
+	RDTYPES = make(map[UUID]ReducerMaker, 10)
+
 	// TODO move to bitsep.go
 	for i := 0; i < len(ABC); i++ {
 		ABC[i] = -1

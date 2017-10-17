@@ -47,10 +47,10 @@ func time2uint(t time.Time) (i uint64) {
 
 func trim_time(full, last uint64) uint64 {
 	i := 5
-	for i < 10 && full&PREFIX_MASKS[i] > last {
+	for i < 11 && full&PREFIX_MASKS[i] <= last {
 		i++
 	}
-	return full & PREFIX_MASKS[i-1]
+	return full & PREFIX_MASKS[i]
 }
 
 func (clock *Clock) Time() UUID {

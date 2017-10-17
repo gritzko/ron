@@ -56,7 +56,7 @@ func (a *Atoms) AType(i int) uint {
 	return uint(a.atoms[i][1] >> 62)
 }
 
-func (a *Atoms) Integer(i int) int64 {
+func (a Atoms) Integer(i int) int64 {
 	neg := a.atoms[i][1] & 1
 	ret := int64(a.atoms[i][0])
 	if neg == 0 {
@@ -66,13 +66,21 @@ func (a *Atoms) Integer(i int) int64 {
 	}
 }
 
-func (a *Atoms) Float(i int) float64 {
+func (a Atoms) IsLink () bool {
+    return a.Count()==1 && a.AType(0)==ATOM_UUID
+}
+
+func (a Atoms) UUID(i int) UUID {
+	return ZERO_UUID // FIXME
+}
+
+func (a Atoms) Float(i int) float64 {
 	num := a.atoms[i][0]
 	exp := a.atoms[i][1]
 	return math.Pow10(int(exp)) * float64(num)
 }
 
-func (a *Atoms) String(i int) string {
+func (a Atoms) String(i int) string {
 	from := a.atoms[i][0] & INT60_FULL
 	till := a.atoms[i][1] & INT60_FULL
 	return string(a.frame[from:till])

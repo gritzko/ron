@@ -74,7 +74,7 @@ func (frame Frame) Stamp(clock Clock) Frame {
 	for !frame.IsEmpty() {
 		op := frame.Op
 		for t := uint(0); t < 4; t++ {
-			uuid := op.UUID(t)
+			uuid := op.Spec.UUID(t)
 			if uuid.IsTemplate() {
 				stamp, ok := stamps[uuid.Origin()]
 				if !ok {

@@ -90,6 +90,9 @@
             p--;
             fnext *RON_start;
             fbreak;
+        } else {
+            it.state.s = p
+            it.state.position++;
         }
     }
 
@@ -107,7 +110,8 @@
     }
 
     action frame_end {
-        it.state.streaming = false
+        it.state.streaming = false;
+        fnext *RON_EOF;
     }
 
     # one of op spec UUIDs: type, object, event id or a reference 
