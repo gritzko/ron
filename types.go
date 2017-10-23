@@ -130,6 +130,8 @@ type Checker interface {
 //
 // [ ] Minimize copying in Frame.Parse()
 //
+// [ ] AppendXXX(t,o,e,r) - Spec... spread sign
+//
 // [x] reducer registry
 // [x] reducer flags (at least, formatting)
 // [x] nice base64 constant definitions (ron ... // "comment")
@@ -161,6 +163,8 @@ type Checker interface {
 // [x] kill 2 impl of zip UUID
 // [x] test formatting
 // [ ] test redefaults - BACKTICK ONLY (replaces the quant)
+
+// [ ] strings: either escaped byte buffer or an unescaped string!!!!!!
 
 // Reducer is essentially a replicated data type.
 // It provides two reducing functions: total and incremental.
