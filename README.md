@@ -27,9 +27,13 @@ That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in plain JSON, short of serializing the entire new state.
 Incremental RON updates are straightforward: 
-`*lww#time1-userA@time3-userA :bar=2`.
+```
+*lww#time1-userA@time3-userA :bar=2
+```
 If compressed: 
-`*lww#time1-userA@\`(3:bar=2`.
+```
+*lww#time1-userA@`(3:bar=2
+```
 
 Thanks to that UUID metadata, RON can:
 
@@ -111,7 +115,7 @@ The syntax outline:
     * `=` starts an integer
     * `'` starts and ends a string
     * `^` starts a float (e-notation)
-    * `>` starts an UUID, UUID array or a version vector (same format)
+    * `>` starts an UUID
     * `!` marks a frame header op
     * `?` marks a query header op
     * `.` ends a frame (optional)

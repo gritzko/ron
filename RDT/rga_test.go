@@ -75,17 +75,17 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@3:1,@4:2,",
 		"*rga#test@4!@1:3'A'@2:4'B'",
 	},
-	{ // 10) s(rm)+s(rm) merge
+	{ // s(rm)+s(rm) merge
 		"*rga#test@5!@1:4a'A'@2:5'B'",
 		"*rga#test@4!@1:4'A'@3:0'C'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@2:5'B'",
 	},
-	{ // 11) s(rm)+s(rm) merge
+	{ // s(rm)+s(rm) merge
 		"*rga#test@3!@1:4a'A'@3:0'C'@2:5'B'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@4:0'D'@2:5'B'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@4'D'@2:5'B'",
 	},
-	{ // 12) s(rm)+s(rm) merge
+	{ // s(rm)+s(rm) merge
 		"*rga#test@5!@1:4a'A'@5:0'E'@3:0'C'@2:5'B'",
 		"*rga#test@7!@1:4a'A'@6:0'F'@3:7'C'@4:0'D'@2:5'B'",
 		"*rga#test@7!@1:4a'A'@6:0'F'@5'E'@3:7'C'@4:0'D'@2:5'B'",
