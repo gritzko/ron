@@ -180,17 +180,20 @@ Use Swarm RON!
 
 ## History
 
-* 2012-2013: started as a part of the Yandex Live Letters project
+* 2012-2013: project started (initially, as a part of the Yandex Live Letters project)
 * 2014 Feb: becomes a separate project
-* 2014 October: version 0.3 is demoed (per-object logs and version vectors, not really scalable)
-* 2015: version 0.4 is scrapped, the math is changed to avoid any version vector use
+* 2014 Oct: version 0.3 is demoed (per-object logs and version vectors, not really scalable)
+* 2015 Sep: version 0.4 is scrapped, the math is changed to avoid any version vector use
 * 2016 Feb: version 1.0 stabilizes (no v.vectors, new asymmetric client protocol)
 * 2016 May: version 1.1 gets peer-to-peer (server-to-server) sync
-* 2016 June: version 1.2 gets crypto (Merkle, entanglement)
-* 2016 October: functional generalizations (map/reduce)
-* 2016 December: cross-columnar compression
-* 2017 May: Swarm RON 2.0.0
-* 2017 August: punctuation tweaks
+* 2016 Jun: version 1.2 gets crypto (Merkle, entanglement)
+* 2016 Oct: functional generalizations (map/reduce)
+* 2016 Dec: cross-columnar compression
+* 2017 Jun: Swarm RON 2.0.0
+* 2017 Jul: new frame-based Causal Tree / Replicated Growable Array implementation
+* 2017 Jul: Ragel parser
+* 2017 Aug: punctuation tweaks
+* 2017 Oct: streaming parser
 
 [2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
 [super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
