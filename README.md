@@ -27,9 +27,9 @@ That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in plain JSON, short of serializing the entire new state.
 Incremental RON updates are straightforward: 
-`\*lww#time1-userA@time3-userA :bar=2`.
+`*lww#time1-userA@time3-userA :bar=2`.
 If compressed: 
-`\*lww#time1-userA|(3:bar=2`.
+`*lww#time1-userA|(3:bar=2`.
 
 Thanks to that UUID metadata, RON can:
 
@@ -95,16 +95,16 @@ No less compact than (say) three times plain JSON
 The syntax outline:
 
 1. constants follow very predictable conventions:
-    * integers `1`
+    * integers: `1`
     * e-notation floats: `3.1415`, `1e+6`
     * UTF-8 JSON-escaped strings: `'строка\n线\t\u7ebf\n라인'`
-    * UUIDs `1D4ICC-XU5eRJ 1D4ICCE-XU5eRJ`
+    * UUIDs `1D4ICC-XU5eRJ`, `1D4ICCE-XU5eRJ`
 2. UUIDs use a compact custom serialization
-    * RON UUIDs mostly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
+    * RON UUIDs roughly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
     * also, RON UUIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
-3. serialized ops use some punctuation, e.g. `\*lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ 'valueA'`
-    * `\*` starts a data type UUID
+3. serialized ops use some punctuation, e.g. `*lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ 'valueA'`
+    * `*` starts a data type UUID
     * `#` starts an object UUID
     * `@` starts an op's own event UUID
     * `:` starts a location UUID
