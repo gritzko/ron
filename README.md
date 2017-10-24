@@ -1,4 +1,4 @@
-# Swarm Replicated Object Notation 2.0.0 #
+# Swarm Replicated Object Notation 2.0.1 #
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
 Swarm Replicated Object Notation is a distributed data serialization format.
