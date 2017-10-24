@@ -2,7 +2,7 @@
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
 Swarm Replicated Object Notation is a distributed data serialization format.
-Implicitly, formats like XML or JSON assume a lump of state being delivered from a server to a client -- once and in one piece.
+Formats like XML or JSON implicitly assume a lump of state being delivered from a server to a client -- once and in one piece.
 RON aims to synchronize *replicas* by delivering a stream of changes -- continuously and incrementally.
 With RON, even an object's state is seen as a batch of compacted changes, with more changes coming.
 
@@ -13,8 +13,8 @@ Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
 RON may express that state as:
 ```
-*lww#time1-userA@`   :bar=1
-#root@time2-userB    :foo>time1-userA
+*lww#time1-userA@`   :bar = 1
+#root@time2-userB    :foo > time1-userA
 ```
 Those are two RON *ops*.
 First, some object has a field "bar" set to 1.
@@ -29,7 +29,7 @@ There is no way to convey that in plain JSON, short of serializing the entire ne
 Incremental RON updates are straightforward: 
 `*lww#time1-userA@time3-userA :bar=2`.
 If compressed: 
-`*lww#time1-userA|(3:bar=2`.
+`*lww#time1-userA@\`(3:bar=2`.
 
 Thanks to that UUID metadata, RON can:
 
@@ -64,7 +64,7 @@ Swarm RON formal model has four key components:
         2. the object's UUID,
         3. the op's own event UUID,
         4. the location UUID,
-        5. constants are strings, integers, floats or references ([UUIDs](uid.md)).
+        5. atoms are strings, integers, floats or references ([UUIDs](uid.md)).
 2. a [frame](frame.md) is a batch of ops
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
@@ -94,13 +94,13 @@ No less compact than (say) three times plain JSON
 
 The syntax outline:
 
-1. constants follow very predictable conventions:
+1. atoms follow very predictable conventions:
     * integers: `1`
     * e-notation floats: `3.1415`, `1e+6`
-    * UTF-8 JSON-escaped strings: `'строка\n线\t\u7ebf\n라인'`
-    * UUIDs `1D4ICC-XU5eRJ`, `1D4ICCE-XU5eRJ`
+    * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`
+    * RON UUIDs `1D4ICC-XU5eRJ`, `1D4ICCE-XU5eRJ`
 2. UUIDs use a compact custom serialization
-    * RON UUIDs roughly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
+    * RON UUIDs roughly correspond to RFC4122 v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
     * also, RON UUIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
 3. serialized ops use some punctuation, e.g. `*lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ 'valueA'`
@@ -136,7 +136,7 @@ There are lots of repeating bits here.
 We may skip repeating UUIDs and prefix-compress close UUIDs.
 The compressed frame will be just a bit longer than bare JSON:
 ```
-*lww#1D4ICC-XU5eRJ|{E! :keyA'valueA' @{1:keyB'valueB'
+*lww#1D4ICC-XU5eRJ@`{E! :keyA'valueA' @{1:keyB'valueB'
 ``` 
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
