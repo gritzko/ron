@@ -1,6 +1,8 @@
 package RON
 
-import "io"
+import (
+	"io"
+)
 
 func OpenFrame(data []byte) Frame {
 	frame := Frame{}
@@ -78,7 +80,7 @@ func (frame *Frame) Read(reader io.Reader) (length int, err error) {
 func (frame Frame) Fill(clock Clock, env Environment) Frame {
 	ret := MakeFrame(frame.Len() << 1)
 	now := clock.Time()
-	for !frame.IsEmpty() {
+	for !frame.EOF() {
 		spec := frame.Spec
 		if spec.uuids[SPEC_EVENT] == ZERO_UUID {
 			spec.uuids[SPEC_EVENT] = now
@@ -93,7 +95,7 @@ func (frame Frame) Fill(clock Clock, env Environment) Frame {
 func (frame Frame) Reformat(format uint) Frame {
 	ret := MakeFrame(frame.Len())
 	ret.Format = format
-	for !frame.IsEmpty() {
+	for !frame.EOF() {
 		ret.AppendOp(frame.Op)
 		frame.Next()
 	}
