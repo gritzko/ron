@@ -1,29 +1,29 @@
 package RDT
 
 import (
-	"github.com/gritzko/RON"
+	"github.com/gritzko/ron"
 	//	"fmt"
 )
 
 type RGA struct {
-	active_ins  RON.FrameHeap
-	waiting_rms map[RON.UUID]RON.UUID
+	active_ins  ron.FrameHeap
+	waiting_rms map[ron.UUID]ron.UUID
 	waiting_ins UUIDFrameMultiMap // TODO   UUID2Map? UUIDIntMultiMap
-	loc_ins     RON.UUIDHeap   // just sort 'em
+	loc_ins     ron.UUIDHeap      // just sort 'em
 }
 
-var RGA_UUID = RON.NewName("rga")
+var RGA_UUID = ron.NewName("rga")
 
-func MakeRGAReducer () RON.Reducer {
+func MakeRGAReducer () ron.Reducer {
 	var rga RGA
-	rga.active_ins = RON.MakeFrameHeap(RON.PRIM_EVENT|RON.PRIM_DESC|RON.SEC_LOCATION|RON.SEC_DESC, 2)
+	rga.active_ins = ron.MakeFrameHeap(ron.PRIM_EVENT|ron.PRIM_DESC|ron.SEC_LOCATION|ron.SEC_DESC, 2)
 	rga.waiting_ins = MakeUUIDFrameMultiMap()
-	rga.waiting_rms = make(map[RON.UUID]RON.UUID)
+	rga.waiting_rms = make(map[ron.UUID]ron.UUID)
 	return rga
 }
 
 // [ ] multiframe handling:
-// 		[ ] Rest(), ranges
+// 		[x] Rest(), ranges
 //		[ ] FrameHeap EJECT_SUBFRAMES
 //		[ ] reinsert subframes
 // 		[ ] Split(), another run
@@ -34,11 +34,11 @@ func MakeRGAReducer () RON.Reducer {
 // RGA multiframe format:
 // ORDER,   WHY
 //
-func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
+func (rga RGA) ReduceAll(inputs []ron.Frame) (result ron.Frame, err ron.UUID) {
 
 	rdtype, object := inputs[0].Type(), inputs[0].Object()
 
-	var version RON.UUID
+	var version ron.UUID
 
 	for k := 0; k < len(inputs); k++ {
 		// TODO check type/object
@@ -66,7 +66,7 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		}
 	}
 	// multiframe parts must be atomically applied, hence same version id
-	header_spec := RON.NewSpec(rdtype, object, version, RON.ZERO_UUID)
+	header_spec := ron.NewSpec(rdtype, object, version, ron.ZERO_UUID)
 
 	for rga.loc_ins.Len() > 0 {
 
@@ -78,7 +78,7 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 		//fmt.Printf("LOC %s (%d)\n", loc.String(), cu)
 
 		// note any states, if so use ! else ;
-		header_spec.SetUUID(RON.SPEC_REF, loc)
+		header_spec.SetUUID(ron.SPEC_REF, loc)
 		if !loc.IsZero() {
 			// ?
 		}
@@ -89,16 +89,16 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 			event := op.Event()
 			atoms := op.Atoms
 			if op.IsRaw() {
-				header_spec.SetUUID(RON.SPEC_REF, RON.ZERO_UUID)
+				header_spec.SetUUID(ron.SPEC_REF, ron.ZERO_UUID)
 			} else {
-				header_spec.SetUUID(RON.SPEC_REF, op.Ref())
+				header_spec.SetUUID(ron.SPEC_REF, op.Ref())
 			}
 			del, ok := rga.waiting_rms[event]
 			if ok && del.LaterThan(op.Ref()) {
-				header_spec.SetUUID(RON.SPEC_REF, del)
+				header_spec.SetUUID(ron.SPEC_REF, del)
 				delete(rga.waiting_rms, event)
 			}
-			header_spec.SetUUID(RON.SPEC_EVENT, event)
+			header_spec.SetUUID(ron.SPEC_EVENT, event)
 
 			result.AppendReduced(header_spec, atoms)
 			//fmt.Printf("APPND %c[ %s ]\n", op.Term(), string(op.Atoms.Body))
@@ -112,12 +112,12 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 	}
 
 	if len(rga.waiting_rms) > 0 {
-		header_spec.SetUUID(RON.SPEC_REF, RON.NEVER_UUID)
+		header_spec.SetUUID(ron.SPEC_REF, ron.NEVER_UUID)
 		result.AppendStateHeader(header_spec) // multiframe
 		for target, maxEvent := range rga.waiting_rms {
-			header_spec.SetUUID(RON.SPEC_EVENT, maxEvent)
-			header_spec.SetUUID(RON.SPEC_REF, target)
-			result.AppendReduced(header_spec, RON.NO_ATOMS)
+			header_spec.SetUUID(ron.SPEC_EVENT, maxEvent)
+			header_spec.SetUUID(ron.SPEC_REF, target)
+			result.AppendReduced(header_spec, ron.NO_ATOMS)
 			delete(rga.waiting_rms, target)
 		}
 	}
@@ -126,33 +126,33 @@ func (rga RGA) ReduceAll(inputs []RON.Frame) (result RON.Frame, err RON.UUID) {
 	return
 }
 
-func (rga RGA) Reduce(a, b RON.Frame) (res RON.Frame, err RON.UUID) {
+func (rga RGA) Reduce(a, b ron.Frame) (res ron.Frame, err ron.UUID) {
 	//fmt.Printf("START [ %s ] + [ %s ]\n", a.String(), b.String())
-	var frames = [2]RON.Frame{a, b}
+	var frames = [2]ron.Frame{a, b}
 	res, err = rga.ReduceAll(frames[0:2])
 	return
 }
 
 type IMMCell struct {
-	p *RON.Frame
+	p *ron.Frame
 	n uint64
 }
 
 type UUIDFrameMultiMap struct {
-	m map[RON.UUID]IMMCell
+	m map[ron.UUID]IMMCell
 	c uint64
 }
 
 func MakeUUIDFrameMultiMap() (ret UUIDFrameMultiMap) {
-	ret.m = make(map[RON.UUID]IMMCell)
+	ret.m = make(map[ron.UUID]IMMCell)
 	return
 }
 
-func (imm *UUIDFrameMultiMap) Put(key RON.UUID, value *RON.Frame) {
+func (imm *UUIDFrameMultiMap) Put(key ron.UUID, value *ron.Frame) {
 	pre, ok := imm.m[key]
 	if ok {
 		imm.c++
-		synth := RON.NewHashUUID(imm.c, RON.INT60_ERROR)
+		synth := ron.NewHashUUID(imm.c, ron.INT60_ERROR)
 		imm.m[synth] = pre
 		imm.m[key] = IMMCell{value, synth.Value()}
 	} else {
@@ -160,25 +160,25 @@ func (imm *UUIDFrameMultiMap) Put(key RON.UUID, value *RON.Frame) {
 	}
 }
 
-func (imm UUIDFrameMultiMap) Take(key RON.UUID) (value *RON.Frame, next RON.UUID) {
+func (imm UUIDFrameMultiMap) Take(key ron.UUID) (value *ron.Frame, next ron.UUID) {
 	pre, ok := imm.m[key]
 	if ok {
 		delete(imm.m, key)
 		value = pre.p
 		if pre.n != 0 {
-			next = RON.NewHashUUID(pre.n, RON.INT60_ERROR)
+			next = ron.NewHashUUID(pre.n, ron.INT60_ERROR)
 		}
 	}
 	return
 }
 
-func (imm UUIDFrameMultiMap) Unload(heap *RON.FrameHeap, key RON.UUID) (count int) {
+func (imm UUIDFrameMultiMap) Unload(heap *ron.FrameHeap, key ron.UUID) (count int) {
 	for pre, ok := imm.m[key]; ok; pre, ok = imm.m[key] {
 		delete(imm.m, key)
 		heap.Put(pre.p)
 		count++
 		if pre.n != 0 {
-			key = RON.NewHashUUID(pre.n, RON.INT60_ERROR)
+			key = ron.NewHashUUID(pre.n, ron.INT60_ERROR)
 		} else {
 			break
 		}
@@ -187,5 +187,5 @@ func (imm UUIDFrameMultiMap) Unload(heap *RON.FrameHeap, key RON.UUID) (count in
 }
 
 func init () {
-	RON.RDTYPES[RGA_UUID] = MakeRGAReducer
+	ron.RDTYPES[RGA_UUID] = MakeRGAReducer
 }

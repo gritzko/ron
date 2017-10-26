@@ -1,4 +1,4 @@
-package RON
+package ron
 
 const INT60LEN = 10
 const MAX_ATOMS = 8

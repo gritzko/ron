@@ -1,9 +1,9 @@
 package RDT
 
 import (
-	"testing"
 	"fmt"
-	"github.com/gritzko/RON"
+	"github.com/gritzko/ron"
+	"testing"
 )
 
 // 3-part tables: first all inserts, then all deletes
@@ -39,12 +39,12 @@ func TestLWW_Reduce(t *testing.T) {
 	for i := 0; i < len(lww_3_tests); i++ {
 		test := lww_3_tests[i]
 		C := test[2]
-		frameA := RON.ParseFrameString(test[0])
-		frameB := RON.ParseFrameString(test[1])
+		frameA := ron.ParseFrameString(test[0])
+		frameB := ron.ParseFrameString(test[1])
 		var lww LWW
 		frameC, err := lww.Reduce(frameA, frameB)
 		fmt.Println(frameA.String(), frameB.String(), frameC.String())
-		if err != RON.ZERO_UUID {
+		if err != ron.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())
 		} else if frameC.String() != C {
@@ -53,4 +53,15 @@ func TestLWW_Reduce(t *testing.T) {
 		}
 
 	}
- }
+}
+
+func TestLWW_FallbackReduce(t *testing.T) {
+	frameA := ron.ParseFrameString("*lww#id@1!:b=2:a=1:c=1")
+	frameB := ron.ParseFrameString("*lww#id@2!:d'4':c=3")
+	var lww LWW
+	frameC, err := lww.FallbackReduce(ron.Batch{frameA, frameB})
+	if !err.IsZero() || frameC.String()!="*lww#id@2!@1:a=1:b=2@2:c=3:d'4'" {
+		t.Fail()
+		t.Log(frameC.String())
+	}
+}

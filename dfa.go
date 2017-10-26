@@ -1,5 +1,5 @@
 //line dfa.rl:1
-package RON
+package ron
 
 import "fmt"
 import "errors"

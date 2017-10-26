@@ -1,4 +1,4 @@
-package RON
+package ron
 
 type UUID2Map struct {
 	subs map[UUID][]UUID

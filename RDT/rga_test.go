@@ -1,17 +1,17 @@
 package RDT
 
 import (
-	"github.com/gritzko/RON"
+	"github.com/gritzko/ron"
 	"testing"
 	"fmt"
 )
 
 func TestIMultiMap_Take(t *testing.T) {
-	frame := RON.ParseFrame([]byte("*rga#test@2:1'B'"))
+	frame := ron.ParseFrame([]byte("*rga#test@2:1'B'"))
 	mm := MakeUUIDFrameMultiMap()
-	mm.Put(RON.ZERO_UUID, &frame)
-	b2, next := mm.Take(RON.ZERO_UUID)
-	if &frame != b2 || next != RON.ZERO_UUID {
+	mm.Put(ron.ZERO_UUID, &frame)
+	b2, next := mm.Take(ron.ZERO_UUID)
+	if &frame != b2 || next != ron.ZERO_UUID {
 		t.Fail()
 	}
 }
@@ -98,12 +98,12 @@ func TestRGA_Reduce(t *testing.T) {
 	for i := 0; i < len(rga_3_tests); i++ {
 		test := rga_3_tests[i]
 		C := test[2]
-		frameA := RON.ParseFrameString(test[0])
-		frameB := RON.ParseFrameString(test[1])
+		frameA := ron.ParseFrameString(test[0])
+		frameB := ron.ParseFrameString(test[1])
 		rga := MakeRGAReducer()
 		frameC, err := rga.Reduce(frameA, frameB)
 		fmt.Println(frameA.String(), frameB.String(), frameC.String())
-		if err != RON.ZERO_UUID {
+		if err != ron.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())
 		} else if frameC.String() != C {

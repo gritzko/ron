@@ -1,4 +1,4 @@
-package RON
+package ron
 
 import (
 	"io"
@@ -103,6 +103,7 @@ func (frame Frame) Reformat(format uint) Frame {
 }
 
 func (frame Frame) Clone() Frame {
+	// FIXME slice :(
 	return frame
 }
 
@@ -179,6 +180,12 @@ func (frame Frame) Position() int {
 
 func (frame Frame) EOF() bool {
 	return frame.state.cs == RON_error
+}
+
+func (frame *Frame) SkipHeader() {
+	if frame.IsHeader() {
+		frame.Next()
+	}
 }
 
 func (frame Frame) Offset() int {
