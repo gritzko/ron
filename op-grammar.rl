@@ -10,7 +10,7 @@
     }
 
     action spec_uuid_start {
-        n = specSep2Bits(it.state.data[p])
+        n = uint(ABC[it.state.data[p]])
         if n < idx { 
             // wrong UUID order; must be type-object-event-ref
             fnext *RON_error;
@@ -79,7 +79,7 @@
     }
 
     action opterm {
-        it.term = termSep2Bits(fc)
+        it.term = uint(ABC[fc])
     }
 
     action op_start {

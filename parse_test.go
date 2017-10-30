@@ -333,7 +333,7 @@ func TestOp_ParseAtoms(t *testing.T) {
 		}
 		types := ""
 		for a := 0; a < frame.Atoms.Count(); a++ {
-			types += string(atomBits2Sep(frame.Atoms.AType(a)))
+			types += string(ATOM_PUNCT[frame.Atoms.AType(a)])
 		}
 		if types != tests[i][1] {
 			t.Logf("misparsed %d: '%s' (%s)", i, types, tests[i][1])

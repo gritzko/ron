@@ -271,10 +271,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -305,7 +306,7 @@ func (it *Frame) Parse() int {
 		idx++
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -324,7 +325,7 @@ func (it *Frame) Parse() int {
 	tr19:
 		it.state.cs = 2
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -351,7 +352,7 @@ func (it *Frame) Parse() int {
 		idx++
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -378,7 +379,7 @@ func (it *Frame) Parse() int {
 		idx++
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -408,7 +409,7 @@ func (it *Frame) Parse() int {
 		idx++
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -426,7 +427,7 @@ func (it *Frame) Parse() int {
 		goto _again
 	tr73:
 		it.state.cs = 2
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -442,10 +443,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -470,7 +472,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -486,10 +488,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -509,7 +512,7 @@ func (it *Frame) Parse() int {
 		it.state.cs = 2
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -525,10 +528,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -555,7 +559,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -571,10 +575,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -601,7 +606,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -617,10 +622,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -649,7 +655,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -665,10 +671,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -695,7 +702,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -711,10 +718,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -741,7 +749,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -757,10 +765,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -790,7 +799,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 //line ./op-grammar.rl:85
@@ -806,10 +815,11 @@ func (it *Frame) Parse() int {
 			}
 		} else {
 			it.state.s = p
+			it.state.position++
 		}
 
 //line ./op-grammar.rl:12
-		n = specSep2Bits(it.state.data[p])
+		n = uint(ABC[it.state.data[p]])
 		if n < idx {
 			// wrong UUID order; must be type-object-event-ref
 			it.state.cs = (RON_error)
@@ -830,7 +840,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:824
+//line dfa.go:834
 		switch it.state.data[p] {
 		case 32:
 			goto tr3
@@ -909,7 +919,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -918,11 +928,11 @@ func (it *Frame) Parse() int {
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr18:
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -931,7 +941,7 @@ func (it *Frame) Parse() int {
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr46:
@@ -943,7 +953,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -952,7 +962,7 @@ func (it *Frame) Parse() int {
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr54:
@@ -964,7 +974,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -973,7 +983,7 @@ func (it *Frame) Parse() int {
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr64:
@@ -988,7 +998,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -997,11 +1007,11 @@ func (it *Frame) Parse() int {
 		it.frame = it.state.data
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr72:
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st22
@@ -1013,13 +1023,13 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr84:
 //line ./op-grammar.rl:78
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr92:
@@ -1033,7 +1043,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr102:
@@ -1047,7 +1057,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr111:
@@ -1062,7 +1072,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr120:
@@ -1076,7 +1086,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr128:
@@ -1090,7 +1100,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	tr139:
@@ -1107,7 +1117,7 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:78
 
 //line ./op-grammar.rl:81
-		it.term = termSep2Bits(it.state.data[p])
+		it.term = uint(ABC[it.state.data[p]])
 
 		goto st22
 	st22:
@@ -1115,7 +1125,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:1154
+//line dfa.go:1164
 		switch it.state.data[p] {
 		case 32:
 			goto tr72
@@ -1136,17 +1146,17 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr71:
 		it.state.cs = 23
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
 		goto _again
 	tr74:
 		it.state.cs = 23
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1159,10 +1169,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1170,10 +1180,10 @@ func (it *Frame) Parse() int {
 	tr87:
 		it.state.cs = 23
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1189,10 +1199,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1208,10 +1218,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1228,10 +1238,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1247,10 +1257,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1266,10 +1276,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1288,10 +1298,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
-//line ./op-grammar.rl:111
+//line ./op-grammar.rl:112
 		it.state.streaming = false
 		it.state.cs = (RON_EOF)
 
@@ -1301,7 +1311,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:1381
+//line dfa.go:1391
 		goto st0
 	tr6:
 //line ././uuid-grammar.rl:5
@@ -1310,7 +1320,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+		i[half] |= uint64(ABC[it.state.data[p]]) << 60
 
 		goto st3
 	tr56:
@@ -1318,7 +1328,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+		i[half] |= uint64(ABC[it.state.data[p]]) << 60
 
 		goto st3
 	st3:
@@ -1326,7 +1336,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:1411
+//line dfa.go:1421
 		switch it.state.data[p] {
 		case 32:
 			goto tr14
@@ -1436,7 +1446,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:1525
+//line dfa.go:1535
 		switch it.state.data[p] {
 		case 32:
 			goto st4
@@ -1476,7 +1486,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1493,7 +1503,7 @@ func (it *Frame) Parse() int {
 
 		goto st5
 	tr20:
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1518,7 +1528,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1543,7 +1553,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1571,7 +1581,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1691,7 +1701,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:1819
+//line dfa.go:1829
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1713,7 +1723,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1842
+//line dfa.go:1852
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -1743,7 +1753,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:1875
+//line dfa.go:1885
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -1786,13 +1796,13 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
 	tr83:
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1806,7 +1816,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1820,7 +1830,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1835,7 +1845,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1849,7 +1859,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1863,7 +1873,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1880,7 +1890,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 		had_end = true
 
 		goto st25
@@ -1889,7 +1899,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:2050
+//line dfa.go:2060
 		switch it.state.data[p] {
 		case 32:
 			goto tr83
@@ -1931,7 +1941,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1948,7 +1958,7 @@ func (it *Frame) Parse() int {
 
 		goto st7
 	tr21:
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1973,7 +1983,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -1998,7 +2008,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2026,7 +2036,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2146,7 +2156,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:2346
+//line dfa.go:2356
 		switch it.state.data[p] {
 		case 32:
 			goto st7
@@ -2178,7 +2188,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2380
+//line dfa.go:2390
 		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
 			goto tr33
 		}
@@ -2202,7 +2212,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2407
+//line dfa.go:2417
 		switch it.state.data[p] {
 		case 32:
 			goto tr91
@@ -2249,7 +2259,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2266,7 +2276,7 @@ func (it *Frame) Parse() int {
 
 		goto st9
 	tr22:
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2291,7 +2301,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2316,7 +2326,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2344,7 +2354,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2464,7 +2474,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2708
+//line dfa.go:2718
 		switch it.state.data[p] {
 		case 32:
 			goto st9
@@ -2519,7 +2529,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+		i[half] |= uint64(ABC[it.state.data[p]]) << 60
 
 		goto st27
 	tr130:
@@ -2527,7 +2537,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(it.state.data[p])) << 60
+		i[half] |= uint64(ABC[it.state.data[p]]) << 60
 
 		goto st27
 	st27:
@@ -2535,7 +2545,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:2784
+//line dfa.go:2794
 		switch it.state.data[p] {
 		case 32:
 			goto tr75
@@ -2607,7 +2617,7 @@ func (it *Frame) Parse() int {
 		half |= 1
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st28
@@ -2652,7 +2662,7 @@ func (it *Frame) Parse() int {
 		half |= 1
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st28
@@ -2661,7 +2671,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:2911
+//line dfa.go:2921
 		switch it.state.data[p] {
 		case 32:
 			goto tr101
@@ -2721,7 +2731,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2738,7 +2748,7 @@ func (it *Frame) Parse() int {
 
 		goto st10
 	tr23:
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2763,7 +2773,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2788,7 +2798,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2816,7 +2826,7 @@ func (it *Frame) Parse() int {
 		it.uuids[idx] = UUID{uint128: i}
 		idx++
 
-//line ./op-grammar.rl:102
+//line ./op-grammar.rl:103
 		if it.term != TERM_RAW {
 			it.term = TERM_REDUCED
 		}
@@ -2936,7 +2946,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:3225
+//line dfa.go:3235
 		switch it.state.data[p] {
 		case 32:
 			goto st10
@@ -3041,7 +3051,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof14
 		}
 	st_case_14:
-//line dfa.go:3331
+//line dfa.go:3341
 		switch it.state.data[p] {
 		case 43:
 			goto st15
@@ -3112,7 +3122,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:27
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st31
@@ -3134,7 +3144,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3424
+//line dfa.go:3434
 		switch it.state.data[p] {
 		case 32:
 			goto tr127
@@ -3247,7 +3257,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3534
+//line dfa.go:3544
 		switch it.state.data[p] {
 		case 32:
 			goto tr138
@@ -3331,7 +3341,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3619
+//line dfa.go:3629
 		switch it.state.data[p] {
 		case 10:
 			goto st0
@@ -3345,7 +3355,7 @@ func (it *Frame) Parse() int {
 		half |= 1
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st17
@@ -3390,7 +3400,7 @@ func (it *Frame) Parse() int {
 		half |= 1
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st17
@@ -3399,7 +3409,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3688
+//line dfa.go:3698
 		switch it.state.data[p] {
 		case 32:
 			goto tr45
@@ -3457,7 +3467,7 @@ func (it *Frame) Parse() int {
 //line ././uuid-grammar.rl:27
 
 //line ././uuid-grammar.rl:10
-		digit = prefixSep2Bits(it.state.data[p]) + 4
+		digit = uint(ABC[it.state.data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st18
@@ -3479,7 +3489,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:3768
+//line dfa.go:3778
 		switch it.state.data[p] {
 		case 32:
 			goto tr53
@@ -3590,7 +3600,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:3876
+//line dfa.go:3886
 		switch it.state.data[p] {
 		case 32:
 			goto tr63
@@ -3674,7 +3684,7 @@ func (it *Frame) Parse() int {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:3961
+//line dfa.go:3971
 		switch it.state.data[p] {
 		case 32:
 			goto tr14
@@ -3850,12 +3860,12 @@ func (it *Frame) Parse() int {
 		if p == eof {
 			switch it.state.cs {
 			case 22:
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 25:
 //line ./op-grammar.rl:78
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 24, 27:
@@ -3865,7 +3875,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 31:
@@ -3878,7 +3888,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 28:
@@ -3891,7 +3901,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 26:
@@ -3904,7 +3914,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 30:
@@ -3917,7 +3927,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 32:
@@ -3933,7 +3943,7 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
 			case 29:
@@ -3947,10 +3957,10 @@ func (it *Frame) Parse() int {
 
 //line ./op-grammar.rl:78
 
-//line ./op-grammar.rl:98
+//line ./op-grammar.rl:99
 				had_end = true
 
-//line dfa.go:4202
+//line dfa.go:4212
 			}
 		}
 
@@ -3977,7 +3987,7 @@ func (it *Frame) Parse() int {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:72
-//line dfa.go:4231
+//line dfa.go:4241
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
@@ -3992,12 +4002,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	_ = eof
 
-//line dfa.go:4250
+//line dfa.go:4260
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4255
+//line dfa.go:4265
 	{
 		if p == pe {
 			goto _test_eof
@@ -4070,7 +4080,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(data[p])) << 60
+		i[half] |= uint64(ABC[data[p]]) << 60
 
 		goto st2
 	tr7:
@@ -4078,7 +4088,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:41
 		half |= 1
 		i[half] &= INT60_FULL
-		i[half] |= uint64(uuidSep2Bits(data[p])) << 60
+		i[half] |= uint64(ABC[data[p]]) << 60
 
 		goto st2
 	st2:
@@ -4086,7 +4096,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4349
+//line dfa.go:4359
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4125,7 +4135,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		half |= 1
 
 //line ./uuid-grammar.rl:10
-		digit = prefixSep2Bits(data[p]) + 4
+		digit = uint(ABC[data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st3
@@ -4170,7 +4180,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		half |= 1
 
 //line ./uuid-grammar.rl:10
-		digit = prefixSep2Bits(data[p]) + 4
+		digit = uint(ABC[data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st3
@@ -4179,7 +4189,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4443
+//line dfa.go:4453
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4206,7 +4216,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:27
 
 //line ./uuid-grammar.rl:10
-		digit = prefixSep2Bits(data[p]) + 4
+		digit = uint(ABC[data[p]]) + 4
 		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
 
 		goto st4
@@ -4228,7 +4238,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4492
+//line dfa.go:4502
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4309,7 +4319,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4570
+//line dfa.go:4580
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4381,7 +4391,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:47
 				i[1] = UUID_NAME_UPPER_BITS
 
-//line dfa.go:4637
+//line dfa.go:4647
 			}
 		}
 

@@ -50,7 +50,7 @@ func FormatZipInt(output []byte, value, context uint64) []byte {
 	if prefix >= 4*6 {
 		prefix -= prefix % 6
 		value = (value << uint(prefix)) & INT60_FULL
-		pchar := prefixBits2Sep(uint(prefix)/6 - 4)
+		pchar := PREFIX_PUNCT[uint(prefix)/6 - 4]
 		output = append(output, pchar)
 		if value != 0 {
 			output = FormatInt(output, value)
@@ -85,10 +85,10 @@ func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 	buf = FormatZipInt(buf, uuid.Origin(), context.Origin())
 	// sometimes, we may skip UUID separator (+-%$)
 	if uuid.Scheme() == context.Scheme() && at > start+1 {
-		if len(buf) > at && ABC[buf[at]] < 0 {
+		if len(buf) > at && ABC_KIND[buf[at]] != BASE_KIND {
 			copy(buf[at-1:], buf[at:])
 			buf = buf[:len(buf)-1]
-		} else if len(buf) == at && ABC[buf[start]] < 0 {
+		} else if len(buf) == at && ABC_KIND[buf[start]] != BASE_KIND {
 			buf = buf[:len(buf)-1]
 		}
 	}
@@ -118,7 +118,7 @@ func (frame *Frame) appendSpec(spec, context Spec) {
 		if (spec.uuids[t] == context.uuids[t]) && (0 == flags&FORMAT_NOSKIP) {
 			continue
 		}
-		frame.state.data = append(frame.state.data, specBits2Sep(uint(t)))
+		frame.state.data = append(frame.state.data, SPEC_PUNCT[uint(t)])
 		if t > 0 && 0 != flags&FORMAT_REDEFAULT {
 			ctxAt := 0
 			ctxUUID := spec.uuids[t-1]
@@ -132,7 +132,7 @@ func (frame *Frame) appendSpec(spec, context Spec) {
 				}
 			}
 			if ctxAt != t {
-				frame.state.data = append(frame.state.data, redefBits2Sep(uint(ctxAt)))
+				frame.state.data = append(frame.state.data, REDEF_PUNCT[uint(ctxAt)])
 			}
 			frame.appendUUID(spec.uuids[t], ctxUUID)
 		} else {
@@ -196,7 +196,7 @@ func (frame *Frame) AppendOp(op Op) {
 	frame.appendAtoms(op.Atoms)
 
 	if op.IsHeader() || (op.IsRaw() && !frame.Op.IsRaw()) || op.Atoms.Count() == 0 {
-		frame.state.data = append(frame.state.data, termBits2Sep(op.term))
+		frame.state.data = append(frame.state.data, TERM_PUNCT[op.term])
 	}
 
 	frame.Op = op

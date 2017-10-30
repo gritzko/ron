@@ -200,11 +200,7 @@ type RawUUID []byte
 
 type Environment map[uint64]UUID
 
-const BASE64 = BASE_PUNCT
-
-var ABC [256]int8
-
-// FIXME bracket order to match the numeric order!!!!   }{][)(
+var BASE64 = string(BASE_PUNCT)
 
 const INT60_FULL uint64 = 1<<60 - 1
 const INT60_ERROR = INT60_FULL
@@ -227,26 +223,4 @@ func init() {
 
 	RDTYPES = make(map[UUID]ReducerMaker, 10)
 
-	// TODO move to bitsep.go
-	for i := 0; i < len(ABC); i++ {
-		ABC[i] = -1
-	}
-	for i := 0; i < len(REDEF_PUNCT); i++ {
-		ABC[REDEF_PUNCT[i]] = -2
-	}
-	for i := 0; i < len(PREFIX_PUNCT); i++ {
-		ABC[PREFIX_PUNCT[i]] = -10 - int8(i)
-	}
-	for i := 0; i < len(UUID_PUNCT); i++ {
-		ABC[UUID_PUNCT[i]] = -4
-	}
-	for i := 0; i < len(BASE64); i++ {
-		ABC[BASE64[i]] = int8(i)
-	}
-	for i := 0; i < len(SPEC_PUNCT); i++ {
-		ABC[SPEC_PUNCT[i]] = -30 - int8(i)
-	}
-	for i := 0; i < len(TERM_PUNCT); i++ {
-		ABC[TERM_PUNCT[i]] = -5
-	}
 }

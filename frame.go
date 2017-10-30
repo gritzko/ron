@@ -102,9 +102,16 @@ func (frame Frame) Reformat(format uint) Frame {
 	return ret.Close()
 }
 
-func (frame Frame) Clone() Frame {
-	// FIXME slice :(
-	return frame
+func (frame Frame) Clone() (clone Frame) {
+	clone = frame
+	if frame.Atoms.Count()<=2 { // FIXME
+		copy(clone._atoms[:frame.Atoms.Count()], frame.atoms)
+		clone.atoms = clone._atoms[:frame.Atoms.Count()]
+	} else {
+		clone.atoms = make([]uint128, frame.Atoms.Count())
+		copy(clone.atoms, frame.atoms)
+	}
+	return
 }
 
 func (frame Frame) String() string {

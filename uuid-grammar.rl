@@ -8,7 +8,7 @@
 
 
     action int60_prefix {
-        digit = prefixSep2Bits(fc)+4;
+        digit = uint(ABC[fc])+4;
         i[half] &= INT60_FLAGS | PREFIX_MASKS[digit];
     }
 
@@ -41,7 +41,7 @@
     action uuid_sep {
         half |= 1;
         i[half] &= INT60_FULL;
-        i[half] |= uint64(uuidSep2Bits(fc))<<60;
+        i[half] |= uint64(ABC[fc])<<60;
     }
 
     action end_name {

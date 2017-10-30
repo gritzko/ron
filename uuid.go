@@ -50,7 +50,7 @@ func (a UUID) Scheme() uint64 {
 }
 
 func (a UUID) Sign() byte {
-	return uuidBits2Sep(uint(a.Scheme()))
+	return UUID_PUNCT[uint(a.Scheme())]
 }
 
 func (a UUID) Replica() uint64 {
