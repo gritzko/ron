@@ -53,25 +53,25 @@ RON wire format makes this process efficient.
 
 ## Formal model
 
-Swarm RON formal model has four key components:
+Swarm RON formal model has five key components:
 
-0. An UUID is a globally unique 128-bit identifier. There are four UUID types:
-    1. an event timestamp (logical/hybrid timestamp, e.g. `1TUAQ+gritzko`, contains a monotonous counter `1TUAQ` and a replica id `gritzko`, roughly corresponds to RFC4122 v1 UUIDs),
-    2. a derived timestamp (`1TUAQ-gritzko`),
-    3. a name (`foo`, `lww`, `bar`, `local_var$gritzko`) or
-    4. a hash (e.g. `4Js8lam4LB%kj529sMEsl`).
-1. An [op](op.md) is an immutable atomic unit of data change.
+1. An UUID is a globally unique 128-bit identifier. There are four UUID types:
+    * an event timestamp (logical/hybrid timestamp, e.g. `1TUAQ+gritzko`, contains a monotonous counter `1TUAQ` and a replica id `gritzko`, roughly corresponds to RFC4122 v1 UUIDs),
+    * a derived timestamp (`1TUAQ-gritzko`),
+    * a name (`foo`, `lww`, `bar`, `local_var$gritzko`) or
+    * a hash (e.g. `4Js8lam4LB%kj529sMEsl`).
+2. An op is an immutable atomic unit of data change.
     An op is a tuple of four [UUIDs](uid.md) and zero or more *atoms*:
-    1. data type UUID, e.g. `lww`,
-    2. object UUID `1TUAQ+gritzko`,
-    3. event UUID `1TUAQ+gritzko` and
-    4. location/reference UUID, e.g. `bar`.
-    5. atoms are strings, integers, floats or references ([UUIDs](uid.md)).
-2. a [frame](frame.md) is an ordered collection of ops, a transactional unit of data
+    * data type UUID, e.g. `lww`,
+    * object UUID `1TUAQ+gritzko`,
+    * event UUID `1TUAQ+gritzko` and
+    * location/reference UUID, e.g. `bar`.
+    * atoms are strings, integers, floats or references ([UUIDs](uid.md)).
+3. a frame is an ordered collection of ops, a transactional unit of data
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
-3. a [reducer](reducer.md) is a RON term for a "data type"; reducers define how object state is changed by new ops
+4. a reducer is a RON term for a "data type"; reducers define how object state is changed by new ops
     * a [reducer][re] is a pure function: `f(state_frame, change_frame) -> new_state_frame`, where frames are either empty frames or single ops or products of past reductions by the same reducer,
     * reducers are:
         1. associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )` where `patch == f(op1,op2)`
@@ -79,10 +79,10 @@ Swarm RON formal model has four key components:
         3. idempotent, e.g. `f(state, op1) == f(f(state, op1), op1) == f(state, f(op1, op1))`, etc.
     * optionally, reducers may have stronger guarantees, e.g. full commutativity (tolerates causality violations),
     * a frame could be an op, a patch or a complete state. Hence, a baseline reducer can "switch gears" from pure op-based CRDT mode to state-based CRDT to delta-based, e.g.
-        1. `f(state, op1, op2, ...)` is op-based
+        1. `f(state, op)` is op-based
         2. `f(state1, state2)` is state-based
         3. `f(state, patch)` is delta-based
-4. a [mapper](mapper.md) translates a replicated object's inner state into other formats
+4. a mapper translates a replicated object's state frame into other formats
     * mappers turn RON objects into JSON or XML documents, C++, JavaScript or other objects
     * mappers are one-way: RON metadata may be lost in conversion
     * mappers can be pipelined, e.g. one can build a full RON->JSON->HTML [MVC][mvc] app using just mappers.
@@ -104,13 +104,13 @@ The syntax outline:
 
 1. atoms follow very predictable conventions:
     * integers: `1`
-    * e-notation floats: `3.1415`, `1e+6`
+    * e-notation floats: `3.1415`, `1.0e+6`
     * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`
     * RON UUIDs `1D4ICC-XU5eRJ`, `1TUAQ+gritzko`
 2. UUIDs use a compact custom serialization
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
     * also, RON timestamp UUIDs may vary in precision, like floats (no need to mention nanoseconds everywhere) -- trailing zeroes are skipped
-    * UUIDs are lexically/numerically comparable (same order), Base64 variant `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~`
+    * UUIDs are lexically/numerically comparable (same order), the Base64 variant is `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~`
 3. serialized ops use some punctuation, e.g. `*lww #1D4ICC-XU5eRJ @1D4ICC2-XU5eRJ :keyA 'valueA'`
     * `*` starts a data type UUID
     * `#` starts an object UUID
@@ -134,7 +134,7 @@ Consider a simple JSON object:
 {"keyA":"valueA", "keyB":"valueB"}
 ```
 A RON frame for that object will have three ops: one frame header op and two key-value ops.
-In tabular form, that frame may look like:
+In the tabular form, that frame may look like:
 ```
 type object         event           location value
 -----------------------------------------------------
@@ -163,23 +163,23 @@ So, let's be precise. Let's put UUIDs on everything.
 
 ## Wire format (binary)
 
-The binary format is more efficient because of higher bit density; it is also simpler and safer because of explicit field lengths. Obviously, it is not human-readable.
+The binary format is more efficient because of higher bit density; it is also simpler and safer to parse because of explicit field lengths. Obviously, it is not human-readable.
 
-Like the Base64, the binary format is only optimized for iteraion. Because of compression, records are inevitably of variable length, so random access is not possible. Also, compression depends on iteration, as UUIDs get abbreviated relative to past UUIDs.
+Like the Base64, the binary format is only optimized for iteraion. Because of compression, records are inevitably of variable length, so random access is not possible. Also, compression depends on iteration, as UUIDs get abbreviated relative to preceding UUIDs.
 
 A binary RON frame starts with magic bytes `RON ` (R-O-N-space) and frame length, a little-endian uint32, 8 bytes total. (For multiframes, the magic bytes are treated as a Base64 number, first frame having `RON0`, second `RON1` and so on.)
 
 On the inside, a frame is a sequence of *fields*.
 Each field starts with a *descriptor* byte.
-A descriptor byte spends two bits for a field type, two bits for a sub-type and four bits for length (listed most-to-least significant bits).
-Length of 15 means the descriptor byte is followed by a the actual length as a four-byte uint32.
+A descriptor byte spends two most significant bits for a field type, next two bits for a sub-type and four bits for field byte length (excluding the descriptor byte, starts with 0).
+Length of 13, 14 or 15 means the descriptor byte is followed by the actual length as a little-endian uint8, uint16 or uint32, respectively.
 Descriptor byte types and sub-types are as follows:
 
 0. `00` Op  - the length is either 0 or the byte length of all the op's fields, excluding the descriptor byte.
-    * `0000` raw subtype,
-    * `0001` reduced,
-    * `0010` header,
-    * `0011` query header
+    * `0000` raw op subtype,
+    * `0001` reduced op,
+    * `0010` header op,
+    * `0011` query header op.
 1. `01` UUID value
     * `0100` type (reducer) id,
     * `0101` object id,
@@ -198,9 +198,10 @@ Descriptor byte types and sub-types are as follows:
 
 UUID coding is as follows:
 * length is 0..8 bytes (0 is a repeat value, see compression above)
-* UUID value/origin has 60 numeric bits; the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (see above)
+* UUID value/origin has 60 numeric bits encoded by 1..8 bytes; in the first byte, the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (0..7)
 
 For example, `0110 0001  1111 0100` is the value part `01` an event UUID `10`, defaults to the object UUID of the same op `1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining 60-7*8=4 bits are `0100`.
+As with the Base64 coding, we optimize for compression of close UUIDs (ideally, sequential UUIDs).
 
 ## The math
 
