@@ -190,7 +190,7 @@ type Reducer interface {
 	ReduceAll(inputs []Frame) (result Frame, err UUID)
 }
 
-type ReducerMaker func () Reducer
+type ReducerMaker func() Reducer
 
 var RDTYPES map[UUID]ReducerMaker
 

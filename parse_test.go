@@ -238,7 +238,7 @@ func TestFrame_EOF2(t *testing.T) {
 			} else {
 				t.Logf("OK state %d at pos %d op %d", frame.ParserState(), frame.state.p, o)
 			}
-			if frame.ParserState()==RON_EOF {
+			if frame.ParserState() == RON_EOF {
 				frame = frame.Rest()
 			}
 			o++

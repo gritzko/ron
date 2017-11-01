@@ -50,7 +50,7 @@ func FormatZipInt(output []byte, value, context uint64) []byte {
 	if prefix >= 4*6 {
 		prefix -= prefix % 6
 		value = (value << uint(prefix)) & INT60_FULL
-		pchar := PREFIX_PUNCT[uint(prefix)/6 - 4]
+		pchar := PREFIX_PUNCT[uint(prefix)/6-4]
 		output = append(output, pchar)
 		if value != 0 {
 			output = FormatInt(output, value)

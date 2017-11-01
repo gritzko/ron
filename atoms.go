@@ -66,8 +66,8 @@ func (a Atoms) Integer(i int) int64 {
 	}
 }
 
-func (a Atoms) IsLink () bool {
-    return a.Count()==1 && a.AType(0)==ATOM_UUID
+func (a Atoms) IsLink() bool {
+	return a.Count() == 1 && a.AType(0) == ATOM_UUID
 }
 
 func (a Atoms) UUID(i int) UUID {

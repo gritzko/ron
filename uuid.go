@@ -158,9 +158,9 @@ func (uuid UUID) prefixWith(context UUID) (ret int) {
 }
 
 func (uuid UUID) Error() string {
-    if uuid.IsError() {
-	    return uuid.String()
-    } else {
-        return ""
-    }
+	if uuid.IsError() {
+		return uuid.String()
+	} else {
+		return ""
+	}
 }

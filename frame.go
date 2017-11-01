@@ -104,7 +104,7 @@ func (frame Frame) Reformat(format uint) Frame {
 
 func (frame Frame) Clone() (clone Frame) {
 	clone = frame
-	if frame.Atoms.Count()<=2 { // FIXME
+	if frame.Atoms.Count() <= 2 { // FIXME
 		copy(clone._atoms[:frame.Atoms.Count()], frame.atoms)
 		clone.atoms = clone._atoms[:frame.Atoms.Count()]
 	} else {
@@ -137,7 +137,7 @@ func (frame *Frame) Next() bool {
 	if frame.state.cs == RON_error {
 		return false
 	}
-	if frame.state.streaming && (frame.state.cs!=RON_start && frame.state.cs!=RON_EOF) {
+	if frame.state.streaming && (frame.state.cs != RON_start && frame.state.cs != RON_EOF) {
 		return false
 	}
 	return true
@@ -247,8 +247,8 @@ func (frame Frame) SplitInclusive() Frame {
 		panic("oops") // FIXME
 	}
 	at := frame.state.p
-	if at>0 && frame.state.data[at-1]==FRAME_TERM_SEP {
-		at -- // strip the frame terminator
+	if at > 0 && frame.state.data[at-1] == FRAME_TERM_SEP {
+		at-- // strip the frame terminator
 	}
 	return ParseFrame(frame.state.data[0:at])
 }

@@ -3044,7 +3044,6 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr117:
 //line ./op-grammar.rl:56
-
 		goto st14
 	st14:
 		if p++; p == pe {
@@ -3970,7 +3969,6 @@ func (it *Frame) Parse() int {
 	}
 
 //line dfa.rl:53
-
 	it.state.incomplete = i
 	it.state.idx = idx
 	it.state.digit = digit
@@ -3987,6 +3985,7 @@ func (it *Frame) Parse() int {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:72
+
 //line dfa.go:4241
 	const UUID_start int = 1
 	const UUID_first_final int = 2
@@ -4382,10 +4381,8 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			switch cs {
 			case 4:
 //line ./uuid-grammar.rl:35
-
 			case 3:
 //line ./uuid-grammar.rl:38
-
 			case 5:
 //line ./uuid-grammar.rl:35
 //line ./uuid-grammar.rl:47
@@ -4401,7 +4398,6 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	}
 
 //line dfa.rl:89
-
 	if cs < UUID_first_final || digit > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))
 	} else {

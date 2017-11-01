@@ -4,11 +4,11 @@ import (
 //	"fmt"
 )
 
-func NewSpec (rdtype, object, event, ref UUID) Spec {
-	return Spec{uuids:[4]UUID{rdtype, object, event, ref}}
+func NewSpec(rdtype, object, event, ref UUID) Spec {
+	return Spec{uuids: [4]UUID{rdtype, object, event, ref}}
 }
 
-func (spec *Spec) SetUUID (idx int, uuid UUID) {
+func (spec *Spec) SetUUID(idx int, uuid UUID) {
 	spec.uuids[idx] = uuid
 }
 
