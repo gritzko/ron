@@ -66,7 +66,7 @@ Swarm RON formal model has five key components:
     * object UUID `1TUAQ+gritzko`,
     * event UUID `1TUAQ+gritzko` and
     * location/reference UUID, e.g. `bar`.
-    * atoms are strings, integers, floats or references ([UUIDs](uid.md)).
+    * atoms are strings, integers, floats or references (UUIDs).
 3. a frame is an ordered collection of ops, a transactional unit of data
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
@@ -197,8 +197,11 @@ Descriptor byte types and sub-types are as follows:
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
 
 UUID coding is as follows:
-* length is 0..8 bytes (0 is a repeat value, see compression above)
-* UUID value/origin has 60 numeric bits encoded by 1..8 bytes; in the first byte, the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (0..7)
+* value (`0100`..`0111`, also `1100`) and origin (`1000`..`1011`) are encoded as separate fields,
+* a skipped field means "same as the default",
+* field length is 0..8 bytes (0 is same as a skipped field)
+* UUID value/origin has 60 numeric bits encoded by 1..8 bytes (8*8-60=4 bits extra)
+* in the first byte, the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (0..7)
 
 For example, `0110 0001  1111 0100` is the value part `01` an event UUID `10`, defaults to the object UUID of the same op `1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining 60-7*8=4 bits are `0100`.
 As with the Base64 coding, we optimize for compression of close UUIDs (ideally, sequential UUIDs).
@@ -242,6 +245,7 @@ Use Swarm RON!
 * 2017 Jul: Ragel parser
 * 2017 Aug: punctuation tweaks
 * 2017 Oct: streaming parser
+* 2017 Oct: binary encoding
 
 [2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
 [super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
