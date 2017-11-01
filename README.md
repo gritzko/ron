@@ -34,6 +34,8 @@ This example illustrates key features of RON:
   Once you subscribe to an object, you receive the state and all the
   future updates, till you unsubscribe.
 * RON is information-centric. Consider git: once you clone a repo, your copy is as good as the original one. Same with RON.
+* RON is a hypermedia format, as data pieces can reference each other globally (imagine a RON-based real-time World-Wide-Web-of-Data).
+ Although, both replica ids and data routing must work at global scale then (federated, etc).
 * RON is not optimized for human consumption. It is a machine-to-machine language mostly. "Human" APIs are produced by mappers (see below).
 * RON employs compression for its metadata. The RON UUID syntax is specifically fine-tuned for easy compression. Consider the above frame uncompressed:
 ```
@@ -71,7 +73,7 @@ Swarm RON formal model has five key components:
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
 4. a reducer is a RON term for a "data type"; reducers define how object state is changed by new ops
-    * a [reducer][re] is a pure function: `f(state_frame, change_frame) -> new_state_frame`, where frames are either empty frames or single ops or products of past reductions by the same reducer,
+    * a reducer is a pure function: `f(state_frame, change_frame) -> new_state_frame`, where frames are either empty frames or single ops or products of past reductions by the same reducer,
     * reducers are:
         1. associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )` where `patch == f(op1,op2)`
         2. commutative for concurrent ops (can tolerate causally consistent partial orders), e.g. `f(f(state,a),b) == f(f(state,b),a)`, assuming `a` and `b` originated concurrently at different replicas,
@@ -202,7 +204,7 @@ UUID coding is as follows:
 * UUID value/origin has 60 numeric bits encoded by 1..8 bytes (8*8-60=4 bits extra)
 * in the first byte, the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (0..7)
 
-For example, `0110 0001  1111 0100` is the value part `01` an event UUID `10`, defaults to the object UUID of the same op `1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining 60-7*8=4 bits are `0100`.
+For example, `0110 0001  1111 0100` is the value part `01` of an event UUID `10`, defaults to the object UUID of the same op `1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining 60-7*8=4 bits are `0100`.
 As with the Base64 coding, we optimize for compression of close UUIDs (ideally, sequential UUIDs).
 
 ## The math

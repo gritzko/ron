@@ -43,7 +43,7 @@ func TestLWW_Reduce(t *testing.T) {
 		frameB := ron.ParseFrameString(test[1])
 		var lww LWW
 		frameC, err := lww.Reduce(frameA, frameB)
-		fmt.Println(frameA.String(), frameB.String(), frameC.String())
+		//fmt.Println(frameA.String(), frameB.String(), frameC.String())
 		if err != ron.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())
@@ -55,13 +55,13 @@ func TestLWW_Reduce(t *testing.T) {
 	}
 }
 
-func TestLWW_FallbackReduce(t *testing.T) {
-	frameA := ron.ParseFrameString("*lww#id@1!:b=2:a=1:c=1")
-	frameB := ron.ParseFrameString("*lww#id@2!:d'4':c=3")
-	var lww LWW
-	frameC, err := lww.FallbackReduce(ron.Batch{frameA, frameB})
-	if !err.IsZero() || frameC.String()!="*lww#id@2!@1:a=1:b=2@2:c=3:d'4'" {
-		t.Fail()
-		t.Log(frameC.String())
-	}
-}
+//func TestLWW_FallbackReduce(t *testing.T) {
+//	frameA := ron.ParseFrameString("*lww#id@1!:b=2:a=1:c=1")
+//	frameB := ron.ParseFrameString("*lww#id@2!:d'4':c=3")
+//	var lww LWW
+//	frameC, err := lww.FallbackReduce(ron.Batch{frameA, frameB})
+//	if !err.IsZero() || frameC.String()!="*lww#id@2!@1:a=1:b=2@2:c=3:d'4'" {
+//		t.Fail()
+//		t.Log(frameC.String())
+//	}
+//}

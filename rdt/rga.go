@@ -22,18 +22,10 @@ func MakeRGAReducer () ron.Reducer {
 	return rga
 }
 
-// [ ] multiframe handling:
-// 		[x] Rest(), ranges
-//		[ ] FrameHeap EJECT_SUBFRAMES
-//		[ ] reinsert subframes
-// 		[ ] Split(), another run
-//		[ ] violation checks
+// [ ] multiframe handling: the O(N) multiframe merge
 // [ ] undo/redo
 
 // Reduce RGA frames
-// RGA multiframe format:
-// ORDER,   WHY
-//
 func (rga RGA) ReduceAll(inputs []ron.Frame) (result ron.Frame, err ron.UUID) {
 
 	rdtype, object := inputs[0].Type(), inputs[0].Object()
@@ -101,13 +93,10 @@ func (rga RGA) ReduceAll(inputs []ron.Frame) (result ron.Frame, err ron.UUID) {
 			header_spec.SetUUID(ron.SPEC_EVENT, event)
 
 			result.AppendReduced(header_spec, atoms)
-			//fmt.Printf("APPND %c[ %s ]\n", op.Term(), string(op.Atoms.Body))
 
 			rga.active_ins.NextPrim() // idempotency  FIXME rename "prim"
-			//fmt.Printf("ACTIVE %d\n", rga.active_ins.Len())
 
 			rga.waiting_ins.Unload(&rga.active_ins, event)
-			//fmt.Printf("ADD %s (+%d)\n", event.String(), c)
 		}
 	}
 
@@ -127,7 +116,6 @@ func (rga RGA) ReduceAll(inputs []ron.Frame) (result ron.Frame, err ron.UUID) {
 }
 
 func (rga RGA) Reduce(a, b ron.Frame) (res ron.Frame, err ron.UUID) {
-	//fmt.Printf("START [ %s ] + [ %s ]\n", a.String(), b.String())
 	var frames = [2]ron.Frame{a, b}
 	res, err = rga.ReduceAll(frames[0:2])
 	return

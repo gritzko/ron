@@ -102,7 +102,7 @@ func TestRGA_Reduce(t *testing.T) {
 		frameB := ron.ParseFrameString(test[1])
 		rga := MakeRGAReducer()
 		frameC, err := rga.Reduce(frameA, frameB)
-		fmt.Println(frameA.String(), frameB.String(), frameC.String())
+		//fmt.Println(frameA.String(), frameB.String(), frameC.String())
 		if err != ron.ZERO_UUID {
 			t.Fail()
 			fmt.Printf("reduction error at %d: %s\n", i, err.String())
