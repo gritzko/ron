@@ -1,4 +1,4 @@
-package RDT
+package rdt
 
 import (
 	"github.com/gritzko/ron"
