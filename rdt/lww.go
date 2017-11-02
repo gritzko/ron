@@ -6,10 +6,10 @@ import (
 
 // LWW is a last-write-wins replicated data type that may host a variety of user-land data types, like:
 //
-// * a dictionary,
-// * a struct or
-// * a simple 1D array (no splice, no index shifts),
-// * a simple 2D array.
+// 		* a dictionary,
+// 		* a struct or
+// 		* a simple 1D array (no splice, no index shifts),
+// 		* a simple 2D array.
 //
 // This LWW employs client-side logical timestamps to decide which write wins, on a field-by-field basis.
 // That is similar to e.g. Cassandra LWW.
