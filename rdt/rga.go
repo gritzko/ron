@@ -5,6 +5,14 @@ import (
 	//	"fmt"
 )
 
+// RGA is a Replicated Growable Array data type, an ordered collection of anything
+// (numbers, strings, objects). This algorithm is actually closer to Causal Trees,
+// albeit that name may turn confusing (RG Arrays are actually trees, Causal Trees
+// are actually arrays, but nevermind).
+//
+// Algorithmically, this differs from Operational Transforms by bruteforcing the
+// problem: all the elements of an array have unique ids, so concurrent changes
+// can't introduce confusion.
 type RGA struct {
 	active_ins  ron.FrameHeap
 	waiting_rms map[ron.UUID]ron.UUID

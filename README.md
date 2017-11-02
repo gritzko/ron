@@ -63,7 +63,7 @@ Swarm RON formal model has five key components:
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`).
 2. An op is an immutable atomic unit of data change.
     An op is a tuple of four [UUIDs](uid.md) and zero or more *atoms*:
-    * data type UUID, e.g. `lww`,
+    * data type UUID, e.g. `lww` a last-write-wins object,
     * object UUID `1TUAQ+gritzko`,
     * event UUID `1TUAQ+gritzko` and
     * location/reference UUID, e.g. `bar`.
