@@ -15,12 +15,19 @@ Consider JSON. It expresses relations by element positioning:
 ```
 RON may express that state as:
 ```
-*lww#1TUAQ+gritzko@`   :bar = 1
-#(R@`                  :foo > 1TUAQ+gritzko
+*lww #1TUAQ+gritzko @`   :bar = 1
+     #(R            @`   :foo > 1TUAQ+gritzko
 ```
-Those are two RON *ops*: some object has a field `bar` set to 1,
-another object has a field `foo` set to the first object.
-This example illustrates key features of RON:
+Those are two RON *ops*:
+
+ 1. some object has a field `bar` set to 1 (on 2017-10-31 10:26:00 UTC, by gritzko),
+ 2. another object has a field `foo` set to the first object (10:27:00, by gritzko).
+
+Each op is a tuple of four globally-unique UUIDs for its data type, object, event and location, plus some number of value *atoms*.
+You may not see any UUIDs in the above example, initially.
+The RON notation does a lot to compress that metadata away.
+
+These are the key features of RON:
 
 * RON's atomic unit is an immutable *op*. Every change to the data is an *event*; every event produces an op. An op may flow from a replica to a replica, from a database to a database, while fully intact and maintaining its original identity.
 * Each RON op is context-independent. Nothing is implied by the context, everything is specified explicitly and unambiguously. An op has four globally unique UUIDs for its data type, object, event and location.
@@ -126,7 +133,7 @@ The syntax outline:
     * `.` ends a frame (optional)
 4. frame format employs cross-columnar compression
     * repeated UUIDs can be skipped altogether ("same as in the last op")
-    * RON abbreviates similar UUIDs using prefix compression, e.g. `1D4ICCE-XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC-XU5eRJ` (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
+    * RON abbreviates similar UUIDs using prefix compression, e.g. `1D4ICCE+XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC+XU5eRJ` (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
     * by default, an UUID is compressed against the same UUID in the previous op (e.g. event id against the previous event id)
     * backtick ` changes the default UUID to the previous UUID of the same op (e.g. event id against same op's object id)
 
@@ -139,15 +146,15 @@ In the tabular form, that frame may look like:
 ```
 type object         event           location value
 -----------------------------------------------------
-*lww #1D4ICC-XU5eRJ @1D4ICCE-XU5eRJ :0       !
-*lww #1D4ICC-XU5eRJ @1D4ICCE-XU5eRJ :keyA    'valueA'
-*lww #1D4ICC-XU5eRJ @1D4ICC1-XU5eRJ :keyB    'valueB'
+*lww #1D4ICC+XU5eRJ @1D4ICCE+XU5eRJ :0       !
+*lww #1D4ICC+XU5eRJ @1D4ICCE+XU5eRJ :keyA    'valueA'
+*lww #1D4ICC+XU5eRJ @1D4ICC1+XU5eRJ :keyB    'valueB'
 ```
 There are lots of repeating bits here.
 We may skip repeating UUIDs and prefix-compress close UUIDs.
 The compressed frame will be just a bit longer than bare JSON:
 ```
-*lww#1D4ICC-XU5eRJ@`{E! :keyA'valueA' @{1:keyB'valueB'
+*lww#1D4ICC+XU5eRJ@`{E! :keyA'valueA' @{1:keyB'valueB'
 ``` 
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.

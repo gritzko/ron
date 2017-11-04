@@ -23,7 +23,7 @@ func NewClock(replica uint64, mode, minLen int) Clock {
 	return Clock{lastSeen: NewEventUUID(0, origin), Mode: mode, MinLength: minLen}
 }
 
-func time2uint(t time.Time) (i uint64) {
+func EncodeCalendar(t time.Time) (i uint64) {
 	months := (t.Year()-2010)*12 + int(t.Month()) - 1
 	i |= uint64(months)
 	days := t.Day() - 1
@@ -59,7 +59,7 @@ func (clock *Clock) Time() UUID {
 	switch clock.Mode {
 	case CLOCK_CALENDAR:
 		t := time.Now().Add(clock.offset).UTC()
-		val = time2uint(t)
+		val = EncodeCalendar(t)
 	case CLOCK_LAMPORT:
 		val = last + 1
 	case CLOCK_EPOCH:
@@ -94,7 +94,17 @@ func (clock Clock) IsSane(uuid UUID) bool {
 	}
 }
 
-func uint2time(v uint64) time.Time {
+func (clock Clock) Decode (uuid UUID) time.Time {
+	switch clock.Mode {
+	case CLOCK_CALENDAR:
+		return DecodeCalendar(uuid.Value())
+	default:
+		return time.Time{}
+	}
+
+}
+
+func DecodeCalendar(v uint64) time.Time {
 	//var seq int = int(v & 4095)
 	v >>= 12
 	var ms int = int(v & 4095)

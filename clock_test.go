@@ -19,14 +19,14 @@ func TestClock_Format(t *testing.T) {
 			t.Fail()
 			break
 		}
-		ui := time2uint(date)
+		ui := EncodeCalendar(date)
 		s := FormatInt([]byte{}, ui)
 		str := string(s)
 		if str != pair[1] {
 			t.Logf("case %d: %s must be %s", i, str, pair[1])
 			t.Fail()
 		}
-		t2 := uint2time(ui)
+		t2 := DecodeCalendar(ui)
 		str2 := t2.Format(time.UnixDate)
 		if str2 != pair[0] {
 			t.Logf("case %d: %s must be %s", i, str2, pair[0])
