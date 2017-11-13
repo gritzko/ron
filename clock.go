@@ -1,6 +1,10 @@
 package ron
 
 import "time"
+import (
+	"encoding/binary"
+	"encoding/hex"
+)
 
 // hybrid calendar/logical clock
 type Clock struct {
@@ -43,6 +47,47 @@ func EncodeCalendar(t time.Time) (i uint64) {
 	i |= uint64(millis)
 	i <<= 12
 	return i
+}
+
+func CalendarToRFC(uuid UUID) (u [16]byte) {
+	// the formula comes from satori/go.uuid
+	time := DecodeCalendar(uuid.Value())
+	timeRfc := uint64(122192928000000000) + uint64(time.UnixNano()/100)
+	var replicaId [6]byte
+	orig := uuid.Origin()
+	for i:=0; i<6; i++ {
+		replicaId[5-i] = byte(orig&255)
+		orig >>= 8
+	}
+
+	binary.BigEndian.PutUint32(u[0:], uint32(timeRfc))
+	binary.BigEndian.PutUint16(u[4:], uint16(timeRfc>>32))
+	binary.BigEndian.PutUint16(u[6:], uint16(timeRfc>>48))
+	binary.BigEndian.PutUint16(u[8:], 0)
+	copy(u[10:], replicaId[:])
+	var version byte = 1
+	u[6] = (u[6] & 0x0f) | (version << 4)
+	u[8] = (u[8] & 0xbf) | 0x80
+
+	return u
+}
+
+func CalendarToRFCString (uuid UUID) string {
+	u := CalendarToRFC(uuid)
+	buf := make([]byte, 36)
+
+	hex.Encode(buf[0:8], u[0:4])
+	buf[8] = '-'
+	hex.Encode(buf[9:13], u[4:6])
+	buf[13] = '-'
+	hex.Encode(buf[14:18], u[6:8])
+	buf[18] = '-'
+	hex.Encode(buf[19:23], u[8:10])
+	buf[23] = '-'
+	hex.Encode(buf[24:], u[10:])
+
+	return string(buf)
+
 }
 
 func trim_time(full, last uint64) uint64 {
