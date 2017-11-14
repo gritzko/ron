@@ -42,10 +42,9 @@ func EncodeCalendar(t time.Time) (i uint64) {
 	seconds := t.Second()
 	i <<= 6
 	i |= uint64(seconds)
-	millis := t.Nanosecond() / 1000000
-	i <<= 12
-	i |= uint64(millis)
-	i <<= 12
+	micros := t.Nanosecond() / 100
+	i <<= 24
+	i |= uint64(micros)
 	return i
 }
 
@@ -53,17 +52,19 @@ func CalendarToRFC(uuid UUID) (u [16]byte) {
 	// the formula comes from satori/go.uuid
 	time := DecodeCalendar(uuid.Value())
 	timeRfc := uint64(122192928000000000) + uint64(time.UnixNano()/100)
+	binary.BigEndian.PutUint32(u[0:], uint32(timeRfc))
+	binary.BigEndian.PutUint16(u[4:], uint16(timeRfc>>32))
+	binary.BigEndian.PutUint16(u[6:], uint16(timeRfc>>48))
+	binary.BigEndian.PutUint16(u[8:], 0)
+
 	var replicaId [6]byte
 	orig := uuid.Origin()
+	orig >>= 60-6*8
 	for i:=0; i<6; i++ {
 		replicaId[5-i] = byte(orig&255)
 		orig >>= 8
 	}
 
-	binary.BigEndian.PutUint32(u[0:], uint32(timeRfc))
-	binary.BigEndian.PutUint16(u[4:], uint16(timeRfc>>32))
-	binary.BigEndian.PutUint16(u[6:], uint16(timeRfc>>48))
-	binary.BigEndian.PutUint16(u[8:], 0)
 	copy(u[10:], replicaId[:])
 	var version byte = 1
 	u[6] = (u[6] & 0x0f) | (version << 4)
@@ -149,11 +150,11 @@ func (clock Clock) Decode (uuid UUID) time.Time {
 
 }
 
+const MASK24 uint64 = 16777215
+
 func DecodeCalendar(v uint64) time.Time {
-	//var seq int = int(v & 4095)
-	v >>= 12
-	var ms int = int(v & 4095)
-	v >>= 12
+	var ns100 int = int(v & MASK24)
+	v >>= 24
 	var secs int = int(v & 63)
 	v >>= 6
 	var mins int = int(v & 63)
@@ -165,6 +166,6 @@ func DecodeCalendar(v uint64) time.Time {
 	var months int = int(v & 4095)
 	var month = months % 12
 	var year = months / 12
-	t := time.Date(year+2010, time.Month(month+1), days+1, hours, mins, secs, ms, time.UTC)
+	t := time.Date(year+2010, time.Month(month+1), days+1, hours, mins, secs, ns100*100, time.UTC)
 	return t
 }
