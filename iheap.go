@@ -35,131 +35,130 @@ func MakeFrameHeap(mode, size int) (ret FrameHeap) {
 	return
 }
 
-func (h FrameHeap) less(i, j int) bool {
-	c := Compare(h.iters[i].uuids[h.primary], h.iters[j].uuids[h.primary])
+func (heap FrameHeap) less(i, j int) bool {
+	c := Compare(UUID(heap.iters[i].atoms[heap.primary]), UUID(heap.iters[j].atoms[heap.primary]))
 	if c == 0 {
-		c = Compare(h.iters[i].uuids[h.secondary], h.iters[j].uuids[h.secondary])
-		if h.sec_desc {
+		c = Compare(UUID(heap.iters[i].atoms[heap.secondary]), UUID(heap.iters[j].atoms[heap.secondary]))
+		if heap.sec_desc {
 			c = -c
 		}
-	} else if h.prim_desc {
+	} else if heap.prim_desc {
 		c = -c
 	}
 	//fmt.Printf("CMP %s %s %d\n", h.iters[i].String(), h.iters[j].String(), c)
 	return c < 0
 }
 
-func (h *FrameHeap) sink(i int) {
+func (heap *FrameHeap) sink(i int) {
 	to := i
 	j := i << 1
-	if j < len(h.iters) && h.less(j, i) {
+	if j < len(heap.iters) && heap.less(j, i) {
 		to = j
 	}
 	j++
-	if j < len(h.iters) && h.less(j, to) {
+	if j < len(heap.iters) && heap.less(j, to) {
 		to = j
 	}
 	if to != i {
-		h.swap(i, to)
-		h.sink(to)
+		heap.swap(i, to)
+		heap.sink(to)
 	}
 }
 
-func (h *FrameHeap) raise(i int) {
+func (heap *FrameHeap) raise(i int) {
 	j := i >> 1
-	if j > 0 && h.less(i, j) {
-		h.swap(i, j)
+	if j > 0 && heap.less(i, j) {
+		heap.swap(i, j)
 		if j > 1 {
-			h.raise(j)
+			heap.raise(j)
 		}
 	}
 }
 
-func (h FrameHeap) Len() int { return len(h.iters) - 1 }
+func (heap FrameHeap) Len() int { return len(heap.iters) - 1 }
 
-func (h FrameHeap) swap(i, j int) {
+func (heap FrameHeap) swap(i, j int) {
 	//fmt.Printf("SWAP %d %d\n", i, j)
-	h.iters[i], h.iters[j] = h.iters[j], h.iters[i]
+	heap.iters[i], heap.iters[j] = heap.iters[j], heap.iters[i]
 }
 
-func (h *FrameHeap) Put(i *Frame) {
-	if !i.IsEmpty() {
-		at := len(h.iters)
-		h.iters = append(h.iters, i)
-		h.raise(at)
+func (heap *FrameHeap) Put(i *Frame) {
+	if !i.EOF() {
+		at := len(heap.iters)
+		heap.iters = append(heap.iters, i)
+		heap.raise(at)
 	}
 }
 
-func (h *FrameHeap) Op() (op *Op) {
-	if len(h.iters) > 1 {
-		op = &h.iters[1].Op
+func (heap *FrameHeap) Current() (frame *Frame) {
+	if len(heap.iters) > 1 {
+		return heap.iters[1]
 	} else {
-		op = &ZERO_OP
+		return nil
 	}
-	return
 }
 
-func (h *FrameHeap) remove(i int) {
-	h.iters[i] = h.iters[len(h.iters)-1]
-	h.iters = h.iters[:len(h.iters)-1]
-	h.sink(i)
+func (heap *FrameHeap) remove(i int) {
+	heap.iters[i] = heap.iters[len(heap.iters)-1]
+	heap.iters = heap.iters[:len(heap.iters)-1]
+	heap.sink(i)
 }
 
-func (h *FrameHeap) next(i int) {
-	h.iters[i].Next()
-	if h.iters[i].IsEmpty() {
-		h.remove(i)
+func (heap *FrameHeap) next(i int) {
+	heap.iters[i].Next()
+	if heap.iters[i].EOF() {
+		heap.remove(i)
 	} else {
-		h.sink(i)
+		heap.sink(i)
 	}
 }
 
-func (h *FrameHeap) Next() (op *Op) {
-	h.next(1)
-	return h.Op()
+func (heap *FrameHeap) Next() (frame *Frame) {
+	heap.next(1)
+	return heap.Current()
 }
 
-func (h *FrameHeap) nexteq(i int, uuid UUID) {
-	if h.iters[i].uuids[h.primary] == uuid {
+func (heap *FrameHeap) nexteq(i int, uuid UUID) {
+	if heap.iters[i].UUID(heap.primary) == uuid {
 		j := i << 1
-		if j < len(h.iters) {
-			if j+1 < len(h.iters) { // FIXME rightmost first!
-				h.nexteq(j+1, uuid)
+		if j < len(heap.iters) {
+			if j+1 < len(heap.iters) { // FIXME rightmost first!
+				heap.nexteq(j+1, uuid)
 			}
-			h.nexteq(j, uuid)
+			heap.nexteq(j, uuid)
 		}
-		h.next(i)
-		for i < len(h.iters) && h.iters[i].uuids[h.primary] == uuid {
-			h.next(i) // FIXME this fix (recheck after removal)
+		heap.next(i)
+		for i < len(heap.iters) && heap.iters[i].UUID(heap.primary) == uuid {
+			heap.next(i) // FIXME this fix (recheck after removal)
 		}
 	}
 }
 
-func (h *FrameHeap) NextPrim() (op *Op) {
-	if !h.IsEmpty() {
-		event := h.iters[1].uuids[h.primary]
-		h.nexteq(1, event)
+func (heap *FrameHeap) NextPrim() (frame *Frame) {
+	if !heap.IsEmpty() {
+		event := heap.iters[1].UUID(heap.primary)
+		heap.nexteq(1, event)
 	}
-	return h.Op()
+	return heap.Current()
 }
 
-func (h *FrameHeap) PutFrame(frame Frame) {
-	h.Put(&frame)
+func (heap *FrameHeap) PutFrame(frame Frame) {
+	heap.Put(&frame)
 }
 
-func (h *FrameHeap) IsEmpty() bool {
-	return len(h.iters) == 1
+func (heap *FrameHeap) IsEmpty() bool {
+	return len(heap.iters) == 1
 }
 
-func (h *FrameHeap) Frame() Frame {
+func (heap *FrameHeap) Frame() Frame {
 	cur := MakeFrame(128)
-	for !h.IsEmpty() {
-		cur.AppendOp(*h.Op())
-		h.Next()
+	for !heap.IsEmpty() {
+		cur.Append(*heap.Current())
+		heap.Next()
 	}
 	return cur.Close()
 }
 
-func (h *FrameHeap) Clear() {
-	h.iters = h.iters[:1]
+func (heap *FrameHeap) Clear() {
+	heap.iters = heap.iters[:1]
 }

@@ -14,15 +14,15 @@ func TestParseOp(t *testing.T) {
 	t.Log("Parser")
 	var frame = "*lww#test-author@(time-origin:loc=1''>test"
 	iter := ParseFrameString(frame)
-	if iter.Spec.Type().String() != "lww" {
+	if iter.Type().String() != "lww" {
 		t.Logf("'%s' %v != '%s'\n", iter.Type().String(), []byte(iter.Type().String()), "lww")
 		t.Fail()
 	}
-	if iter.Spec.Object().String() != "test-author" {
+	if iter.Object().String() != "test-author" {
 		t.Logf("'%s' %v != '%s'\n", iter.Type().String(), []byte(iter.Object().String()), "test-author")
 		t.Fail()
 	}
-	t.Log(iter.Op.String())
+	t.Log(iter.OpString())
 	i := iter.Integer(0)
 	if i != 1 {
 		t.Logf("int parse fails: %d", iter)
@@ -41,8 +41,8 @@ func BenchmarkParseOp(b *testing.B) {
 	frame := ParseFrame(frames)
 	var off int
 	for i := 0; i < b.N; i++ {
-		if frame.Event().Origin() != origin.Origin() || frame.Atoms.Count() != 1 || frame.Atoms.AType(0) != ATOM_INT {
-			b.Logf("parse fail: off %d len %d '%s'", off, len(framestr), frame.Op.String())
+		if frame.Event().Origin() != origin.Origin() || frame.Count() != 1 || frame.Atom(0).Type() != ATOM_INT {
+			b.Logf("parse fail: off %d len %d '%s'", off, len(framestr), frame.OpString())
 			b.Fail()
 			break
 		}

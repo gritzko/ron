@@ -10,10 +10,6 @@ func ParseUUID(data []byte) (uuid UUID, err error) {
 	return ZERO_UUID.Parse(data)
 }
 
-func ParseOp(data []byte) Op {
-	return OpenFrame(data).Op
-}
-
 func ParseFrame(data []byte) Frame { // TODO swap with OpenFrame
 	return OpenFrame(data)
 }
@@ -27,20 +23,25 @@ func ParseFrameString(frame string) Frame {
 // the return slice is empty. The sanity checker is invoked on every
 // op, on error the function aborts (all the completed frames still
 // in the slice).
-func (frame Frame) SplitMultiframe(sanity Checker) (ret []Frame, err error) {
-	for !frame.IsEmpty() {
-		if sanity != nil {
-			err = sanity.Check(frame)
-			if err != nil {
-				return
-			}
-		}
-		if frame.IsHeader() {
-			ret = append(ret, Frame{})
-		}
-		ret[len(ret)-1].AppendOp(frame.Op)
-		frame.Next()
-	}
-	return
-	// TODO make slice frames (head op not in the body), avoid copy
-}
+//func (frame Frame) SplitMultiframe(sanity Checker) (ret []Frame, err error) {
+//
+//
+//	// FIXME format and copy!!!
+//
+//
+//	for !frame.IsEmpty() {
+//		if sanity != nil {
+//			err = sanity.Check(frame)
+//			if err != nil {
+//				return
+//			}
+//		}
+//		if frame.IsHeader() {
+//			ret = append(ret, Frame{})
+//		}
+//		ret[len(ret)-1].Append(frame)
+//		frame.Next()
+//	}
+//	return
+//	// TODO make slice frames (head op not in the body), avoid copy
+//}

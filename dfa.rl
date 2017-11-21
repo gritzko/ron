@@ -5,44 +5,51 @@ import "errors"
 
 %% machine RON;
 %% write data;
-%% access it.state.;
+%% access frame.Parser.;
+%% variable p frame.Parser.position;
+%% variable data frame.Body;
+%% variable cs frame.Parser.state;
 const RON_EOF = -1
 
 
-// Parse consumes one op, unless the buffer ends earlier.
-func (it *Frame) Parse() int {
+// Parse consumes one op from data[], unless the buffer ends earlier.
+// Fills atoms[], returns op term (TERM_RAW etc) or TERM_ERROR
+func (frame *Frame) Parse() {
 
-    if it.state.p>=len(it.state.data) {
-        if !it.state.streaming {
-            it.Op = ZERO_OP
-            it.state.cs = RON_error
+    if frame.Parser.position >= len(frame.Body) {
+        if !frame.Parser.streaming {
+            frame.Parser.state = RON_error
         }
-        return RON_error
+        return 
     }
 
-    if it.state.cs==RON_EOF {
-        it.state.cs = RON_error
-        return RON_error
+    if frame.Parser.state==RON_error {
+        if frame.Parser.position==0 {
+	        %% write init;
+            frame.atoms = make([]Atom, 4, 8)
+        } else {
+            return
+        }
+    } else if frame.Parser.state==RON_EOF {
+        frame.Parser.state = RON_error
+        return
+    } else if frame.Parser.state==RON_start {
+        frame.Parser.offset = frame.Parser.position;
+        frame.atoms = frame.atoms[:4];
+        frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = 0, 0, 0;
     }
 
-    if it.state.cs==0 && it.state.p==0 {
-	    %% write init;
-    } 
-
-    had_end := false 
-	p, pe, eof := it.state.p, len(it.state.data), len(it.state.data)
-    n := uint(0)
+	pe, eof := len(frame.Body), len(frame.Body)
+    n := 0
     _ = eof
     _ = pe // FIXME kill
 
-    if it.state.streaming {
+    if frame.Parser.streaming {
         eof = -1
     }
 
-    i := it.state.incomplete;
-    idx := it.state.idx;
-    half := it.state.half;
-    digit := it.state.digit;
+    atm, hlf, dgt := frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt;
+    atoms := frame.atoms;
 
 	%%{
 
@@ -52,17 +59,13 @@ func (it *Frame) Parse() int {
 	    write exec;
 	}%%
 
-    it.state.incomplete = i;
-    it.state.idx = idx;
-    it.state.digit = digit;
-    it.state.half = half;
-    it.state.p = p;
+    frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = atm, hlf, dgt;
+    frame.atoms = atoms;
 
-    if !it.state.streaming && it.state.cs<RON_first_final && it.state.cs>0 {
-        it.state.cs = RON_error
+    if !frame.Parser.streaming && frame.Parser.state<RON_first_final && frame.Parser.state>0 {
+        frame.Parser.state = RON_error
     }
 
-    return it.state.cs
 }
 
 
@@ -71,13 +74,12 @@ func (ctx_uuid UUID) Parse (data []byte) (UUID, error) {
     %% machine UUID;
     %% write data;
 
-    var i uint128 = ctx_uuid.uint128
-    digit := uint(0)
-    half := 0
-
 	cs, p, pe, eof := 0, 0, len(data), len(data)
     _ = eof
 
+    atm, hlf, dgt := 0, 0, 0
+
+    atoms := [1]Atom{Atom(ctx_uuid)}
 
 	%%{ 
 
@@ -88,10 +90,10 @@ func (ctx_uuid UUID) Parse (data []byte) (UUID, error) {
 	    write exec;
 	}%%
 
-    if cs < UUID_first_final || digit>10 {
+    if cs < UUID_first_final || dgt>10 {
         return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))
     } else {
-        return UUID{uint128:i}, nil 
+        return UUID(atoms[0]), nil 
     }
 
 }

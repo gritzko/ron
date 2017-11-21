@@ -25,3 +25,22 @@ func TestFrame_Split(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestBatchFrames(t *testing.T) {
+	frame1 := "*lww#A@1!:a=1,:b=2,:c=3"
+	frame2 := "*lww#A@2!:d=4"
+	var batch Batch
+	batch = append(batch, ParseFrameString(frame1))
+	batch = append(batch, ParseFrameString(frame2))
+	frame12 := BatchFrames(batch)
+	batchStr := "*batch#A@2!*lww@1!:a=1:b=2:c=3@2:0!:d=4"
+	if frame12.String() != batchStr {
+		t.Logf("\n%s != \n%s\n", frame12.String(), batchStr)
+		t.Fail()
+	}
+	b2 := SplitBatch(frame12)
+	if len(b2) != 2 {
+		t.Fail()
+		t.Log("length", len(b2))
+	}
+}

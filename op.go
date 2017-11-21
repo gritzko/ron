@@ -4,64 +4,52 @@ import (
 //	"fmt"
 )
 
-func NewSpec(rdtype, object, event, ref UUID) Spec {
-	return Spec{uuids: [4]UUID{rdtype, object, event, ref}}
+func (frame Frame) IsSameOp(b Frame) bool {
+	return frame.Event() == b.Event() && frame.Object() == b.Object() && frame.Ref() == b.Ref() && frame.Type() == b.Type()
 }
 
-func (spec *Spec) SetUUID(idx int, uuid UUID) {
-	spec.uuids[idx] = uuid
+func (frame Frame) Type() UUID {
+	return frame.UUID(SPEC_TYPE)
 }
 
-func (a Spec) IsSame(b Spec) bool {
-	return a.Event() == b.Event() && a.Object() == b.Object() && a.Ref() == b.Ref() && a.Type() == b.Type()
+func (frame Frame) Object() UUID {
+	return frame.UUID(SPEC_OBJECT)
 }
 
-func (spec Spec) UUID(i uint) UUID {
-	return spec.uuids[i]
+func (frame Frame) Event() UUID {
+	return frame.UUID(SPEC_EVENT)
 }
 
-func (spec Spec) Type() UUID {
-	return spec.uuids[SPEC_TYPE]
+func (frame Frame) Ref() UUID {
+	return frame.UUID(SPEC_REF)
 }
 
-func (spec Spec) Object() UUID {
-	return spec.uuids[SPEC_OBJECT]
+func (frame Frame) Term() int {
+	return frame.term
 }
 
-func (spec Spec) Event() UUID {
-	return spec.uuids[SPEC_EVENT]
+func (frame Frame) IsQuery() bool {
+	return frame.Term() == TERM_QUERY
 }
 
-func (spec Spec) Ref() UUID {
-	return spec.uuids[SPEC_REF]
+func (frame Frame) IsHeader() bool {
+	return frame.Term() == TERM_HEADER
 }
 
-func (op Op) Term() uint {
-	return op.term
+func (frame Frame) IsFramed() bool {
+	return frame.Term() == TERM_REDUCED
 }
 
-func (op Op) IsQuery() bool {
-	return op.Term() == TERM_QUERY
+func (frame Frame) IsRaw() bool {
+	return frame.Term() == TERM_RAW
 }
 
-func (op Op) IsHeader() bool {
-	return op.Term() == TERM_HEADER
+func (frame Frame) IsOn() bool {
+	return frame.IsQuery() && frame.Ref() != NEVER_UUID
 }
 
-func (op Op) IsFramed() bool {
-	return op.Term() == TERM_REDUCED
-}
-
-func (op Op) IsRaw() bool {
-	return op.Term() == TERM_RAW
-}
-
-func (op Op) IsOn() bool {
-	return op.IsQuery() && op.Ref() != NEVER_UUID
-}
-
-func (op Op) IsOff() bool {
-	return op.IsQuery() && op.Ref() == NEVER_UUID
+func (frame Frame) IsOff() bool {
+	return frame.IsQuery() && frame.Ref() == NEVER_UUID
 }
 
 func CreateFrame(rdtype, object, event, location, value string) Frame {
@@ -71,40 +59,35 @@ func CreateFrame(rdtype, object, event, location, value string) Frame {
 func (frame Frame) Stamp(clock Clock) Frame {
 	cur := MakeFrame(frame.Len() + 20)
 	stamps := map[uint64]UUID{}
-	for !frame.IsEmpty() {
-		op := frame.Op
-		for t := uint(0); t < 4; t++ {
-			uuid := op.Spec.UUID(t)
+	for !frame.EOF() {
+		for t := 0; t < 4; t++ {
+			uuid := frame.UUID(t)
 			if uuid.IsTemplate() {
 				stamp, ok := stamps[uuid.Origin()]
 				if !ok {
 					stamp = clock.Time()
 					stamps[uuid.Origin()] = stamp
 				}
-				op.uuids[t] = stamp
+				frame.atoms[t] = Atom(stamp)
 			}
 		}
-		cur.AppendOp(op)
+		cur.Append(frame)
 		frame.Next()
 	}
 	return cur.Close()
 }
 
-func (op Op) IsEmpty() bool {
-	return op.IsSame(ZERO_OP.Spec)
-}
-
-func (spec *Op) isZero() bool {
+func (frame Frame) isZero() bool {
 	for t := 0; t < 4; t++ {
-		if !spec.uuids[t].IsZero() {
+		if !frame.UUID(t).IsZero() {
 			return false
 		}
 	}
 	return true
 }
 
-func (op Op) String() string {
+func (frame Frame) OpString() string {
 	cur := MakeFrame(128)
-	cur.AppendOp(op)
-	return string(cur.Body())
+	cur.Append(frame)
+	return string(cur.Body)
 }

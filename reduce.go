@@ -9,9 +9,9 @@ func (r EmptyReducer) Reduce(ai, bi Frame) (frame Frame, err UUID) {
 		loc = ai.Event()
 	}
 	cur := MakeFrame(128)
-	spec := ai.Spec
-	spec.uuids[SPEC_EVENT] = bi.Event()
-	spec.uuids[SPEC_REF] = loc
+	spec := ai.Spec()
+	spec.Event = bi.Event()
+	spec.Ref = loc
 	cur.AppendStateHeader(spec)
 	return cur.Close(), ZERO_UUID
 }
@@ -36,23 +36,24 @@ func (omni OmniReducer) AddType(id UUID, r Reducer) {
 	omni.Types[id.Value()] = r
 }
 
-func (omni OmniReducer) pickReducer(t UUID) Reducer {
-	r := omni.Types[t.Value()]
-	if r == nil {
-		r = omni.empty
-	}
-	return r
-}
-
-// Reduce picks a reducer function, performs all the sanity checks,
-// creates the header, invokes the reducer, returns the result
-func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
-	r := omni.pickReducer(a.Type())
-	return r.Reduce(a, b)
-}
-
-func (omni OmniReducer) ReduceAll(inputs []Frame) (result Frame, err UUID) {
-	r := omni.pickReducer(inputs[0].Type())
-	// TODO sanity checks
-	return r.ReduceAll(inputs)
-}
+//
+//func (omni OmniReducer) pickReducer(t UUID) Reducer {
+//	r := omni.Types[t.Value()]
+//	if r == nil {
+//		r = omni.empty
+//	}
+//	return r
+//}
+//
+//// Reduce picks a reducer function, performs all the sanity checks,
+//// creates the header, invokes the reducer, returns the result
+//func (omni OmniReducer) Reduce(a, b Frame) (result Frame, err UUID) {
+//	r := omni.pickReducer(a.Type())
+//	return r.Reduce(a, b)
+//}
+//
+//func (omni OmniReducer) ReduceAll(inputs []Frame) (result Frame, err UUID) {
+//	r := omni.pickReducer(inputs[0].Type())
+//	// TODO sanity checks
+//	return r.ReduceAll(inputs)
+//}

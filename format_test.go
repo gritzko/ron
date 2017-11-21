@@ -7,12 +7,12 @@ import (
 
 func TestUUID_String(t *testing.T) {
 	tests := [][]string{
+		{"0$author", "name$author2", "name{2"},
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
 		{"0", "1", "1"},
 		{"0", "123-0", "123-"},
 		{"0", "0000000001-orig", ")1-orig"},
 		{"1time01-src", "1time02+src", "{2+"},
-		{"0$author", "name$author2", "name{2"},
 		{"hash%here", "hash%there", "%there"},
 		{"1", ")1", "0000000001"}, //7
 		{"0", "name$0", "name"},
@@ -104,20 +104,20 @@ func BenchmarkUnzip(b *testing.B) {
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
 	str := "*lww#object@time-origin:loc=1"
-	op := ParseOp([]byte(str))
-	if op.Atoms.Count() != 1 {
+	op := ParseFrameString(str)
+	if op.Count() != 1 || op.Atom(0).Type() != ATOM_INT {
 		t.Fail()
 		t.Logf("misparsed %s", str)
 		return
 	}
-	context := op
-	op.uuids[2].uint128[0]++
-	op.uuids[3].uint128[0]++
+	context := op.Clone()
+	op.atoms[2][0]++
+	op.atoms[3][0]++
 	cur := MakeFrame(1024)
-	cur.AppendOp(context)
+	cur.Append(context)
 	le := cur.Len()
-	cur.AppendOp(op)
-	opstr := string(cur.Body()[le:])
+	cur.Append(op)
+	opstr := string(cur.Body[le:])
 	correct := "@)1:)1=1"
 	if opstr != correct {
 		t.Logf("incorrect: '%s' != '%s'", opstr, correct)
@@ -127,13 +127,13 @@ func TestOp_String(t *testing.T) {
 
 func BenchmarkFormatOp(b *testing.B) {
 	str := "*lww#object@time-origin:loc=1"
-	op := ParseOp([]byte(str))
+	op := ParseFrameString(str)
 	frame := MakeFrame(b.N*len(str)*2 + 100)
-	frame.AppendOp(op)
+	frame.Append(op)
 	for i := 0; i < b.N; i++ {
-		op.uuids[2].uint128[0]++
-		op.uuids[3].uint128[0]++
-		frame.AppendOp(op)
+		op.atoms[2][0]++
+		op.atoms[3][0]++
+		frame.Append(op)
 	}
 }
 
@@ -150,15 +150,11 @@ func TestFormatOptions(t *testing.T) {
 			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more:a=1;",
 		},
 	}
-	frame := OpenFrame([]byte(framestr))
-	if frame.EOF() {
-		t.Fail()
-		return
-	}
 	for k, f := range formats {
+		frame := OpenFrame([]byte(framestr))
 		formatted := MakeFormattedFrame(f.flags, 1024)
 		for !frame.EOF() {
-			formatted.AppendOp(frame.Op)
+			formatted.Append(frame)
 			frame.Next()
 		}
 		if formatted.String() != f.correct {

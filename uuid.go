@@ -1,13 +1,11 @@
 package ron
 
-import "math/bits"
-
 func (uuid UUID) Value() uint64 {
-	return uuid.uint128[0]
+	return uuid[0]
 }
 
 func (uuid UUID) Origin() uint64 {
-	return uuid.uint128[1]
+	return uuid[1] & INT60_FULL
 }
 
 func Compare(a, b UUID) int {
@@ -25,7 +23,11 @@ func Compare(a, b UUID) int {
 }
 
 func (t UUID) Equal(b UUID) bool {
-	return t.uint128 == b.uint128
+	return t == b
+}
+
+func (uuid UUID) IsTranscendentName() bool {
+	return uuid[1] == UUID_NAME_UPPER_BITS
 }
 
 func (a UUID) LaterThan(b UUID) bool {
@@ -46,7 +48,7 @@ func (a UUID) EarlierThan(b UUID) bool {
 }
 
 func (a UUID) Scheme() uint64 {
-	return a.Origin() >> 60
+	return a[1] >> 60
 }
 
 func (a UUID) Sign() byte {
@@ -54,7 +56,7 @@ func (a UUID) Sign() byte {
 }
 
 func (a UUID) Replica() uint64 {
-	return a.Origin() & INT60_FULL
+	return a[1] & INT60_FULL
 }
 
 func (a UUID) SameAs(b UUID) bool {
@@ -69,10 +71,6 @@ func (a UUID) SameAs(b UUID) bool {
 	}
 }
 
-func (uuid UUID) IsName() bool {
-	return uuid.Origin()>>60 == UUID_NAME
-}
-
 func (uuid UUID) Derived() UUID {
 	if uuid.Scheme() == UUID_EVENT {
 		return NewUUID(UUID_DERIVED, uuid.Value(), uuid.Origin())
@@ -84,7 +82,7 @@ func (uuid UUID) Derived() UUID {
 var UUID_UPPER_BITS = [4]uint64{0, 1 << 60, 2 << 60, 3 << 60}
 
 func NewUUID(scheme uint, time, origin uint64) UUID {
-	return UUID{uint128{time, (origin & INT60_FULL) | UUID_UPPER_BITS[scheme]}}
+	return UUID{time, (origin & INT60_FULL) | UUID_UPPER_BITS[scheme]}
 }
 
 func NewEventUUID(time, origin uint64) UUID {
@@ -141,18 +139,6 @@ func (uuid UUID) String() (ret string) {
 	ret = uuid.ZipString(ZERO_UUID)
 	if len(ret) == 0 {
 		ret = "0"
-	}
-	return
-}
-
-func (uuid UUID) prefixWith(context UUID) (ret int) {
-	vp := bits.LeadingZeros64(uuid.Value() ^ context.Value())
-	vp -= vp % 6
-	op := bits.LeadingZeros64((uuid.Origin() ^ context.Origin()) & INT60_FULL)
-	op -= op % 6
-	ret = vp + op
-	if uuid.Scheme() != context.Scheme() {
-		ret--
 	}
 	return
 }

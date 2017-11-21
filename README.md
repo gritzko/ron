@@ -1,6 +1,6 @@
 # Swarm Replicated Object Notation 2.0.1 #
 
-Swarm Replicated Object Notation is a distributed data serialization format.
+Swarm Replicated Object Notation is a format for *distributed live data*.
 RON's focus is data synchronization.
 RON assumes that every *object* naturally has an unlimited number of *replicas* that synchronize incrementally.
 RON is information-centric, it aims to liberate the data from its location, storage, application or transport.
@@ -16,11 +16,11 @@ Consider JSON. It expresses relations by element positioning:
 RON may express that state as:
 ```
 *lww #1TUAQ+gritzko @`   :bar = 1
-     #(R            @`   :foo > 1TUAQ+gritzko
+     #(R            @`   :foo > (Q
 ```
 Those are two RON *ops*:
 
- 1. some object has a field `bar` set to 1 (on 2017-10-31 10:26:00 UTC, by gritzko),
+ 1. some last-write-wins object has a field `bar` set to `1` (on 2017-10-31 10:26:00 UTC, by gritzko),
  2. another object has a field `foo` set to the first object (10:27:00, by gritzko).
 
 Each op is a tuple of four globally-unique UUIDs for its data type, object, event and location, plus some number of value *atoms*.
@@ -35,7 +35,7 @@ These are the key features of RON:
  Overall, RON relates pieces of data by their UUIDs.
  Thanks to that, RON data can be cached locally, updated incrementally and edited while offline.
 * An object's state is a *reduction* of its ops. A data type is a reducer function: `lww(state,change) = new_state`. Reducers tolerate partial order of updates. Hence, all ops are applied immediately, without any linearization by a central server.
-* There is no sharp border between a state snapshot and a state update. State is change and change is state (state-change duality). A transactional unit of data storage/transmission is a *frame*. A frame can contain a single op, a complete object graph or anything inbetween: object state, object stale state, patch, otherwise a piece of an object.
+* There is no sharp border between a state snapshot and a state update. State is change and change is state (state-change duality). A transactional unit of data storage/transmission is a *frame*. A frame can contain a single op, a complete object graph or anything inbetween: object state, stale state, patch, otherwise a piece of an object.
 * RON model implies no special "source of truth". The event's *origin* is the source of truth, not a server in the cloud. Every event/object is marked with its origin (e.g. `gritzko` in `1TUAQ+gritzko`).
 * A RON frame is not a "message": it has an *origin* but it has no "destination". RON speaks in terms of data updates and subscriptions.
   Once you subscribe to an object, you receive the state and all the
@@ -63,11 +63,11 @@ RON wire format makes this process efficient.
 
 Swarm RON formal model has five key components:
 
-1. An UUID is a globally unique 128-bit identifier. There are four UUID types:
-    * an event timestamp (logical/hybrid timestamp, e.g. `1TUAQ+gritzko`, contains a monotonous counter `1TUAQ` and a replica id `gritzko`, roughly corresponds to RFC4122 v1 UUIDs),
-    * a derived timestamp (`1TUAQ-gritzko`),
-    * a name (`foo`, `lww`, `bar`, `local_var$gritzko`) or
-    * a hash (e.g. `4Js8lam4LB%kj529sMEsl`).
+1. An UUID is a globally unique 128-bit identifier. An UUID consists of two 60-bit parts: *value* and *origin*. 4+4 bits are reserved for flags. There are four UUID types:
+    * an event timestamp: logical/hybrid timestamp, e.g. `1TUAQ+gritzko`, value is a monotonous counter `1TUAQ`, origin is a a replica id `gritzko`, roughly corresponds to RFC4122 v1 UUIDs,
+    * a derived timestamp: same as event timestamp, but refers to some derived calculation, not the original event (e.g. `1TUAQ-gritzko`),
+    * a name, either global or scoped to a replica, e.g. `foo`, `lww`, `bar` (global), `MyVariable$gritzko` (scoped),
+    * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
 2. An op is an immutable atomic unit of data change.
     An op is a tuple of four [UUIDs](uid.md) and zero or more *atoms*:
     * data type UUID, e.g. `lww` a last-write-wins object,
@@ -173,7 +173,7 @@ So, let's be precise. Let's put UUIDs on everything.
 
 The binary format is more efficient because of higher bit density; it is also simpler and safer to parse because of explicit field lengths. Obviously, it is not human-readable.
 
-Like the Base64, the binary format is only optimized for iteraion. Because of compression, records are inevitably of variable length, so random access is not possible. Also, compression depends on iteration, as UUIDs get abbreviated relative to preceding UUIDs.
+Like the Base64, the binary format is only optimized for iteration. Because of compression, records are inevitably of variable length, so random access is not possible. Also, compression depends on iteration, as UUIDs get abbreviated relative to preceding UUIDs.
 
 A binary RON frame starts with magic bytes `RON ` (R-O-N-space) and frame length, a little-endian uint32, 8 bytes total. (For multiframes, the magic bytes are treated as a Base64 number, first frame having `RON0`, second `RON1` and so on.)
 
@@ -208,7 +208,7 @@ UUID coding is as follows:
 * value (`0100`..`0111`, also `1100`) and origin (`1000`..`1011`) are encoded as separate fields,
 * a skipped field means "same as the default",
 * field length is 0..8 bytes (0 is same as a skipped field)
-* UUID value/origin has 60 numeric bits encoded by 1..8 bytes (8*8-60=4 bits extra)
+* UUID value/origin has 60 numeric bits encoded by 1..8 bytes (big-endian, also note the 8*8-60=4 extra bits)
 * in the first byte, the most significant bit denotes a default flip (same as ` in the Base64 coding), next three bits specify the shared prefix length, in bytes (0..7)
 
 For example, `0110 0001  1111 0100` is the value part `01` of an event UUID `10`, defaults to the object UUID of the same op `1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining 60-7*8=4 bits are `0100`.

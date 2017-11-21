@@ -15,58 +15,65 @@ const RON_en_main int = 21
 //line dfa.rl:8
 
 //line dfa.rl:9
+//line dfa.rl:10
+//line dfa.rl:11
+//line dfa.rl:12
 const RON_EOF = -1
 
-// Parse consumes one op, unless the buffer ends earlier.
-func (it *Frame) Parse() int {
+// Parse consumes one op from data[], unless the buffer ends earlier.
+// Fills atoms[], returns op term (TERM_RAW etc) or TERM_ERROR
+func (frame *Frame) Parse() {
 
-	if it.state.p >= len(it.state.data) {
-		if !it.state.streaming {
-			it.Op = ZERO_OP
-			it.state.cs = RON_error
+	if frame.Parser.position >= len(frame.Body) {
+		if !frame.Parser.streaming {
+			frame.Parser.state = RON_error
 		}
-		return RON_error
+		return
 	}
 
-	if it.state.cs == RON_EOF {
-		it.state.cs = RON_error
-		return RON_error
-	}
+	if frame.Parser.state == RON_error {
+		if frame.Parser.position == 0 {
 
-	if it.state.cs == 0 && it.state.p == 0 {
+//line dfa.go:46
+			{
+				(frame.Parser.state) = RON_start
+			}
 
-//line dfa.go:44
-		{
-			it.state.cs = RON_start
+//line dfa.rl:29
+			frame.atoms = make([]Atom, 4, 8)
+		} else {
+			return
 		}
-
-//line dfa.rl:30
+	} else if frame.Parser.state == RON_EOF {
+		frame.Parser.state = RON_error
+		return
+	} else if frame.Parser.state == RON_start {
+		frame.Parser.offset = frame.Parser.position
+		frame.atoms = frame.atoms[:4]
+		frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = 0, 0, 0
 	}
 
-	had_end := false
-	p, pe, eof := it.state.p, len(it.state.data), len(it.state.data)
-	n := uint(0)
+	pe, eof := len(frame.Body), len(frame.Body)
+	n := 0
 	_ = eof
 	_ = pe // FIXME kill
 
-	if it.state.streaming {
+	if frame.Parser.streaming {
 		eof = -1
 	}
 
-	i := it.state.incomplete
-	idx := it.state.idx
-	half := it.state.half
-	digit := it.state.digit
+	atm, hlf, dgt := frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt
+	atoms := frame.atoms
 
-//line dfa.go:68
+//line dfa.go:78
 	{
-		if p == pe {
+		if (frame.Parser.position) == pe {
 			goto _test_eof
 		}
 		goto _resume
 
 	_again:
-		switch it.state.cs {
+		switch frame.Parser.state {
 		case 21:
 			goto st21
 		case 0:
@@ -135,11 +142,11 @@ func (it *Frame) Parse() int {
 			goto st20
 		}
 
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof
 		}
 	_resume:
-		switch it.state.cs {
+		switch frame.Parser.state {
 		case 21:
 			goto st_case_21
 		case 0:
@@ -209,11 +216,11 @@ func (it *Frame) Parse() int {
 		}
 		goto st_out
 	st21:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof21
 		}
 	st_case_21:
-		switch it.state.data[p] {
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st1
 		case 35:
@@ -227,20 +234,20 @@ func (it *Frame) Parse() int {
 		case 64:
 			goto tr2
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto st1
 		}
 		goto st0
 	st_case_0:
 	st0:
-		it.state.cs = 0
+		(frame.Parser.state) = 0
 		goto _out
 	st1:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof1
 		}
 	st_case_1:
-		switch it.state.data[p] {
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st1
 		case 35:
@@ -252,596 +259,594 @@ func (it *Frame) Parse() int {
 		case 64:
 			goto tr2
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto st1
 		}
 		goto st0
 	tr2:
-		it.state.cs = 2
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr3:
 //line ./op-grammar.rl:26
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 		goto st2
 	tr5:
-		it.state.cs = 2
+		(frame.Parser.state) = 2
 //line ./op-grammar.rl:26
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr19:
-		it.state.cs = 2
+		(frame.Parser.state) = 2
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr47:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:38
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr55:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr65:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr73:
-		it.state.cs = 2
-//line ./op-grammar.rl:99
-		had_end = true
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr77:
-		it.state.cs = 2
-//line ./op-grammar.rl:36
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr85:
-		it.state.cs = 2
-//line ./op-grammar.rl:78
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr93:
-		it.state.cs = 2
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:56
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr103:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:38
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr112:
-		it.state.cs = 2
-//line ./op-grammar.rl:56
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr121:
-		it.state.cs = 2
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+		(frame.Parser.state) = 2
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr129:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	tr140:
-		it.state.cs = 2
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 2
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:85
-		idx = 0
-		if had_end {
+//line ./op-grammar.rl:91
+		hlf = 0
+		if frame.Parser.position > frame.Parser.offset {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
-			p--
-			it.state.cs = (RON_start)
+			frame.Parser.position--
+			(frame.Parser.state) = (RON_start)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
-			it.state.s = p
-			it.state.position++
+			//op_idx++;
 		}
 
 //line ./op-grammar.rl:12
-		n = uint(ABC[it.state.data[p]])
-		if n < idx {
+		n = (int)(ABC[(frame.Body)[(frame.Parser.position)]])
+		if n < atm {
 			// wrong UUID order; must be type-object-event-ref
-			it.state.cs = (RON_error)
+			(frame.Parser.state) = (RON_error)
 			{
-				p++
+				(frame.Parser.position)++
 				goto _out
 			}
 		} else {
 			// start parsing the UUID
-			idx = n
-			i = it.uuids[idx].uint128
-			digit = 0
+			atm = n
+			hlf = 0
+			dgt = 0
 		}
 
 		goto _again
 	st2:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:834
-		switch it.state.data[p] {
+//line dfa.go:842
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr3
 		case 33:
@@ -882,27 +887,27 @@ func (it *Frame) Parse() int {
 			goto tr9
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr3
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr8
 				}
 			default:
 				goto tr6
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr9
 				}
-			case it.state.data[p] > 90:
-				if 95 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 95 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr9
 				}
 			default:
@@ -916,217 +921,216 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr18:
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr46:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr54:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr64:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr72:
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st22
 	tr76:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr84:
-//line ./op-grammar.rl:78
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:84
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr92:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:56
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr102:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr111:
-//line ./op-grammar.rl:56
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr120:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr128:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	tr139:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:81
-		it.term = uint(ABC[it.state.data[p]])
+//line ./op-grammar.rl:87
+		frame.term = int(ABC[(frame.Body)[(frame.Parser.position)]])
 
 		goto st22
 	st22:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:1164
-		switch it.state.data[p] {
+//line dfa.go:1172
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr72
 		case 35:
@@ -1140,204 +1144,194 @@ func (it *Frame) Parse() int {
 		case 64:
 			goto tr73
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto tr72
 		}
 		goto st0
 	tr71:
-		it.state.cs = 23
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr74:
-		it.state.cs = 23
-//line ./op-grammar.rl:99
-		had_end = true
-
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:104
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr79:
-		it.state.cs = 23
-//line ./op-grammar.rl:36
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr87:
-		it.state.cs = 23
-//line ./op-grammar.rl:78
-//line ./op-grammar.rl:99
-		had_end = true
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:84
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr95:
-		it.state.cs = 23
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
-
-//line ./op-grammar.rl:36
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:56
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr105:
-		it.state.cs = 23
-//line ././uuid-grammar.rl:38
+		(frame.Parser.state) = 23
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr114:
-		it.state.cs = 23
-//line ./op-grammar.rl:56
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr123:
-		it.state.cs = 23
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
-
-//line ./op-grammar.rl:36
+		(frame.Parser.state) = 23
+//line ./op-grammar.rl:62
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr133:
-		it.state.cs = 23
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 23
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	tr142:
-		it.state.cs = 23
-//line ././uuid-grammar.rl:35
+		(frame.Parser.state) = 23
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
-//line ./op-grammar.rl:112
-		it.state.streaming = false
-		it.state.cs = (RON_EOF)
+//line ./op-grammar.rl:113
+		(frame.Parser.state) = (RON_EOF)
 
 		goto _again
 	st23:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:1391
+//line dfa.go:1392
 		goto st0
 	tr6:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[it.state.data[p]]) << 60
+//line ././uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << 60
 
 		goto st3
 	tr56:
-//line ././uuid-grammar.rl:35
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[it.state.data[p]]) << 60
+//line ././uuid-grammar.rl:34
+//line ././uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << 60
 
 		goto st3
 	st3:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof3
 		}
 	st_case_3:
 //line dfa.go:1421
-		switch it.state.data[p] {
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr14
 		case 33:
@@ -1378,22 +1372,22 @@ func (it *Frame) Parse() int {
 			goto tr16
 		}
 		switch {
-		case it.state.data[p] < 48:
+		case (frame.Body)[(frame.Parser.position)] < 48:
 			switch {
-			case it.state.data[p] > 13:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 13:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr15
 				}
-			case it.state.data[p] >= 9:
+			case (frame.Body)[(frame.Parser.position)] >= 9:
 				goto tr14
 			}
-		case it.state.data[p] > 57:
+		case (frame.Body)[(frame.Parser.position)] > 57:
 			switch {
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr16
 				}
-			case it.state.data[p] >= 65:
+			case (frame.Body)[(frame.Parser.position)] >= 65:
 				goto tr16
 			}
 		default:
@@ -1404,50 +1398,54 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 		goto st4
 	tr45:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 		goto st4
 	tr53:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 		goto st4
 	tr63:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
 		goto st4
 	st4:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:1535
-		switch it.state.data[p] {
+//line dfa.go:1539
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st4
 		case 33:
@@ -1475,7 +1473,7 @@ func (it *Frame) Parse() int {
 		case 94:
 			goto tr23
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto st4
 		}
 		goto st0
@@ -1483,226 +1481,237 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr20:
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr48:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr57:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr66:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr78:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr86:
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr94:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
+//line ./op-grammar.rl:56
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr104:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr113:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr122:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr131:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	tr141:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st5
 	st5:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:1829
-		switch it.state.data[p] {
+//line dfa.go:1844
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 10:
 			goto st0
 		case 13:
@@ -1714,17 +1723,17 @@ func (it *Frame) Parse() int {
 		}
 		goto tr24
 	tr24:
-//line ./op-grammar.rl:62
-		i[0] = uint64(p)
+//line ./op-grammar.rl:65
+		atoms[atm][0] = ((uint64)(frame.Parser.position)) << 32
 
 		goto st6
 	st6:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1852
-		switch it.state.data[p] {
+//line dfa.go:1867
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 10:
 			goto st0
 		case 13:
@@ -1736,25 +1745,27 @@ func (it *Frame) Parse() int {
 		}
 		goto st6
 	tr25:
-//line ./op-grammar.rl:62
-		i[0] = uint64(p)
-
 //line ./op-grammar.rl:65
-		i[1] = uint64(p) | ATOM_STRING_62
+		atoms[atm][0] = ((uint64)(frame.Parser.position)) << 32
+
+//line ./op-grammar.rl:68
+		atoms[atm][0] |= uint64(frame.Parser.position)
+		atoms[atm][1] = ((uint64)(ATOM_STRING)) << 62
 
 		goto st24
 	tr28:
-//line ./op-grammar.rl:65
-		i[1] = uint64(p) | ATOM_STRING_62
+//line ./op-grammar.rl:68
+		atoms[atm][0] |= uint64(frame.Parser.position)
+		atoms[atm][1] = ((uint64)(ATOM_STRING)) << 62
 
 		goto st24
 	st24:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:1885
-		switch it.state.data[p] {
+//line dfa.go:1902
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr75
 		case 33:
@@ -1784,123 +1795,126 @@ func (it *Frame) Parse() int {
 		case 94:
 			goto tr82
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto tr75
 		}
 		goto st0
 	tr75:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr83:
-//line ./op-grammar.rl:78
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:84
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr91:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:56
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr101:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr110:
-//line ./op-grammar.rl:56
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr119:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr127:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	tr138:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-		had_end = true
+//line ./op-grammar.rl:104
 
 		goto st25
 	st25:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:2060
-		switch it.state.data[p] {
+//line dfa.go:2081
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr83
 		case 33:
@@ -1930,7 +1944,7 @@ func (it *Frame) Parse() int {
 		case 94:
 			goto tr90
 		}
-		if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 			goto tr83
 		}
 		goto st0
@@ -1938,226 +1952,237 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr21:
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr50:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr60:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr68:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr80:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr88:
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr96:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
+//line ./op-grammar.rl:56
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr107:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr115:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr124:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr135:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	tr144:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st7
 	st7:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:2356
-		switch it.state.data[p] {
+//line dfa.go:2388
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st7
 		case 43:
@@ -2166,54 +2191,56 @@ func (it *Frame) Parse() int {
 			goto tr31
 		}
 		switch {
-		case it.state.data[p] > 13:
-			if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		case (frame.Body)[(frame.Parser.position)] > 13:
+			if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 				goto tr32
 			}
-		case it.state.data[p] >= 9:
+		case (frame.Body)[(frame.Parser.position)] >= 9:
 			goto st7
 		}
 		goto st0
 	tr31:
-//line ./op-grammar.rl:41
+//line ./op-grammar.rl:44
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
 
-//line ./op-grammar.rl:43
-		if it.state.data[p] == '-' {
-			i[1] |= 1
+//line ./op-grammar.rl:47
+		if (frame.Body)[(frame.Parser.position)] == '-' {
+			atoms[atm][1] |= 1
 		}
 
 		goto st8
 	st8:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2390
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+//line dfa.go:2423
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto tr33
 		}
 		goto st0
 	tr32:
-//line ./op-grammar.rl:41
+//line ./op-grammar.rl:44
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
 
-//line ./op-grammar.rl:48
-		i[0] *= 10
-		i[0] += uint64(int(it.state.data[p]) - int('0'))
+//line ./op-grammar.rl:52
+		atoms[atm][0] *= 10
+		atoms[atm][0] += (uint64)((frame.Body)[(frame.Parser.position)] - '0')
 
 		goto st26
 	tr33:
-//line ./op-grammar.rl:48
-		i[0] *= 10
-		i[0] += uint64(int(it.state.data[p]) - int('0'))
+//line ./op-grammar.rl:52
+		atoms[atm][0] *= 10
+		atoms[atm][0] += (uint64)((frame.Body)[(frame.Parser.position)] - '0')
 
 		goto st26
 	st26:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2417
-		switch it.state.data[p] {
+//line dfa.go:2451
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr91
 		case 33:
@@ -2244,11 +2271,11 @@ func (it *Frame) Parse() int {
 			goto tr98
 		}
 		switch {
-		case it.state.data[p] > 13:
-			if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		case (frame.Body)[(frame.Parser.position)] > 13:
+			if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 				goto tr33
 			}
-		case it.state.data[p] >= 9:
+		case (frame.Body)[(frame.Parser.position)] >= 9:
 			goto tr91
 		}
 		goto st0
@@ -2256,226 +2283,237 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr22:
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr51:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr61:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr69:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr81:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr89:
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr97:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
+//line ./op-grammar.rl:56
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr108:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr116:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr125:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr136:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	tr145:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st9
 	st9:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2718
-		switch it.state.data[p] {
+//line dfa.go:2763
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st9
 		case 43:
@@ -2496,23 +2534,23 @@ func (it *Frame) Parse() int {
 			goto tr37
 		}
 		switch {
-		case it.state.data[p] < 40:
+		case (frame.Body)[(frame.Parser.position)] < 40:
 			switch {
-			case it.state.data[p] > 13:
-				if 36 <= it.state.data[p] && it.state.data[p] <= 37 {
+			case (frame.Body)[(frame.Parser.position)] > 13:
+				if 36 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 37 {
 					goto tr35
 				}
-			case it.state.data[p] >= 9:
+			case (frame.Body)[(frame.Parser.position)] >= 9:
 				goto st9
 			}
-		case it.state.data[p] > 41:
+		case (frame.Body)[(frame.Parser.position)] > 41:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr37
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr37
 				}
 			default:
@@ -2524,29 +2562,28 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr35:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[it.state.data[p]]) << 60
+//line ././uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << 60
 
 		goto st27
 	tr130:
-//line ././uuid-grammar.rl:35
-//line ././uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[it.state.data[p]]) << 60
+//line ././uuid-grammar.rl:34
+//line ././uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << 60
 
 		goto st27
 	st27:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:2794
-		switch it.state.data[p] {
+//line dfa.go:2838
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr75
 		case 33:
@@ -2589,22 +2626,22 @@ func (it *Frame) Parse() int {
 			goto tr100
 		}
 		switch {
-		case it.state.data[p] < 48:
+		case (frame.Body)[(frame.Parser.position)] < 48:
 			switch {
-			case it.state.data[p] > 13:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 13:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr99
 				}
-			case it.state.data[p] >= 9:
+			case (frame.Body)[(frame.Parser.position)] >= 9:
 				goto tr75
 			}
-		case it.state.data[p] > 57:
+		case (frame.Body)[(frame.Parser.position)] > 57:
 			switch {
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr100
 				}
-			case it.state.data[p] >= 65:
+			case (frame.Body)[(frame.Parser.position)] >= 65:
 				goto tr100
 			}
 		default:
@@ -2612,67 +2649,67 @@ func (it *Frame) Parse() int {
 		}
 		goto st0
 	tr99:
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st28
 	tr100:
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ././uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 28
+				(frame.Parser.position)++
+				(frame.Parser.state) = 28
 				goto _out
 			}
 		}
 
 		goto st28
 	tr106:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 28
+				(frame.Parser.position)++
+				(frame.Parser.state) = 28
 				goto _out
 			}
 		}
 
 		goto st28
 	tr132:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st28
 	st28:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:2921
-		switch it.state.data[p] {
+//line dfa.go:2965
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr101
 		case 33:
@@ -2707,17 +2744,17 @@ func (it *Frame) Parse() int {
 			goto tr106
 		}
 		switch {
-		case it.state.data[p] < 48:
-			if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		case (frame.Body)[(frame.Parser.position)] < 48:
+			if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 				goto tr101
 			}
-		case it.state.data[p] > 57:
+		case (frame.Body)[(frame.Parser.position)] > 57:
 			switch {
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr106
 				}
-			case it.state.data[p] >= 65:
+			case (frame.Body)[(frame.Parser.position)] >= 65:
 				goto tr106
 			}
 		default:
@@ -2728,226 +2765,237 @@ func (it *Frame) Parse() int {
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr23:
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr52:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr62:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr70:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
 //line ./op-grammar.rl:26
 
 		// OK, save the UUID
-		it.uuids[idx] = UUID{uint128: i}
-		idx++
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:103
-		if it.term != TERM_RAW {
-			it.term = TERM_REDUCED
+//line ./op-grammar.rl:107
+		if frame.term != TERM_RAW {
+			frame.term = TERM_REDUCED
 		}
-		it.Reset()
-		// not that necessary: op refs its frame
-		it.frame = it.state.data
 
-//line ./op-grammar.rl:75
-		idx = 0
+//line ./op-grammar.rl:79
+		atm = 4
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr82:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr90:
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr98:
-//line ./op-grammar.rl:52
-		i[1] |= ATOM_INT_62
+//line ./op-grammar.rl:56
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr109:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr118:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr126:
-//line ./op-grammar.rl:58
-		i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr137:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	tr146:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-		i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+		atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 		// TODO max size for int/float/string
-		it.AddAtom(i)
+		atm++
+		hlf = 0
+		dgt = 0
 
-//line ./op-grammar.rl:32
-		digit = 0
-		i = uint128{0, 0}
+//line ./op-grammar.rl:33
+		dgt = 0
+		atoms = append(atoms, Atom{})
 
 		goto st10
 	st10:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:3235
-		switch it.state.data[p] {
+//line dfa.go:3290
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st10
 		case 43:
@@ -2956,50 +3004,50 @@ func (it *Frame) Parse() int {
 			goto st11
 		}
 		switch {
-		case it.state.data[p] > 13:
-			if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		case (frame.Body)[(frame.Parser.position)] > 13:
+			if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 				goto st12
 			}
-		case it.state.data[p] >= 9:
+		case (frame.Body)[(frame.Parser.position)] >= 9:
 			goto st10
 		}
 		goto st0
 	st11:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof11
 		}
 	st_case_11:
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto st12
 		}
 		goto st0
 	st12:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof12
 		}
 	st_case_12:
-		if it.state.data[p] == 46 {
+		if (frame.Body)[(frame.Parser.position)] == 46 {
 			goto st13
 		}
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto st12
 		}
 		goto st0
 	st13:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof13
 		}
 	st_case_13:
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto st29
 		}
 		goto st0
 	st29:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof29
 		}
 	st_case_29:
-		switch it.state.data[p] {
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr110
 		case 33:
@@ -3034,48 +3082,50 @@ func (it *Frame) Parse() int {
 			goto tr117
 		}
 		switch {
-		case it.state.data[p] > 13:
-			if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		case (frame.Body)[(frame.Parser.position)] > 13:
+			if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 				goto st29
 			}
-		case it.state.data[p] >= 9:
+		case (frame.Body)[(frame.Parser.position)] >= 9:
 			goto tr110
 		}
 		goto st0
 	tr117:
-//line ./op-grammar.rl:56
+//line ./op-grammar.rl:59
+		atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
+
 		goto st14
 	st14:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof14
 		}
 	st_case_14:
-//line dfa.go:3341
-		switch it.state.data[p] {
+//line dfa.go:3397
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 43:
 			goto st15
 		case 45:
 			goto st15
 		}
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto st30
 		}
 		goto st0
 	st15:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof15
 		}
 	st_case_15:
-		if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto st30
 		}
 		goto st0
 	st30:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof30
 		}
 	st_case_30:
-		switch it.state.data[p] {
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr119
 		case 33:
@@ -3106,45 +3156,44 @@ func (it *Frame) Parse() int {
 			goto tr126
 		}
 		switch {
-		case it.state.data[p] > 13:
-			if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+		case (frame.Body)[(frame.Parser.position)] > 13:
+			if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 				goto st30
 			}
-		case it.state.data[p] >= 9:
+		case (frame.Body)[(frame.Parser.position)] >= 9:
 			goto tr119
 		}
 		goto st0
 	tr36:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:27
+//line ././uuid-grammar.rl:26
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st31
 	tr134:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 31
+				(frame.Parser.position)++
+				(frame.Parser.state) = 31
 				goto _out
 			}
 		}
 
 		goto st31
 	st31:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3434
-		switch it.state.data[p] {
+//line dfa.go:3489
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr127
 		case 33:
@@ -3187,27 +3236,27 @@ func (it *Frame) Parse() int {
 			goto tr134
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr127
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr132
 				}
 			default:
 				goto tr130
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr134
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr134
 				}
 			default:
@@ -3219,45 +3268,44 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr37:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:27
+//line ././uuid-grammar.rl:26
 
-//line ././uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ././uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 32
+				(frame.Parser.position)++
+				(frame.Parser.state) = 32
 				goto _out
 			}
 		}
 
 		goto st32
 	tr143:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 32
+				(frame.Parser.position)++
+				(frame.Parser.state) = 32
 				goto _out
 			}
 		}
 
 		goto st32
 	st32:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3544
-		switch it.state.data[p] {
+//line dfa.go:3598
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr138
 		case 33:
@@ -3300,27 +3348,27 @@ func (it *Frame) Parse() int {
 			goto tr143
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr138
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr132
 				}
 			default:
 				goto tr130
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr143
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr143
 				}
 			default:
@@ -3331,17 +3379,17 @@ func (it *Frame) Parse() int {
 		}
 		goto st0
 	tr26:
-//line ./op-grammar.rl:62
-		i[0] = uint64(p)
+//line ./op-grammar.rl:65
+		atoms[atm][0] = ((uint64)(frame.Parser.position)) << 32
 
 		goto st16
 	st16:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3629
-		switch it.state.data[p] {
+//line dfa.go:3683
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 10:
 			goto st0
 		case 13:
@@ -3349,67 +3397,67 @@ func (it *Frame) Parse() int {
 		}
 		goto st6
 	tr15:
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st17
 	tr16:
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ././uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 17
+				(frame.Parser.position)++
+				(frame.Parser.state) = 17
 				goto _out
 			}
 		}
 
 		goto st17
 	tr49:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 17
+				(frame.Parser.position)++
+				(frame.Parser.state) = 17
 				goto _out
 			}
 		}
 
 		goto st17
 	tr58:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ././uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st17
 	st17:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3698
-		switch it.state.data[p] {
+//line dfa.go:3752
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr45
 		case 33:
@@ -3442,17 +3490,17 @@ func (it *Frame) Parse() int {
 			goto tr49
 		}
 		switch {
-		case it.state.data[p] < 48:
-			if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+		case (frame.Body)[(frame.Parser.position)] < 48:
+			if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 				goto tr45
 			}
-		case it.state.data[p] > 57:
+		case (frame.Body)[(frame.Parser.position)] > 57:
 			switch {
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr49
 				}
-			case it.state.data[p] >= 65:
+			case (frame.Body)[(frame.Parser.position)] >= 65:
 				goto tr49
 			}
 		default:
@@ -3461,35 +3509,34 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr8:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:27
+//line ././uuid-grammar.rl:26
 
-//line ././uuid-grammar.rl:10
-		digit = uint(ABC[it.state.data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ././uuid-grammar.rl:9
+		dgt = int(ABC[(frame.Body)[(frame.Parser.position)]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st18
 	tr59:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 18
+				(frame.Parser.position)++
+				(frame.Parser.state) = 18
 				goto _out
 			}
 		}
 
 		goto st18
 	st18:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:3778
-		switch it.state.data[p] {
+//line dfa.go:3831
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr53
 		case 33:
@@ -3530,27 +3577,27 @@ func (it *Frame) Parse() int {
 			goto tr59
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr53
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr58
 				}
 			default:
 				goto tr56
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr59
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr59
 				}
 			default:
@@ -3562,45 +3609,44 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr9:
 //line ././uuid-grammar.rl:5
-		half = 0
 
-//line ././uuid-grammar.rl:27
+//line ././uuid-grammar.rl:26
 
-//line ././uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ././uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 19
+				(frame.Parser.position)++
+				(frame.Parser.state) = 19
 				goto _out
 			}
 		}
 
 		goto st19
 	tr67:
-//line ././uuid-grammar.rl:15
-		i[half] |= uint64(ABC[it.state.data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ././uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[(frame.Parser.position)]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
-				p++
-				it.state.cs = 19
+				(frame.Parser.position)++
+				(frame.Parser.state) = 19
 				goto _out
 			}
 		}
 
 		goto st19
 	st19:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:3886
-		switch it.state.data[p] {
+//line dfa.go:3938
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr63
 		case 33:
@@ -3641,27 +3687,27 @@ func (it *Frame) Parse() int {
 			goto tr67
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr63
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr58
 				}
 			default:
 				goto tr56
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr67
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr67
 				}
 			default:
@@ -3673,18 +3719,18 @@ func (it *Frame) Parse() int {
 		goto st0
 	tr13:
 //line ./op-grammar.rl:6
-		if idx != 0 {
-			it.uuids[idx] = it.uuids[idx-1]
+		if atm > 0 {
+			atoms[atm] = atoms[atm-1]
 		}
 
 		goto st20
 	st20:
-		if p++; p == pe {
+		if (frame.Parser.position)++; (frame.Parser.position) == pe {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:3971
-		switch it.state.data[p] {
+//line dfa.go:4023
+		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr14
 		case 33:
@@ -3725,27 +3771,27 @@ func (it *Frame) Parse() int {
 			goto tr9
 		}
 		switch {
-		case it.state.data[p] < 43:
+		case (frame.Body)[(frame.Parser.position)] < 43:
 			switch {
-			case it.state.data[p] < 36:
-				if 9 <= it.state.data[p] && it.state.data[p] <= 13 {
+			case (frame.Body)[(frame.Parser.position)] < 36:
+				if 9 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 13 {
 					goto tr14
 				}
-			case it.state.data[p] > 37:
-				if 40 <= it.state.data[p] && it.state.data[p] <= 41 {
+			case (frame.Body)[(frame.Parser.position)] > 37:
+				if 40 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 41 {
 					goto tr8
 				}
 			default:
 				goto tr6
 			}
-		case it.state.data[p] > 45:
+		case (frame.Body)[(frame.Parser.position)] > 45:
 			switch {
-			case it.state.data[p] < 65:
-				if 48 <= it.state.data[p] && it.state.data[p] <= 57 {
+			case (frame.Body)[(frame.Parser.position)] < 65:
+				if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 					goto tr9
 				}
-			case it.state.data[p] > 90:
-				if 97 <= it.state.data[p] && it.state.data[p] <= 122 {
+			case (frame.Body)[(frame.Parser.position)] > 90:
+				if 97 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 122 {
 					goto tr9
 				}
 			default:
@@ -3757,209 +3803,211 @@ func (it *Frame) Parse() int {
 		goto st0
 	st_out:
 	_test_eof21:
-		it.state.cs = 21
+		(frame.Parser.state) = 21
 		goto _test_eof
 	_test_eof1:
-		it.state.cs = 1
+		(frame.Parser.state) = 1
 		goto _test_eof
 	_test_eof2:
-		it.state.cs = 2
+		(frame.Parser.state) = 2
 		goto _test_eof
 	_test_eof22:
-		it.state.cs = 22
+		(frame.Parser.state) = 22
 		goto _test_eof
 	_test_eof23:
-		it.state.cs = 23
+		(frame.Parser.state) = 23
 		goto _test_eof
 	_test_eof3:
-		it.state.cs = 3
+		(frame.Parser.state) = 3
 		goto _test_eof
 	_test_eof4:
-		it.state.cs = 4
+		(frame.Parser.state) = 4
 		goto _test_eof
 	_test_eof5:
-		it.state.cs = 5
+		(frame.Parser.state) = 5
 		goto _test_eof
 	_test_eof6:
-		it.state.cs = 6
+		(frame.Parser.state) = 6
 		goto _test_eof
 	_test_eof24:
-		it.state.cs = 24
+		(frame.Parser.state) = 24
 		goto _test_eof
 	_test_eof25:
-		it.state.cs = 25
+		(frame.Parser.state) = 25
 		goto _test_eof
 	_test_eof7:
-		it.state.cs = 7
+		(frame.Parser.state) = 7
 		goto _test_eof
 	_test_eof8:
-		it.state.cs = 8
+		(frame.Parser.state) = 8
 		goto _test_eof
 	_test_eof26:
-		it.state.cs = 26
+		(frame.Parser.state) = 26
 		goto _test_eof
 	_test_eof9:
-		it.state.cs = 9
+		(frame.Parser.state) = 9
 		goto _test_eof
 	_test_eof27:
-		it.state.cs = 27
+		(frame.Parser.state) = 27
 		goto _test_eof
 	_test_eof28:
-		it.state.cs = 28
+		(frame.Parser.state) = 28
 		goto _test_eof
 	_test_eof10:
-		it.state.cs = 10
+		(frame.Parser.state) = 10
 		goto _test_eof
 	_test_eof11:
-		it.state.cs = 11
+		(frame.Parser.state) = 11
 		goto _test_eof
 	_test_eof12:
-		it.state.cs = 12
+		(frame.Parser.state) = 12
 		goto _test_eof
 	_test_eof13:
-		it.state.cs = 13
+		(frame.Parser.state) = 13
 		goto _test_eof
 	_test_eof29:
-		it.state.cs = 29
+		(frame.Parser.state) = 29
 		goto _test_eof
 	_test_eof14:
-		it.state.cs = 14
+		(frame.Parser.state) = 14
 		goto _test_eof
 	_test_eof15:
-		it.state.cs = 15
+		(frame.Parser.state) = 15
 		goto _test_eof
 	_test_eof30:
-		it.state.cs = 30
+		(frame.Parser.state) = 30
 		goto _test_eof
 	_test_eof31:
-		it.state.cs = 31
+		(frame.Parser.state) = 31
 		goto _test_eof
 	_test_eof32:
-		it.state.cs = 32
+		(frame.Parser.state) = 32
 		goto _test_eof
 	_test_eof16:
-		it.state.cs = 16
+		(frame.Parser.state) = 16
 		goto _test_eof
 	_test_eof17:
-		it.state.cs = 17
+		(frame.Parser.state) = 17
 		goto _test_eof
 	_test_eof18:
-		it.state.cs = 18
+		(frame.Parser.state) = 18
 		goto _test_eof
 	_test_eof19:
-		it.state.cs = 19
+		(frame.Parser.state) = 19
 		goto _test_eof
 	_test_eof20:
-		it.state.cs = 20
+		(frame.Parser.state) = 20
 		goto _test_eof
 
 	_test_eof:
 		{
 		}
-		if p == eof {
-			switch it.state.cs {
+		if (frame.Parser.position) == eof {
+			switch frame.Parser.state {
 			case 22:
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 25:
-//line ./op-grammar.rl:78
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:84
+//line ./op-grammar.rl:104
 
 			case 24, 27:
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 31:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 28:
-//line ././uuid-grammar.rl:38
+//line ././uuid-grammar.rl:37
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 26:
-//line ./op-grammar.rl:52
-				i[1] |= ATOM_INT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:56
+//line ./op-grammar.rl:37
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 30:
-//line ./op-grammar.rl:58
-				i[1] |= ATOM_FLOAT_62
-
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+//line ./op-grammar.rl:37
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 32:
-//line ././uuid-grammar.rl:35
+//line ././uuid-grammar.rl:34
 
-//line ././uuid-grammar.rl:47
-				i[1] = UUID_NAME_UPPER_BITS
+//line ././uuid-grammar.rl:46
+				atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:37
 
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
 			case 29:
-//line ./op-grammar.rl:56
-//line ./op-grammar.rl:58
-				i[1] |= ATOM_FLOAT_62
+//line ./op-grammar.rl:59
+				atoms[atm][1] |= ((uint64)(ATOM_FLOAT)) << 62
 
-//line ./op-grammar.rl:36
+//line ./op-grammar.rl:62
+
+//line ./op-grammar.rl:37
 				// TODO max size for int/float/string
-				it.AddAtom(i)
+				atm++
+				hlf = 0
+				dgt = 0
 
-//line ./op-grammar.rl:78
+//line ./op-grammar.rl:84
 
-//line ./op-grammar.rl:99
-				had_end = true
+//line ./op-grammar.rl:104
 
-//line dfa.go:4212
+//line dfa.go:4267
 			}
 		}
 
@@ -3968,45 +4016,41 @@ func (it *Frame) Parse() int {
 		}
 	}
 
-//line dfa.rl:53
-	it.state.incomplete = i
-	it.state.idx = idx
-	it.state.digit = digit
-	it.state.half = half
-	it.state.p = p
+//line dfa.rl:60
 
-	if !it.state.streaming && it.state.cs < RON_first_final && it.state.cs > 0 {
-		it.state.cs = RON_error
+	frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = atm, hlf, dgt
+	frame.atoms = atoms
+
+	if !frame.Parser.streaming && frame.Parser.state < RON_first_final && frame.Parser.state > 0 {
+		frame.Parser.state = RON_error
 	}
 
-	return it.state.cs
 }
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line dfa.rl:72
-
-//line dfa.go:4241
+//line dfa.rl:75
+//line dfa.go:4292
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line dfa.rl:73
-	var i uint128 = ctx_uuid.uint128
-	digit := uint(0)
-	half := 0
-
+//line dfa.rl:76
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	_ = eof
 
-//line dfa.go:4260
+	atm, hlf, dgt := 0, 0, 0
+
+	atoms := [1]Atom{Atom(ctx_uuid)}
+
+//line dfa.go:4310
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4265
+//line dfa.go:4315
 	{
 		if p == pe {
 			goto _test_eof
@@ -4074,20 +4118,19 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto _out
 	tr0:
 //line ./uuid-grammar.rl:5
-		half = 0
 
-//line ./uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[data[p]]) << 60
+//line ./uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << 60
 
 		goto st2
 	tr7:
-//line ./uuid-grammar.rl:35
-//line ./uuid-grammar.rl:41
-		half |= 1
-		i[half] &= INT60_FULL
-		i[half] |= uint64(ABC[data[p]]) << 60
+//line ./uuid-grammar.rl:34
+//line ./uuid-grammar.rl:40
+		hlf = 1
+		atoms[atm][hlf] &= INT60_FULL
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << 60
 
 		goto st2
 	st2:
@@ -4095,7 +4138,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4359
+//line dfa.go:4408
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4129,27 +4172,27 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr4:
-//line ./uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ./uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ./uuid-grammar.rl:10
-		digit = uint(ABC[data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ./uuid-grammar.rl:9
+		dgt = int(ABC[data[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st3
 	tr5:
-//line ./uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ./uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ./uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ./uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ./uuid-grammar.rl:15
-		i[half] |= uint64(ABC[data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ./uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
 				p++
 				cs = 3
@@ -4159,10 +4202,10 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 		goto st3
 	tr6:
-//line ./uuid-grammar.rl:15
-		i[half] |= uint64(ABC[data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ./uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
 				p++
 				cs = 3
@@ -4172,15 +4215,15 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 		goto st3
 	tr8:
-//line ./uuid-grammar.rl:35
+//line ./uuid-grammar.rl:34
 
-//line ./uuid-grammar.rl:30
-		digit = 0
-		half |= 1
+//line ./uuid-grammar.rl:29
+		dgt = 0
+		hlf = 1
 
-//line ./uuid-grammar.rl:10
-		digit = uint(ABC[data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ./uuid-grammar.rl:9
+		dgt = int(ABC[data[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st3
 	st3:
@@ -4188,7 +4231,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4453
+//line dfa.go:4502
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4210,20 +4253,19 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto st0
 	tr2:
 //line ./uuid-grammar.rl:5
-		half = 0
 
-//line ./uuid-grammar.rl:27
+//line ./uuid-grammar.rl:26
 
-//line ./uuid-grammar.rl:10
-		digit = uint(ABC[data[p]]) + 4
-		i[half] &= INT60_FLAGS | PREFIX_MASKS[digit]
+//line ./uuid-grammar.rl:9
+		dgt = int(ABC[data[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st4
 	tr9:
-//line ./uuid-grammar.rl:15
-		i[half] |= uint64(ABC[data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ./uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
 				p++
 				cs = 4
@@ -4237,7 +4279,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4502
+//line dfa.go:4550
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4281,17 +4323,16 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		goto st0
 	tr3:
 //line ./uuid-grammar.rl:5
-		half = 0
 
-//line ./uuid-grammar.rl:27
+//line ./uuid-grammar.rl:26
 
-//line ./uuid-grammar.rl:23
-		i[half] &= INT60_FLAGS
+//line ./uuid-grammar.rl:22
+		atoms[atm][hlf] &= INT60_FLAGS
 
-//line ./uuid-grammar.rl:15
-		i[half] |= uint64(ABC[data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ./uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
 				p++
 				cs = 5
@@ -4301,10 +4342,10 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 		goto st5
 	tr10:
-//line ./uuid-grammar.rl:15
-		i[half] |= uint64(ABC[data[p]]) << DIGIT_OFFSETS[digit]
-		digit++
-		if digit > 10 {
+//line ./uuid-grammar.rl:14
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
 			{
 				p++
 				cs = 5
@@ -4318,7 +4359,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4580
+//line dfa.go:4627
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4380,15 +4421,17 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		if p == eof {
 			switch cs {
 			case 4:
-//line ./uuid-grammar.rl:35
-			case 3:
-//line ./uuid-grammar.rl:38
-			case 5:
-//line ./uuid-grammar.rl:35
-//line ./uuid-grammar.rl:47
-				i[1] = UUID_NAME_UPPER_BITS
+//line ./uuid-grammar.rl:34
 
-//line dfa.go:4647
+			case 3:
+//line ./uuid-grammar.rl:37
+
+			case 5:
+//line ./uuid-grammar.rl:34
+//line ./uuid-grammar.rl:46
+				atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
+
+//line dfa.go:4694
 			}
 		}
 
@@ -4397,11 +4440,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:89
-	if cs < UUID_first_final || digit > 10 {
+//line dfa.rl:91
+
+	if cs < UUID_first_final || dgt > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))
 	} else {
-		return UUID{uint128: i}, nil
+		return UUID(atoms[0]), nil
 	}
 
 }

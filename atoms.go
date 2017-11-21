@@ -1,64 +1,48 @@
 package ron
 
-import "math"
-
-func NewAtoms() (ret Atoms) {
-	ret.atoms = ret._atoms[0:0:len(ret._atoms)]
-	return
-}
+import (
+	"math"
+)
 
 const ATOM_INT_62 = uint64(ATOM_INT) << 62
 const ATOM_FLOAT_62 = uint64(ATOM_FLOAT) << 62
 const ATOM_STRING_62 = uint64(ATOM_STRING) << 62
 const ATOM_UUID_62 = uint64(ATOM_UUID) << 62
 
-func (a *Atoms) AddAtom(atom uint128) {
-	a.atoms = append(a.atoms, atom)
-}
-
-func (a *Atoms) AddInteger(i int64) {
-	second := ATOM_INT_62
-	var first uint64
-	if i >= 0 {
-		first = uint64(i)
+func NewIntegerAtom(i int64) (a Atom) {
+	a[1] = ATOM_INT_62
+	if i > 0 {
+		a[0] = uint64(i)
 	} else {
-		first = uint64(-i)
-		second |= 1
+		a[0] = uint64(-i)
+		a[1] |= 1
 	}
-	a.AddAtom(uint128{first, second})
+	return
 }
 
-func (a *Atoms) AddStringRange(from, till uint64) {
-	a.AddAtom(uint128{from, till | ATOM_STRING_62})
+func NewStringRangeAtom(from, till int) Atom {
+	return Atom{uint64((from << 32) | till), ATOM_STRING_62}
 }
 
-func (a *Atoms) AddString(s string) {
-	// TODO
+func NewFloatAtom(f float64) Atom {
+	return Atom{math.Float64bits(f), ATOM_FLOAT_62}
 }
 
-func (a *Atoms) AddFloat(i float64) {
-	a.AddAtom(uint128{uint64(i), ATOM_FLOAT_62}) // TODO
+func NewUUIDAtom(uuid UUID) Atom {
+	return Atom(uuid)
 }
 
-func (a *Atoms) AddUUID(uuid UUID) {
-	a.AddAtom(uint128{uuid.uint128[0], uuid.uint128[1] | ATOM_UUID_62})
+func (frame Frame) Count() int {
+	return len(frame.atoms) - 4
 }
 
-func (a *Atoms) Reset() {
-	a.atoms = a.atoms[:0]
+func (a Atom) Type() uint {
+	return uint(a[1] >> 62)
 }
 
-func (a Atoms) Count() int {
-	return len(a.atoms)
-}
-
-func (a *Atoms) AType(i int) uint {
-	return uint(a.atoms[i][1] >> 62)
-}
-
-func (a Atoms) Integer(i int) int64 {
-	neg := a.atoms[i][1] & 1
-	ret := int64(a.atoms[i][0])
+func (a Atom) Integer() int64 {
+	neg := a[1] & 1
+	ret := int64(a[0])
 	if neg == 0 {
 		return ret
 	} else {
@@ -66,22 +50,49 @@ func (a Atoms) Integer(i int) int64 {
 	}
 }
 
-func (a Atoms) IsLink() bool {
-	return a.Count() == 1 && a.AType(0) == ATOM_UUID
+func (a Atom) IsUUID() bool {
+	return a.Type() == ATOM_UUID
 }
 
-func (a Atoms) UUID(i int) UUID {
-	return ZERO_UUID // FIXME
+func (a Atom) UUID() UUID {
+	return UUID(a)
 }
 
-func (a Atoms) Float(i int) float64 {
-	num := a.atoms[i][0]
-	exp := a.atoms[i][1]
-	return math.Pow10(int(exp)) * float64(num)
+func (a Atom) Float() float64 {
+	return math.Float64frombits(a[0])
 }
 
-func (a Atoms) String(i int) string {
-	from := a.atoms[i][0] & INT60_FULL
-	till := a.atoms[i][1] & INT60_FULL
-	return string(a.frame[from:till])
+// add JSON escapes
+func esc(str []byte) []byte {
+	return str
+}
+
+// remove JSON escapes
+func unesc(str []byte) []byte {
+	// TODO
+	return str
+}
+
+func (a Atom) RawString(body []byte) string {
+	from := a[0] >> 32
+	till := a[0] & INT32_FULL
+	// FIXME check if binary
+	return string(unesc(body[from:till]))
+}
+
+var INT32_FULL uint64 = (1 << 32) - 1
+
+func (a Atom) EscString(body []byte) []byte {
+	from := a[0] >> 32
+	till := a[0] & INT32_FULL
+	// FIXME check if binary
+	return body[from:till]
+}
+
+func (frame Frame) RawString(idx int) string {
+	return frame.atoms[idx+4].RawString(frame.Body)
+}
+
+func (frame Frame) EscString(idx int) []byte {
+	return frame.atoms[idx+4].EscString(frame.Body)
 }

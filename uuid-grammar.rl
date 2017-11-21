@@ -3,33 +3,32 @@
     machine UUID;
 
     action start_uuid {
-        half = 0;
     }
 
 
     action int60_prefix {
-        digit = uint(ABC[fc])+4;
-        i[half] &= INT60_FLAGS | PREFIX_MASKS[digit];
+        dgt = int(ABC[fc])+4;
+        atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt];
     }
 
-    action int60_digit {
-        i[half] |= uint64(ABC[fc]) << DIGIT_OFFSETS[digit]
-        digit++
-        if (digit>10) {
+    action int60_dgt {
+        atoms[atm][hlf] |= ((uint64)(ABC[fc])) << DIGIT_OFFSETS[dgt];
+        dgt++;
+        if (dgt>10) {
             fbreak;
         }
     }
 
     action start_full_int {
-        i[half] &= INT60_FLAGS;
+        atoms[atm][hlf] &= INT60_FLAGS;
     }
 
     action start_value {
     }
 
     action start_origin {
-        digit = 0;
-        half |= 1;
+        dgt = 0;
+        hlf = 1;
     }
 
     action end_value {
@@ -39,17 +38,17 @@
     }
 
     action uuid_sep {
-        half |= 1;
-        i[half] &= INT60_FULL;
-        i[half] |= uint64(ABC[fc])<<60;
+        hlf = 1;
+        atoms[atm][hlf] &= INT60_FULL;
+        atoms[atm][hlf] |= ((uint64)(ABC[fc]))<<60;
     }
 
     action end_name {
-        i[1] = UUID_NAME_UPPER_BITS;
+        atoms[atm][1] = ((uint64)(UUID_NAME)) << 60;
     }
 
     # Base64 value
-    BASE = ( [0-9a-zA-Z~_] @int60_digit )+;
+    BASE = ( [0-9a-zA-Z~_] @int60_dgt )+;
     # prefix compression 
     PREFIX =  [([\{\}\])]  @int60_prefix;
     # UUID type: name, hash, event or derived event 

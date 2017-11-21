@@ -163,32 +163,32 @@ func TestParseFrame(t *testing.T) {
 	}
 	// pack into a frame
 	frame := MakeFrame(dim*dim*22 + dim*100)
-	frame.Format |= FORMAT_OP_LINES
+	frame.Serializer.Format |= FORMAT_OP_LINES
 	const ops = 30
 	for j := 0; j < ops; j++ {
 		at = j << 2
-		frame.AppendStateHeader(Spec{uuids: [4]UUID{uuids[at], uuids[at+1], uuids[at+2], uuids[at+3]}})
+		frame.AppendStateHeader(Spec{uuids[at], uuids[at+1], uuids[at+2], uuids[at+3]})
 	}
 	t.Logf(frame.String())
 	// recover, compare
 	iter := frame.Restart()
 	for k := 0; k < ops; k++ {
-		if iter.IsEmpty() {
+		if iter.EOF() {
 			t.Fail()
-			t.Logf("Premature end: %d not %d, failed at %d\n", k, ops, iter.state.p)
+			t.Logf("Premature end: %d not %d, failed at %d\n", k, ops, iter.Parser.position)
 			break
 		}
 		at = k << 2
 		for u := 0; u < 4; u++ {
-			uuid := iter.uuids[u]
+			uuid := iter.UUID(u)
 			if uuid != uuids[at+u] {
 				t.Fail()
-				t.Logf("uuid %d decoding failed in op#%d, '%s' should be '%s'", u, k, iter.uuids[u].String(), uuids[at+u].String())
+				t.Logf("uuid %d decoding failed in op#%d, '%s' should be '%s'", u, k, iter.UUID(u).String(), uuids[at+u].String())
 			}
 		}
 		iter.Next()
 	}
-	if !iter.IsEmpty() {
+	if !iter.EOF() {
 		t.Fail()
 		t.Log("No end")
 	}
@@ -229,17 +229,17 @@ func TestFrame_EOF2(t *testing.T) {
 	o := 0
 	frame := MakeStreamedFrame(128)
 	for i := 0; i < len(multi); i++ {
-		frame.Append(multi[i : i+1])
+		frame.AppendBytes(multi[i : i+1])
 		if frame.Next() {
-			if states[o] != frame.ParserState() {
+			if states[o] != frame.Parser.state {
 				t.Fail()
-				t.Logf("state %d at pos %d op %d, expected %d", frame.ParserState(), frame.state.p, o, states[o])
+				t.Logf("state %d at pos %d op %d, expected %d", frame.Parser.state, frame.Parser.position, o, states[o])
 				break
 			} else {
-				t.Logf("OK state %d at pos %d op %d", frame.ParserState(), frame.state.p, o)
+				//t.Logf("OK state %d at pos %d op %d", frame.Parser.state, frame.Parser.position, o)
 			}
-			if frame.ParserState() == RON_EOF {
-				frame = frame.Rest()
+			if frame.Parser.state == RON_EOF {
+				frame = MakeStreamedFrame(1024)
 			}
 			o++
 		}
@@ -250,8 +250,9 @@ func TestFrame_EOF2(t *testing.T) {
 	}
 }
 
+// A RON-text file must start with '*'
 func TestXParseOpWhitespace(t *testing.T) {
-	str := " #test ;\n#next?"
+	str := "*lww \t #test ;\n#next?"
 	frame := ParseFrameString(str)
 	if str[frame.Offset()-1] != '\n' {
 		t.Fail()
@@ -332,8 +333,8 @@ func TestOp_ParseAtoms(t *testing.T) {
 			break
 		}
 		types := ""
-		for a := 0; a < frame.Atoms.Count(); a++ {
-			types += string(ATOM_PUNCT[frame.Atoms.AType(a)])
+		for a := 0; a < frame.Count(); a++ {
+			types += string(ATOM_PUNCT[frame.Atom(a).Type()])
 		}
 		if types != tests[i][1] {
 			t.Logf("misparsed %d: '%s' (%s)", i, types, tests[i][1])
@@ -375,19 +376,19 @@ func TestParse_Errors(t *testing.T) {
 
 func TestFrame_ParseStream(t *testing.T) {
 	str := "*op1=123*op2!*op3!."
-	var frame Frame
-	frame.state.streaming = true
+	frame := MakeStreamedFrame(1024)
 	count := 0
 	for i := 0; i < len(str); i++ {
-		frame.state.data = append(frame.state.data, str[i])
+		frame.Body = append(frame.Body, str[i])
 		frame.Parse()
-		//fmt.Println(frame.state.cs, "AT", frame.Offset(), frame.Op.String())
+		//fmt.Println(frame.Parser.state, "AT", frame.Offset(), string(frame.Body[:frame.Offset()]))
 		if frame.IsComplete() {
-			//fmt.Println("TADAAM", frame.Op.String(), frame.Atoms.Count(), "\n")
+			//fmt.Println("TADAAM", frame.OpString(), frame.Count(), "\n")
 			count++
 		}
 	}
 	if count != 3 {
+		t.Logf("count %d!=3", count)
 		t.Fail()
 	}
 }

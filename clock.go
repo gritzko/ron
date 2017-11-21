@@ -59,9 +59,9 @@ func CalendarToRFC(uuid UUID) (u [16]byte) {
 
 	var replicaId [6]byte
 	orig := uuid.Origin()
-	orig >>= 60-6*8
-	for i:=0; i<6; i++ {
-		replicaId[5-i] = byte(orig&255)
+	orig >>= 60 - 6*8
+	for i := 0; i < 6; i++ {
+		replicaId[5-i] = byte(orig & 255)
 		orig >>= 8
 	}
 
@@ -73,7 +73,7 @@ func CalendarToRFC(uuid UUID) (u [16]byte) {
 	return u
 }
 
-func CalendarToRFCString (uuid UUID) string {
+func CalendarToRFCString(uuid UUID) string {
 	u := CalendarToRFC(uuid)
 	buf := make([]byte, 36)
 
@@ -140,7 +140,7 @@ func (clock Clock) IsSane(uuid UUID) bool {
 	}
 }
 
-func (clock Clock) Decode (uuid UUID) time.Time {
+func (clock Clock) Decode(uuid UUID) time.Time {
 	switch clock.Mode {
 	case CLOCK_CALENDAR:
 		return DecodeCalendar(uuid.Value())

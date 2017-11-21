@@ -1,37 +1,49 @@
 package ron
 
 const INT60LEN = 10
-const MAX_ATOMS = 8
+const MAX_ATOMS_PER_OP = 1 << 20
 
-type uint128 [2]uint64
+type Atom [2]uint64
 
-type UUID struct {
-	uint128
-}
+type UUID Atom
 
 type Spec struct {
-	uuids [4]UUID
+	RDType, Object, Event, Ref UUID
 }
 
-type Atoms struct {
-	_atoms [2]uint128
-	atoms  []uint128
-	frame  []byte
+type ParserState struct {
+	// position in the atom array, in the atom, in the half-atom
+	atm, hlf, dgt int
+	// ragel parser state
+	state int
+	// byte offset of the current op
+	offset int
+	// parsing byte offset
+	position int
+	// whether the frame might get more data
+	streaming bool
 }
 
-// OP is an immutable atomic operation object - no write access
-type Op struct { // ~128 bytes
-	Spec
-	Atoms
-	term uint
+type SerializerState struct {
+	Format uint
 }
 
 // Immutable RON op Frame; the first op is pre-parsed
 // Iteration state machine:
 type Frame struct {
-	Op
-	state  OpParserState
-	Format uint
+	Parser     ParserState
+	Serializer SerializerState
+	// RON coding: binary/text
+	binary bool
+	// The current position in the frame (op idx).
+	Position int
+	// ints hosts the current op: 4 pairs for spec uuid entries, the rest is values (also pairs).
+	// General convention: hte first int is hte value, the second is flags and other stuff.
+	atoms []Atom
+	// Op terminator (see OP_TERM)
+	term int
+	// Frame body, raw bytes.
+	Body []byte
 }
 
 // Checker performs sanity checks on incoming data. Note that a Checker
@@ -129,6 +141,9 @@ type Checker interface {
 // [ ] No Rewind(), just Clone()
 //
 // [ ] Minimize copying in Frame.Parse()
+// [ ] clonable Frames (by value)
+// [ ] Atom parser/iterator
+// [ ] frame splitting ("op" and "rest", no reset?, more tests)
 //
 // [ ] AppendXXX(t,o,e,r) - Spec... spread sign
 //
@@ -167,32 +182,16 @@ type Checker interface {
 // [ ] strings: either escaped byte buffer or an unescaped string!!!!!!
 
 // Reducer is essentially a replicated data type.
-// It provides two reducing functions: total and incremental.
 // A reduction of the object's full op log produces its RON state.
 // A reduction of a log segment produces a patch.
-// A reduced frame has same type, object id; event id is the one
-// of the last input frame.
-type Reducer interface {
-	// Reduce is a non-reordering incremental reducer.
-	// It turns two adjacent frames into a single reduced frame,
-	// if that is possible (quite often, two ops can not
-	// be meaningfully combined without having the full state).
-	// For a full op log, chained Reduce() must produce exactly
-	// the same end result as ReduceAll()
-	// Associative, commutative*, idempotent.
-	Reduce(a, b Frame) (result Frame, err UUID)
-	// ReduceAll is a reordering batch reducer. It turns a sequence
-	// of frames into a reduced multiframe. In case the input is
-	// the full log, the result must match that of chained Reduce().
-	// Complexity guarantees: max O(log N)
-	// (could be made to reduce 1mln single-op frames)
-	// Associative, commutative*, idempotent.
-	ReduceAll(inputs []Frame) (result Frame, err UUID)
-}
+// A reduced frame has the same object id and, in most cases, type.
+// Event id is the one of the last input frame.
+// Complexity guarantees: max O(log N)
+// (could be made to reduce 1mln single-op frames)
+// Associative, commutative*, idempotent.
+type Reducer func(batch Batch) Frame
 
-type ReducerMaker func() Reducer
-
-var RDTYPES map[UUID]ReducerMaker
+var RDTYPES map[UUID]Reducer
 
 type Batch []Frame
 
@@ -215,12 +214,8 @@ var NEVER_UUID = NewNameUUID(INT60_INFINITY, 0)
 
 var ERROR_UUID = NewNameUUID(INT60_ERROR, 0)
 
-var ZERO_OP = Op{}
-
-var NO_ATOMS = Atoms{}
-
 func init() {
 
-	RDTYPES = make(map[UUID]ReducerMaker, 10)
+	RDTYPES = make(map[UUID]Reducer, 10)
 
 }
