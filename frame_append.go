@@ -225,31 +225,45 @@ func (frame *Frame) Append(other Frame) {
 
 }
 
-// A temporary frame with no serialized body
-func TmpFrame(atoms []Atom, term int) (ret Frame) {
-	ret.atoms = atoms
-	ret.term = term
-	return
+func (frame *Frame) AppendReducedRef(ref UUID, other Frame) {
+	tmpRef, tmpTerm := other.atoms[SPEC_REF], other.term
+	other.atoms[SPEC_REF] = Atom(ref)
+	other.term = TERM_REDUCED
+	frame.Append(other)
+	other.atoms[SPEC_REF], other.term = tmpRef, tmpTerm
+}
+
+//   BWAHAHA   TMP FRAME BREAKS STRINGS !!!!!!!!!
+
+func (frame *Frame) AppendReduced(other Frame) {
+	tmpTerm := other.term
+	other.term = TERM_REDUCED
+	frame.Append(other)
+	other.term = tmpTerm
+}
+
+func (frame *Frame) AppendEmpty(spec Spec, term int) {
+	tmp := Frame{term:term}
+	atm := [4]Atom{
+		SPEC_TYPE:   Atom(spec.RDType),
+		SPEC_OBJECT: Atom(spec.Object),
+		SPEC_EVENT:  Atom(spec.Event),
+		SPEC_REF:    Atom(spec.Ref),
+	}
+	tmp.atoms = atm[:]
+	frame.Append(tmp)
+}
+
+func (frame *Frame) AppendReducedOp(spec Spec) {
+	frame.AppendEmpty(spec, TERM_REDUCED)
 }
 
 func (frame *Frame) AppendStateHeader(spec Spec) {
-	a := [4]Atom{
-		SPEC_TYPE:   Atom(spec.RDType),
-		SPEC_OBJECT: Atom(spec.Object),
-		SPEC_EVENT:  Atom(spec.Event),
-		SPEC_REF:    Atom(spec.Ref),
-	}
-	frame.Append(TmpFrame(a[:], TERM_HEADER))
+	frame.AppendEmpty(spec, TERM_HEADER)
 }
 
 func (frame *Frame) AppendQueryHeader(spec Spec) {
-	a := [4]Atom{
-		SPEC_TYPE:   Atom(spec.RDType),
-		SPEC_OBJECT: Atom(spec.Object),
-		SPEC_EVENT:  Atom(spec.Event),
-		SPEC_REF:    Atom(spec.Ref),
-	}
-	frame.Append(TmpFrame(a[:], TERM_QUERY))
+	frame.AppendEmpty(spec, TERM_QUERY)
 }
 
 func (frame *Frame) AppendAll(i Frame) {

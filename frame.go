@@ -66,14 +66,13 @@ func (frame Frame) Fill(clock Clock, env Environment) Frame {
 	ret := MakeFrame(frame.Len() << 1)
 	now := clock.Time()
 	for !frame.EOF() {
-		atoms := frame.atoms
-		if frame.UUID(SPEC_EVENT) == ZERO_UUID {
-			atoms = make([]Atom, len(atoms))
-			copy(atoms, frame.atoms)
-			atoms[SPEC_EVENT] = Atom(now)
+		ev := frame.Event()
+		if ev==ZERO_UUID {
+			frame.atoms[SPEC_EVENT] = Atom(now)
 		}
 		// TODO implement env fill
-		ret.Append(TmpFrame(atoms, frame.term))
+		ret.Append(frame)
+		frame.atoms[SPEC_EVENT] = Atom(ev)
 		frame.Next()
 	}
 	return ret.Close()
@@ -93,6 +92,9 @@ func (frame Frame) Clone() (clone Frame) {
 	clone = frame
 	clone.atoms = make([]Atom, len(frame.atoms))
 	copy(clone.atoms, frame.atoms)
+    l := len(frame.Body)
+    // prevent from appending to the same buffer
+    clone.Body = frame.Body[0:l:l]
 	return
 }
 
@@ -218,4 +220,10 @@ func (frame Frame) Integer(i int) int64 {
 
 func (frame Frame) Atom(i int) Atom {
 	return frame.atoms[i+4]
+}
+
+
+
+func (frame Frame) Values() []Atom {
+    return frame.atoms[4:]
 }

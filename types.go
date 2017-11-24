@@ -28,8 +28,13 @@ type SerializerState struct {
 	Format uint
 }
 
-// Immutable RON op Frame; the first op is pre-parsed
-// Iteration state machine:
+// RON Frame is a vector of immutable RON ops.
+// A frame is always positioned on some op (initially, the first one).
+// In a sense, Frame is its own iterator: frame.Next(), returns true is the 
+// frame is re-positioned to the next op, false on error (EOF is an error too).
+// That is made to minimize boilerplate as Frames are forwarded based on the
+// frame header (the first op).
+// Frame is not thread-safe; the underlying buffer is append-only, thus thread-safe.
 type Frame struct {
 	Parser     ParserState
 	Serializer SerializerState
@@ -189,9 +194,13 @@ type Checker interface {
 // Complexity guarantees: max O(log N)
 // (could be made to reduce 1mln single-op frames)
 // Associative, commutative*, idempotent.
-type Reducer func(batch Batch) Frame
+type Reducer interface {
+	Reduce(batch Batch) Frame
+}
 
-var RDTYPES map[UUID]Reducer
+type ReducerMaker func () Reducer
+
+var RDTYPES map[UUID]ReducerMaker
 
 type Batch []Frame
 
@@ -216,6 +225,6 @@ var ERROR_UUID = NewNameUUID(INT60_ERROR, 0)
 
 func init() {
 
-	RDTYPES = make(map[UUID]Reducer, 10)
+	RDTYPES = make(map[UUID]ReducerMaker, 10)
 
 }

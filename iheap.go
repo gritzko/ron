@@ -83,6 +83,9 @@ func (heap FrameHeap) swap(i, j int) {
 }
 
 func (heap *FrameHeap) Put(i *Frame) {
+	if !i.EOF() && i.IsHeader() {
+		i.Next()
+	}
 	if !i.EOF() {
 		at := len(heap.iters)
 		heap.iters = append(heap.iters, i)

@@ -1,6 +1,6 @@
 package ron
 
-type UUID2Map struct {
+type UUIDMultiMap struct {
 	subs map[UUID][]UUID
 	// avoid allocating lots of small slices, allocate larger slabs
 	slab []UUID
@@ -11,15 +11,15 @@ type UUID2Map struct {
 const U2M_DEFAULT_SLICE_SIZE = 2
 const U2M_SLAB_SIZE = 32 // 32*16=512 bytes
 
-func MakeUUID2Map() UUID2Map {
-	um := UUID2Map{
+func MakeUUID2Map() UUIDMultiMap {
+	um := UUIDMultiMap{
 		subs: make(map[UUID][]UUID),
 		slab: make([]UUID, U2M_SLAB_SIZE),
 	}
 	return um
 }
 
-func (um *UUID2Map) Add(key, value UUID) {
+func (um *UUIDMultiMap) Add(key, value UUID) {
 	values, ok := um.subs[key]
 	if !ok {
 		if len(um.slab) < U2M_DEFAULT_SLICE_SIZE {
@@ -32,11 +32,29 @@ func (um *UUID2Map) Add(key, value UUID) {
 	um.Put(key, values)
 }
 
-func (um UUID2Map) List(key UUID) []UUID {
+func (um UUIDMultiMap) Len() int {
+	return len(um.subs)
+}
+
+func (um UUIDMultiMap) Keys() []UUID {
+	ret := make([]UUID, 0, um.Len())
+	for key, _ := range um.subs {
+		ret = append(ret, key)
+	}
+	return ret
+}
+
+func (um UUIDMultiMap) List(key UUID) []UUID {
 	return um.subs[key]
 }
 
-func (um *UUID2Map) Put(key UUID, values []UUID) {
+func (um UUIDMultiMap) Take(key UUID) (ret []UUID) {
+	ret = um.List(key)
+	delete(um.subs, key)
+	return
+}
+
+func (um *UUIDMultiMap) Put(key UUID, values []UUID) {
 	if len(values) > 0 {
 		um.subs[key] = values
 	} else {
@@ -44,7 +62,7 @@ func (um *UUID2Map) Put(key UUID, values []UUID) {
 	}
 }
 
-func (um *UUID2Map) Remove(key UUID, value UUID) {
+func (um *UUIDMultiMap) Remove(key UUID, value UUID) {
 	values, ok := um.subs[key]
 	if !ok {
 		return
