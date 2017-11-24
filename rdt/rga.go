@@ -3,6 +3,7 @@ package rdt
 import (
 	"github.com/gritzko/ron"
 	//	"fmt"
+	"sort"
 )
 
 // RGA is a Replicated Growable Array data type, an ordered collection of anything
@@ -14,174 +15,162 @@ import (
 // problem: all the elements of an array have unique ids, so concurrent changes
 // can't introduce confusion.
 type RGA struct {
-	active_ins  ron.FrameHeap
-	waiting_rms map[ron.UUID]ron.UUID
-	waiting_ins UUIDFrameMultiMap // TODO   UUID2Map? UUIDIntMultiMap
-	loc_ins     ron.UUIDHeap      // just sort 'em
+	active ron.FrameHeap         // active subtrees, a frame heap
+	rms    map[ron.UUID]ron.UUID // removes
+	ins    []*ron.Frame          // subtrees-to-insert, ordered by ref
+	traps  map[ron.UUID]int      // points to an offset at ins
 }
 
 var RGA_UUID = ron.NewName("rga")
+var RM_UUID = ron.NewName("rm")
+var NO_ATOMS []ron.Atom
 
-func MakeRGAReducer () ron.Reducer {
+func MakeRGAReducer() ron.Reducer {
 	var rga RGA
-	rga.active_ins = ron.MakeFrameHeap(ron.PRIM_EVENT|ron.PRIM_DESC|ron.SEC_LOCATION|ron.SEC_DESC, 2)
-	rga.waiting_ins = MakeUUIDFrameMultiMap()
-	rga.waiting_rms = make(map[ron.UUID]ron.UUID)
+	rga.active = ron.MakeFrameHeap(ron.PRIM_EVENT|ron.PRIM_DESC|ron.SEC_LOCATION|ron.SEC_DESC, 2)
+	rga.rms = make(map[ron.UUID]ron.UUID)
+	rga.ins = make([]*ron.Frame, 32)
+	rga.traps = make(map[ron.UUID]int)
 	return rga
 }
 
 // [ ] multiframe handling: the O(N) multiframe merge
 // [ ] undo/redo
 
+func AddMax(rmmap map[ron.UUID]ron.UUID, event, target ron.UUID) {
+	rm, ok := rmmap[target]
+	if !ok || event.LaterThan(rm) {
+		rmmap[target] = event
+	}
+}
+
+type RefOrderedBatch []*ron.Frame
+
+func (b RefOrderedBatch) Len() int           { return len(b) }
+func (b RefOrderedBatch) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b RefOrderedBatch) Less(i, j int) bool { return b[j].Ref().LaterThan(b[i].Ref()) }
+
+type RevOrderedUUIDSlice []ron.UUID
+
+func (b RevOrderedUUIDSlice) Len() int           { return len(b) }
+func (b RevOrderedUUIDSlice) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b RevOrderedUUIDSlice) Less(i, j int) bool { return b[i].LaterThan(b[j]) }
+
 // Reduce RGA frames
-func (rga RGA) ReduceAll(inputs []ron.Frame) (result ron.Frame, err ron.UUID) {
+func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
-	rdtype, object := inputs[0].Type(), inputs[0].Object()
+	rdtype, object := batch[0].Type(), batch[0].Object()
+	event := batch[len(batch)-1].Event()
+	// multiframe parts must be atomically applied, hence same version id
+	spec := ron.Spec{rdtype, object, event, ron.ZERO_UUID}
+	_produce := [4]ron.Frame{}
+	produce := _produce[:0]
+	pending := rga.ins[:0]
 
-	var version ron.UUID
-
-	for k := 0; k < len(inputs); k++ {
-		// TODO check type/object
-		raw := !inputs[k].IsHeader()
-		at := inputs[k].Ref()
-		version = inputs[k].Event()
-		if !raw {
-			inputs[k].Next()
-			// FIXME if over: remove!!!
+	for k := 0; k < len(batch); k++ {
+		b := &batch[k]
+		if !b.IsHeader() {
+			if b.Count() == 0 {
+				AddMax(rga.rms, b.Event(), b.Ref())
+			} else {
+				pending = append(pending, b)
+			}
+		} else {
+			if b.Ref() == RM_UUID { // rm batch
+				b.Next()
+				for !b.EOF() {
+					AddMax(rga.rms, b.Event(), b.Ref())
+					b.Next()
+				}
+			} else {
+				pending = append(pending, b)
+			}
 		}
-		if inputs[k].Atoms.Count() == 0 {
-			// FIXME what if others are inserts?
-			// option: root tree, other trees, then orphan removes
-			// break on order violation
-			for ii := inputs[k]; !ii.EOF(); ii.Next() {
-				pre, ok := rga.waiting_rms[ii.Ref()]
-				if !ok || ii.Event().LaterThan(pre) {
-					rga.waiting_rms[ii.Ref()] = ii.Event()
+	}
+
+	sort.Sort(RefOrderedBatch(pending))
+	for i := len(pending) - 1; i >= 0; i-- {
+		rga.traps[pending[i].Ref()] = i
+	}
+
+	for i := 0; i < len(pending); {
+
+		result := ron.MakeFrame(1024)
+
+		for spec.Ref = pending[i].Ref(); i < len(pending) && !pending[i].EOF() && pending[i].Ref() == spec.Ref; i++ {
+			rga.active.Put(pending[i])
+		}
+
+		spec.Event = event
+		result.AppendStateHeader(spec)
+
+		for !rga.active.IsEmpty() {
+			op := rga.active.Current()
+			spec.Event = op.Event()
+			ref := op.Ref()
+			if op.IsRaw() {
+				ref = ron.ZERO_UUID
+			}
+			rm, ok := rga.rms[op.Event()]
+			if ok && rm.LaterThan(op.Ref()) {
+				ref = rm
+				delete(rga.rms, op.Event())
+			}
+
+			result.AppendReducedRef(ref, *op)
+			rga.active.NextPrim()
+
+			for t, ok := rga.traps[op.Event()]; ok && t < len(pending); t++ {
+				if !pending[t].EOF() && pending[t].Ref() == op.Event() {
+					rga.active.Put(pending[t])
+				} else {
+					break
 				}
 			}
-		} else { // inserts
-			//fmt.Printf("WAIT %s\n", at.String())
-			rga.waiting_ins.Put(at, &inputs[k])
-			rga.loc_ins.Put(at)
+
 		}
-	}
-	// multiframe parts must be atomically applied, hence same version id
-	header_spec := ron.NewSpec(rdtype, object, version, ron.ZERO_UUID)
 
-	for rga.loc_ins.Len() > 0 {
+		produce = append(produce, result)
 
-		loc := rga.loc_ins.PopUnique()
-		cu := rga.waiting_ins.Unload(&rga.active_ins, loc)
-		if 0 == cu {
-			continue
-		}
-		//fmt.Printf("LOC %s (%d)\n", loc.String(), cu)
-
-		// note any states, if so use ! else ;
-		header_spec.SetUUID(ron.SPEC_REF, loc)
-		if !loc.IsZero() {
-			// ?
-		}
-		result.AppendStateHeader(header_spec)
-
-		for rga.active_ins.Len() > 0 {
-			op := *rga.active_ins.Op()
-			event := op.Event()
-			atoms := op.Atoms
-			if op.IsRaw() {
-				header_spec.SetUUID(ron.SPEC_REF, ron.ZERO_UUID)
-			} else {
-				header_spec.SetUUID(ron.SPEC_REF, op.Ref())
-			}
-			del, ok := rga.waiting_rms[event]
-			if ok && del.LaterThan(op.Ref()) {
-				header_spec.SetUUID(ron.SPEC_REF, del)
-				delete(rga.waiting_rms, event)
-			}
-			header_spec.SetUUID(ron.SPEC_EVENT, event)
-
-			result.AppendReduced(header_spec, atoms)
-
-			rga.active_ins.NextPrim() // idempotency  FIXME rename "prim"
-
-			rga.waiting_ins.Unload(&rga.active_ins, event)
+		for i < len(pending) && pending[i].EOF() {
+			i++
 		}
 	}
 
-	if len(rga.waiting_rms) > 0 {
-		header_spec.SetUUID(ron.SPEC_REF, ron.NEVER_UUID)
-		result.AppendStateHeader(header_spec) // multiframe
-		for target, maxEvent := range rga.waiting_rms {
-			header_spec.SetUUID(ron.SPEC_EVENT, maxEvent)
-			header_spec.SetUUID(ron.SPEC_REF, target)
-			result.AppendReduced(header_spec, ron.NO_ATOMS)
-			delete(rga.waiting_rms, target)
+	if len(rga.rms) > 0 {
+		result := ron.MakeFrame(1024)
+		spec.Event = event
+		spec.Ref = RM_UUID
+		result.AppendStateHeader(spec)
+		// take removed event ids
+		refs := make([]ron.UUID, 0, len(rga.rms))
+		for ref := range rga.rms {
+			refs = append(refs, ref)
 		}
+		sort.Sort(RevOrderedUUIDSlice(refs))
+		// scan, append
+		for _, key := range refs {
+			spec.Ref = key
+			spec.Event = rga.rms[key]
+			result.AppendReducedOp(spec)
+			delete(rga.rms, key)
+		}
+		produce = append(produce, result)
+
 	}
 	// safety: ceil for inserted subtrees - SANITY SCAN!!!
+	rga.ins = pending[:0] // reuse memory
+	for x := range rga.traps {
+		delete(rga.traps, x)
+	}
 
-	return
-}
-
-func (rga RGA) Reduce(a, b ron.Frame) (res ron.Frame, err ron.UUID) {
-	var frames = [2]ron.Frame{a, b}
-	res, err = rga.ReduceAll(frames[0:2])
-	return
-}
-
-type IMMCell struct {
-	p *ron.Frame
-	n uint64
-}
-
-type UUIDFrameMultiMap struct {
-	m map[ron.UUID]IMMCell
-	c uint64
-}
-
-func MakeUUIDFrameMultiMap() (ret UUIDFrameMultiMap) {
-	ret.m = make(map[ron.UUID]IMMCell)
-	return
-}
-
-func (imm *UUIDFrameMultiMap) Put(key ron.UUID, value *ron.Frame) {
-	pre, ok := imm.m[key]
-	if ok {
-		imm.c++
-		synth := ron.NewHashUUID(imm.c, ron.INT60_ERROR)
-		imm.m[synth] = pre
-		imm.m[key] = IMMCell{value, synth.Value()}
+	if len(produce) == 1 {
+		return produce[0]
 	} else {
-		imm.m[key] = IMMCell{value, 0}
+		return ron.BatchFrames(produce)
 	}
 }
 
-func (imm UUIDFrameMultiMap) Take(key ron.UUID) (value *ron.Frame, next ron.UUID) {
-	pre, ok := imm.m[key]
-	if ok {
-		delete(imm.m, key)
-		value = pre.p
-		if pre.n != 0 {
-			next = ron.NewHashUUID(pre.n, ron.INT60_ERROR)
-		}
-	}
-	return
-}
-
-func (imm UUIDFrameMultiMap) Unload(heap *ron.FrameHeap, key ron.UUID) (count int) {
-	for pre, ok := imm.m[key]; ok; pre, ok = imm.m[key] {
-		delete(imm.m, key)
-		heap.Put(pre.p)
-		count++
-		if pre.n != 0 {
-			key = ron.NewHashUUID(pre.n, ron.INT60_ERROR)
-		} else {
-			break
-		}
-	}
-	return
-}
-
-func init () {
+func init() {
 	ron.RDTYPES[RGA_UUID] = MakeRGAReducer
 }

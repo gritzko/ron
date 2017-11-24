@@ -6,18 +6,10 @@ import (
 	"fmt"
 )
 
-func TestIMultiMap_Take(t *testing.T) {
-	frame := ron.ParseFrame([]byte("*rga#test@2:1'B'"))
-	mm := MakeUUIDFrameMultiMap()
-	mm.Put(ron.ZERO_UUID, &frame)
-	b2, next := mm.Take(ron.ZERO_UUID)
-	if &frame != b2 || next != ron.ZERO_UUID {
-		t.Fail()
-	}
-}
 
 // 3-part tables: first all inserts, then all deletes
 var rga_3_tests = [][3]string{
+
 	{ // 0+o
 		"*rga#textB!",
 		"*rga#textB@time'A'",
@@ -59,7 +51,6 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@1:4'A'@3:0'C'",
 		"*rga#test@4!@1:4'A'@3:0'C'@2'B'",
 	},
-
 	{ // 8) o+rm
 		"*rga#test@2:1'B'",
 		"*rga#test@3:2;",
@@ -70,9 +61,9 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4:2;",
 		"*rga#test@4:1!@2:4'B'@3:0'C'",
 	},
-	{ // s+rms
+	{ // 10 s+rms
 		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@4!@3:1,@4:2,",
+		"*rga#test@4:rm!@3:1,@4:2,",
 		"*rga#test@4!@1:3'A'@2:4'B'",
 	},
 	{ // s(rm)+s(rm) merge
@@ -80,7 +71,7 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@1:4'A'@3:0'C'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@2:5'B'",
 	},
-	{ // s(rm)+s(rm) merge
+	{ // 12 s(rm)+s(rm) merge
 		"*rga#test@3!@1:4a'A'@3:0'C'@2:5'B'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@4:0'D'@2:5'B'",
 		"*rga#test@4!@1:4a'A'@3:0'C'@4'D'@2:5'B'",
@@ -98,17 +89,18 @@ func TestRGA_Reduce(t *testing.T) {
 	for i := 0; i < len(rga_3_tests); i++ {
 		test := rga_3_tests[i]
 		C := test[2]
-		frameA := ron.ParseFrameString(test[0])
-		frameB := ron.ParseFrameString(test[1])
+		frames := [2]ron.Frame{
+			ron.ParseFrameString(test[0]),
+			ron.ParseFrameString(test[1]),
+		}
 		rga := MakeRGAReducer()
-		frameC, err := rga.Reduce(frameA, frameB)
+		frameC := rga.Reduce(frames[0:2])
 		//fmt.Println(frameA.String(), frameB.String(), frameC.String())
-		if err != ron.ZERO_UUID {
-			t.Fail()
-			fmt.Printf("reduction error at %d: %s\n", i, err.String())
-		} else if frameC.String() != C {
+		if frameC.String() != C {
 			t.Fail()
 			fmt.Printf("\n-------------------------\nwrong result at %d: \nhave [ %s ]\nneed [ %s ]\n\n", i, frameC.String(), C)
+		} else {
+			//fmt.Printf("%d OK: %s\n", i, C)
 		}
 
 	}
