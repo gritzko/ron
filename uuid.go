@@ -30,6 +30,10 @@ func (uuid UUID) IsTranscendentName() bool {
 	return uuid[1] == UUID_NAME_UPPER_BITS
 }
 
+func (uuid UUID) IsName() bool {
+	return uuid.Scheme()==UUID_NAME
+}
+
 func (a UUID) LaterThan(b UUID) bool {
 	if a.Value() == b.Value() {
 		return a.Origin() > b.Origin()

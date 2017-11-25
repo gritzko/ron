@@ -37,12 +37,7 @@ func (frame Frame) Cap() int {
 }
 
 func (frame Frame) Spec() Spec {
-	return Spec{
-		UUID(frame.atoms[SPEC_TYPE]),
-		UUID(frame.atoms[SPEC_OBJECT]),
-		UUID(frame.atoms[SPEC_EVENT]),
-		UUID(frame.atoms[SPEC_REF]),
-	}
+	return frame.atoms[:4]
 }
 
 func (frame *Frame) Read(reader io.Reader) (length int, err error) {
@@ -64,18 +59,16 @@ func (frame Frame) UUID(idx int) UUID {
 
 func (frame Frame) Fill(clock Clock, env Environment) Frame {
 	ret := MakeFrame(frame.Len() << 1)
-	now := clock.Time()
+	// FIXME header
 	for !frame.EOF() {
-		ev := frame.Event()
-		if ev==ZERO_UUID {
-			frame.atoms[SPEC_EVENT] = Atom(now)
+		spec := frame.Spec()
+		if spec.Event().IsZero() {
+			spec.SetEvent(clock.Time())
 		}
-		// TODO implement env fill
-		ret.Append(frame)
-		frame.atoms[SPEC_EVENT] = Atom(ev)
+		ret.AppendAmended(spec, frame, frame.Term())
 		frame.Next()
 	}
-	return ret.Close()
+	return ret
 }
 
 func (frame Frame) Reformat(format uint) Frame {
@@ -85,7 +78,7 @@ func (frame Frame) Reformat(format uint) Frame {
 		ret.Append(frame)
 		frame.Next()
 	}
-	return ret.Close()
+	return ret
 }
 
 func (frame Frame) Clone() (clone Frame) {
@@ -184,7 +177,13 @@ func (frame *Frame) AppendBytes(data []byte) {
 }
 
 func NewFrame() Frame {
-	return NewBufferFrame(make([]byte, 1024))
+	return NewBufferFrame(make([]byte, 0, 1024))
+}
+
+func NewFormattedFrame(format uint) (ret Frame) {
+	ret = NewFrame()
+	ret.Serializer.Format = format
+	return
 }
 
 func (frame Frame) Rest() []byte {
@@ -222,8 +221,36 @@ func (frame Frame) Atom(i int) Atom {
 	return frame.atoms[i+4]
 }
 
-
+func NewSpec (t,o,e,l UUID) Spec {
+	return Spec{Atom(t), Atom(o), Atom(e), Atom(l)}
+}
 
 func (frame Frame) Values() []Atom {
     return frame.atoms[4:]
+}
+
+func (spec Spec) Type () UUID {
+	return UUID(spec[SPEC_TYPE])
+}
+func (spec Spec) Object () UUID {
+	return UUID(spec[SPEC_OBJECT])
+}
+func (spec Spec) Event () UUID {
+	return UUID(spec[SPEC_EVENT])
+}
+func (spec Spec) Ref () UUID {
+	return UUID(spec[SPEC_REF])
+}
+
+func (spec Spec) SetType (uuid UUID) {
+	spec[SPEC_TYPE] = Atom(uuid)
+}
+func (spec Spec) SetObject (uuid UUID) {
+	spec[SPEC_OBJECT] = Atom(uuid)
+}
+func (spec Spec) SetEvent (uuid UUID) {
+	spec[SPEC_EVENT] = Atom(uuid)
+}
+func (spec Spec) SetRef (uuid UUID) {
+	spec[SPEC_REF] = Atom(uuid)
 }

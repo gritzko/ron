@@ -62,7 +62,7 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 	rdtype, object := batch[0].Type(), batch[0].Object()
 	event := batch[len(batch)-1].Event()
 	// multiframe parts must be atomically applied, hence same version id
-	spec := ron.Spec{rdtype, object, event, ron.ZERO_UUID}
+	spec := ron.NewSpec(rdtype, object, event, ron.ZERO_UUID)
 	_produce := [4]ron.Frame{}
 	produce := _produce[:0]
 	pending := rga.ins[:0]
@@ -97,16 +97,16 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 		result := ron.MakeFrame(1024)
 
-		for spec.Ref = pending[i].Ref(); i < len(pending) && !pending[i].EOF() && pending[i].Ref() == spec.Ref; i++ {
+		for spec.SetRef(pending[i].Ref()); i < len(pending) && !pending[i].EOF() && pending[i].Ref() == spec.Ref(); i++ {
 			rga.active.Put(pending[i])
 		}
 
-		spec.Event = event
+		spec.SetEvent(event)
 		result.AppendStateHeader(spec)
 
 		for !rga.active.IsEmpty() {
 			op := rga.active.Current()
-			spec.Event = op.Event()
+			spec.SetEvent(op.Event())
 			ref := op.Ref()
 			if op.IsRaw() {
 				ref = ron.ZERO_UUID
@@ -139,8 +139,8 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 	if len(rga.rms) > 0 {
 		result := ron.MakeFrame(1024)
-		spec.Event = event
-		spec.Ref = RM_UUID
+		spec.SetEvent(event)
+		spec.SetRef(RM_UUID)
 		result.AppendStateHeader(spec)
 		// take removed event ids
 		refs := make([]ron.UUID, 0, len(rga.rms))
@@ -150,9 +150,9 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 		sort.Sort(RevOrderedUUIDSlice(refs))
 		// scan, append
 		for _, key := range refs {
-			spec.Ref = key
-			spec.Event = rga.rms[key]
-			result.AppendReducedOp(spec)
+			spec.SetRef(key)
+			spec.SetEvent(rga.rms[key])
+			result.AppendEmptyReducedOp(spec)
 			delete(rga.rms, key)
 		}
 		produce = append(produce, result)

@@ -7,9 +7,9 @@ type Atom [2]uint64
 
 type UUID Atom
 
-type Spec struct {
-	RDType, Object, Event, Ref UUID
-}
+type Atoms []Atom
+
+type Spec []Atom
 
 type ParserState struct {
 	// position in the atom array, in the atom, in the half-atom

@@ -233,8 +233,6 @@ func (frame *Frame) AppendReducedRef(ref UUID, other Frame) {
 	other.atoms[SPEC_REF], other.term = tmpRef, tmpTerm
 }
 
-//   BWAHAHA   TMP FRAME BREAKS STRINGS !!!!!!!!!
-
 func (frame *Frame) AppendReduced(other Frame) {
 	tmpTerm := other.term
 	other.term = TERM_REDUCED
@@ -243,19 +241,35 @@ func (frame *Frame) AppendReduced(other Frame) {
 }
 
 func (frame *Frame) AppendEmpty(spec Spec, term int) {
-	tmp := Frame{term:term}
-	atm := [4]Atom{
-		SPEC_TYPE:   Atom(spec.RDType),
-		SPEC_OBJECT: Atom(spec.Object),
-		SPEC_EVENT:  Atom(spec.Event),
-		SPEC_REF:    Atom(spec.Ref),
-	}
-	tmp.atoms = atm[:]
+	tmp := Frame{atoms:spec, term:term}
 	frame.Append(tmp)
 }
 
-func (frame *Frame) AppendReducedOp(spec Spec) {
+func (frame *Frame) AppendEmptyReducedOp(spec Spec) {
 	frame.AppendEmpty(spec, TERM_REDUCED)
+}
+
+func (frame *Frame) AppendAmended(spec Spec, values Frame, term int) {
+	tmp := values.Clone()
+	tmp.term = term
+	copy(tmp.atoms, spec)
+	frame.Append(tmp)
+}
+
+func (frame *Frame) AppendSpecValT(spec Spec, value Atom, term int) {
+	var atoms [5]Atom
+	copy(atoms[:], spec)
+	atoms[4] = value
+	tmp := Frame{atoms:atoms[:], term:term}
+	frame.Append(tmp)
+}
+
+func (frame *Frame) AppendReducedOpInt(spec Spec, value int64) {
+	frame.AppendSpecValT(spec, NewIntegerAtom(value), TERM_REDUCED)
+}
+
+func (frame *Frame) AppendReducedOpUUID(spec Spec, value UUID) {
+	frame.AppendSpecValT(spec, NewUUIDAtom(value), TERM_REDUCED)
 }
 
 func (frame *Frame) AppendStateHeader(spec Spec) {
@@ -264,6 +278,14 @@ func (frame *Frame) AppendStateHeader(spec Spec) {
 
 func (frame *Frame) AppendQueryHeader(spec Spec) {
 	frame.AppendEmpty(spec, TERM_QUERY)
+}
+
+//func (frame *Frame) AppendRaw (spec Spec, value Atom) {
+//	frame.AppendSpecValT(spec, value, TERM_RAW)
+//}
+
+func (frame Frame) Atoms() []Atom {
+	return frame.atoms[:]
 }
 
 func (frame *Frame) AppendAll(i Frame) {
@@ -295,12 +317,12 @@ var BATCH_UUID = NewName("batch")
 func BatchFrames(batch Batch) Frame {
 	ret := MakeFrame(1024)
 	// FIXME check ids
-	spec := Spec{
-		RDType: BATCH_UUID,
-		Object: batch[0].Object(),
-		Event:  batch[len(batch)-1].Event(),
-		Ref:    ZERO_UUID,
-	}
+	spec := NewSpec(
+		BATCH_UUID,
+		batch[0].Object(),
+		batch[len(batch)-1].Event(),
+		ZERO_UUID,
+	)
 	ret.AppendStateHeader(spec)
 	for _, f := range batch {
 		ret.AppendFrame(f)

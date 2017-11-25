@@ -24,7 +24,7 @@ var DELTA_UUID = ron.NewName("d")
 func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 	heap := ron.MakeFrameHeap(ron.PRIM_LOCATION|ron.SEC_EVENT|ron.SEC_DESC, len(inputs))
 	spec := inputs[0].Spec()
-	spec.Event = inputs[len(inputs)-1].Event()
+	spec.SetEvent(inputs[len(inputs)-1].Event())
 	haveState := false
 	for k:=0; k<len(inputs); k++ {
 		if inputs[k].Ref().IsZero() && inputs[k].IsHeader() {
@@ -33,9 +33,9 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 		heap.Put(&inputs[k])
 	}
 	if !haveState {
-		spec.Ref = DELTA_UUID
+		spec.SetRef(DELTA_UUID)
 	} else {
-		spec.Ref = ron.ZERO_UUID
+		spec.SetRef(ron.ZERO_UUID)
 	}
 	res.AppendStateHeader(spec)
 	for !heap.IsEmpty() {
