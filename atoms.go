@@ -58,8 +58,19 @@ func (a Atom) UUID() UUID {
 	return UUID(a)
 }
 
+var BIT32 = uint64(1)<<32
+var BIT33 = uint64(1)<<33
+
 func (a Atom) Float() float64 {
-	return math.Float64frombits(a[0])
+	pow := int(a[1]&INT32_FULL)
+	if a[1]&BIT33 != 0 {
+		pow = -pow
+	}
+	ret := float64(a[0]) * math.Pow10(pow)
+	if a[1]&BIT32 != 0 {
+		ret = -ret
+	}
+	return ret
 }
 
 // add JSON escapes

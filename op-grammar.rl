@@ -42,7 +42,6 @@
     }
 
     action int_atom_start {
-        atoms[atm][1] |= ((uint64)(ATOM_INT))<<62;
     }
     action int_sign {
         if (fc=='-') {
@@ -54,12 +53,49 @@
         atoms[atm][0] += (uint64)(fc-'0');
     }
     action int_atom_end {
+        atoms[atm][1] |= ((uint64)(ATOM_INT))<<62;
     }
 
     action float_atom_start {
-        atoms[atm][1] |= ((uint64)(ATOM_FLOAT))<<62;
+        e_sgn = 0;
+        e_val = 0;
+        e_frac = 0;
+    }
+    action float_dgt {
+        atoms[atm][0] *= 10;
+        atoms[atm][0] += (uint64)(fc-'0');
+    }
+    action float_sgn {
+        if (fc=='-') {
+            atoms[atm][1] |= uint64(1)<<32;
+        }
+    }
+    action float_frac_dgt {
+        atoms[atm][0] *= 10;
+        atoms[atm][0] += (uint64)(fc-'0');
+        e_frac++;
+    }
+    action float_e_sgn {
+        if (fc=='-') {
+            e_sgn = -1;
+        }
+    }
+    action float_e_dgt {
+        e_val *= 10;
+        e_val += int(fc-'0');
     }
     action float_atom_end {
+        if (e_sgn==-1) {
+            e_val = -e_val -e_frac;
+        } else {
+            e_val = +e_val -e_frac;
+        }
+        if (e_val<0) {
+            atoms[atm][1] |= uint64(1)<<33;
+            e_val = -e_val;
+        }
+        atoms[atm][1] |= uint64(e_val)
+        atoms[atm][1] |= ((uint64)(ATOM_FLOAT))<<62;
     }
 
     action string_atom_start {
@@ -71,10 +107,11 @@
     }
 
     action uuid_atom_start {
-        atoms[atm][1] |= ((uint64)(ATOM_UUID))<<62;
     }
     action uuid_atom_end {
+        atoms[atm][1] |= ((uint64)(ATOM_UUID))<<62;
     }
+
 
     action atoms_start {
         atm = 4;
@@ -123,7 +160,7 @@
     INT_ATOM = ([\-+]? @int_sign ( digit @int_digit )+ ) %int_atom_end >int_atom_start;
 
     # 64-bit (double) float 
-    FLOAT_ATOM = [\-+]? [0-9]+ ("." digit+) ([eE][\-+]?digit+)? >float_atom_start %float_atom_end ;
+    FLOAT_ATOM = ( [\-+]? @float_sgn [0-9]+ @float_dgt "." [0-9]+ @float_frac_dgt ([eE] [\-+]? @float_e_sgn digit+ @float_e_dgt)? ) >float_atom_start %float_atom_end ;
 
     # JSON-escaped string 
     UNIESC = "\\u" [0-9a-fA-F]{4};

@@ -20,12 +20,12 @@ RON may express that state as:
 ```
 Those are two RON *ops*:
 
- 1. some last-write-wins object has a field `bar` set to `1` (on 2017-10-31 10:26:00 UTC, by gritzko),
- 2. another object has a field `foo` set to the first object (10:27:00, by gritzko).
+ 1. some last-write-wins object is created with a field `bar` set to `1` (on 2017-10-31 10:26:00 UTC, by gritzko),
+ 2. another object is created with a field `foo` pointing to the first object (10:27:00, by gritzko).
 
 Each op is a tuple of four globally-unique UUIDs for its data type, object, event and location, plus some number of value *atoms*.
 You may not see any UUIDs in the above example, initially.
-The RON notation does a lot to compress that metadata away.
+The notation does a lot to compress that metadata away.
 
 These are the key features of RON:
 

@@ -37,7 +37,9 @@ func (frame Frame) Cap() int {
 }
 
 func (frame Frame) Spec() Spec {
-	return frame.atoms[:4]
+	var ret [4]Atom
+	copy(ret[:], frame.atoms[:4])
+	return ret[:]
 }
 
 func (frame *Frame) Read(reader io.Reader) (length int, err error) {

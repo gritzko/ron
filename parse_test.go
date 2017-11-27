@@ -1,10 +1,12 @@
 package ron
 
 import (
+	"math"
 	"math/rand"
 	"os"
 	"strings"
 	"testing"
+	"fmt"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -339,6 +341,48 @@ func TestOp_ParseAtoms(t *testing.T) {
 		if types != tests[i][1] {
 			t.Logf("misparsed %d: '%s' (%s)", i, types, tests[i][1])
 			t.Fail()
+		}
+	}
+}
+
+func TestOp_ParseFloat(t *testing.T) {
+	frames := [][2]string{
+		{"*lww#id^3.141592", "*lww#id^3.141592"},
+		{"*lww#id^-0.25", "*lww#id^-0.25"},
+		{"*lww#id^0.000001", "*lww#id^1.0e-6"},
+		{"*lww#id^-0.00000e+02", "*lww#id^0.0"},
+		{"*lww#id^-1.00000e+09", "*lww#id^-1000000000.0"},
+		{"*lww#id^1000000000.0e-1", "*lww#id^100000000.0"},
+		{"*lww#id^12345.6789e+16", "*lww#id^1.23456789e+20"},
+	}
+	vals := []float64{
+		3.141592,
+		-0.25,
+		0.000001,
+		0,
+		-1e+9,
+		1e+8,
+		1.23456789e+20,
+	}
+	for i := 0; i < len(frames); i++ {
+		frame := ParseFrameString(frames[i][0])
+		if frame.Count() != 1 || frame.Atom(0).Type() != ATOM_FLOAT {
+			t.Fail()
+			t.Log("misparsed a float")
+		}
+		atom := frame.Atom(0)
+		val := atom.Float()
+		if math.Abs(val-vals[i]) > 0.001 {
+			t.Fail()
+			t.Logf("%d float value unparsed %e!=%e", i, val, vals[i])
+			fmt.Println("---")
+			return
+		}
+		back := NewFrame()
+		back.Append(frame)
+		if back.String() != frames[i][1] {
+			t.Fail()
+			t.Logf("float serialize fail (got/want):\n%s\n%s\n", back.String(), frames[i][1])
 		}
 	}
 }

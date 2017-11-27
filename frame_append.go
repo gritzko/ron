@@ -115,6 +115,60 @@ func (frame *Frame) appendUUID(uuid UUID, context UUID) {
 	}
 }
 
+var zeros []byte = []byte("0000000000")
+
+func (frame *Frame) appendFloat(a Atom) {
+	if a[0]==0 {
+		frame.Body = append(frame.Body, "0.0"...)
+		return
+	}
+	intStr := fmt.Sprintf("%d", a[0])
+	e := int(a[1]&INT32_FULL)
+	if a[1]&BIT32!=0 {
+		frame.Body = append(frame.Body, '-')
+	}
+	if a[1]&BIT33!=0 { // neg e
+		ip := len(intStr) - e
+		if ip>0 { // integer part
+			frame.Body = append(frame.Body, intStr[:ip]...)
+			frame.Body = append(frame.Body, '.')
+			tail := intStr[ip:]
+			for len(tail)>1 && tail[len(tail)-1]=='0' {
+				tail = tail[:len(tail)-1]
+			}
+			frame.Body = append(frame.Body, tail...)
+		} else if ip==0 {
+			frame.Body = append(frame.Body, '0', '.')
+			frame.Body = append(frame.Body, intStr...)
+		} else {
+			de := 1-ip
+			frame.Body = append(frame.Body, intStr[:1]...)
+			frame.Body = append(frame.Body, '.')
+			if len(intStr)>1 {
+				frame.Body = append(frame.Body, intStr[1:]...)
+			} else {
+				frame.Body = append(frame.Body, '0')
+			}
+			frame.Body = append(frame.Body, 'e', '-')
+			exp := fmt.Sprintf("%d", de)
+			frame.Body = append(frame.Body, exp...)
+		}
+	} else {
+		if e+len(intStr)<=10 {
+			frame.Body = append(frame.Body, intStr...)
+			frame.Body = append(frame.Body, zeros[:e]...)
+			frame.Body = append(frame.Body, ".0"...)
+		} else {
+			exp := fmt.Sprintf("%d", e+len(intStr)-1)
+			frame.Body = append(frame.Body, intStr[0])
+			frame.Body = append(frame.Body, '.')
+			frame.Body = append(frame.Body, intStr[1:]...)
+			frame.Body = append(frame.Body, "e+"...)
+			frame.Body = append(frame.Body, exp...)
+		}
+	}
+}
+
 func (frame *Frame) appendSpec(spec, context []Atom) {
 
 	start := len(frame.Body)
@@ -171,9 +225,7 @@ func (frame *Frame) appendAtoms(other Frame) {
 		case ATOM_FLOAT:
 			{
 				frame.Body = append(frame.Body, ATOM_FLOAT_SEP)
-				s := fmt.Sprint(a.Float())
-				frame.Body = append(frame.Body, []byte(s)...)
-				frame.Body = append(frame.Body, '.')
+				frame.appendFloat(a)
 			}
 		case ATOM_UUID:
 			{

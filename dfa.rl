@@ -50,6 +50,7 @@ func (frame *Frame) Parse() {
 
     atm, hlf, dgt := frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt;
     atoms := frame.atoms;
+    var e_sgn, e_val, e_frac int
 
 	%%{
 
