@@ -171,7 +171,7 @@ With RON, that is perfectly OK.
 Consider "Hello world!" collaboratively written by two users, `bart` and `lisa` on 27 Nov 2017 around 9am GMT.
 A compressed RGA (Replicated Growable Array) frame would look like:
 ```
-*rga#1UQ8p+bart@1UQ8yk+lisa!@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'
+*rga#1UQ8p+bart@1UQ8yk+lisa!@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
 ```
 If nicely indented, the frame is easier to read:
 ```
@@ -213,7 +213,7 @@ If rendered in JSON, the same document would probably start as
     _version: "98f38f80-d351-11e7-8000-c2dde5000000",
     ...
 ```
-...which is already bigger than the entire compressed frame above.
+...which is already 90% of the size of the entire compressed frame above. Adding per-symbol metadata is difficult to do in idiomatic JSON and certainly quite expensive.
 
 So, let's be precise. Let's put UUIDs on everything. RON makes it possible.
 
