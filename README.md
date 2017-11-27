@@ -171,9 +171,9 @@ With RON, that is perfectly OK.
 Consider "Hello world!" collaboratively written by two users, `bart` and `lisa` on 27 Nov 2017 around 9am GMT.
 A compressed RGA (Replicated Growable Array) frame would look like:
 ```
-*rga#1UQ8p+bart@1UQ8yk+lisa!@(s+gritzko'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'
+*rga#1UQ8p+bart@1UQ8yk+lisa!@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'
 ```
-If nicely indented, a compressed frame is easier to read:
+If nicely indented, the frame is easier to read:
 ```
 *rga #1UQ8p+bart @1UQ8yk+lisa     !
                  @(s+bart        'H'
@@ -189,7 +189,7 @@ If nicely indented, a compressed frame is easier to read:
                  @[2             'd'
                  @[k             '!'
 ```
-A fully uncompressed frame:
+If fully uncompressed, the frame takes more space:
 ```
 *rga   #1UQ8p+bart   @1UQ8yk+lisa     :0      !
 *rga   #1UQ8p+bart   @1UQ8s+bart      :0     'H'
@@ -206,7 +206,7 @@ A fully uncompressed frame:
 *rga   #1UQ8p+bart   @1UQ8yk+lisa     :0     '!'
 ```
 
-If rendered in JSON, this document should probably start as
+If rendered in JSON, the same document would probably start as
 ```
 {
     _id: "3b127800-d350-11e7-8000-9a5db8000000",
