@@ -173,6 +173,7 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 
 	start := len(frame.Body)
 	flags := frame.Serializer.Format
+	skips := 0
 	for t := 0; t < 4; t++ {
 		if 0 != flags&FORMAT_GRID {
 			rest := t*22 - (len(frame.Body) - start)
@@ -181,6 +182,7 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 			frame.Body = append(frame.Body, ' ')
 		}
 		if (spec[t] == context[t]) && (0 == flags&FORMAT_NOSKIP) {
+			skips++
 			continue
 		}
 		frame.Body = append(frame.Body, SPEC_PUNCT[uint(t)])
@@ -203,6 +205,9 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 		} else {
 			frame.appendUUID(UUID(spec[t]), UUID(context[t]))
 		}
+	}
+	if skips==4 {
+		frame.Body = append(frame.Body, '@')
 	}
 }
 

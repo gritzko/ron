@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"fmt"
 )
 
 func TestParseUUID(t *testing.T) {
@@ -375,8 +374,6 @@ func TestOp_ParseFloat(t *testing.T) {
 		if math.Abs(val-vals[i]) > 0.001 {
 			t.Fail()
 			t.Logf("%d float value unparsed %e!=%e", i, val, vals[i])
-			fmt.Println("---")
-			return
 		}
 		back := NewFrame()
 		back.Append(frame)

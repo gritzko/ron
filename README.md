@@ -167,6 +167,44 @@ We may take this to the extreme if we consider the case of a CRDT-based collabor
 Then, every letter in the text has its own UUID.
 With RFC4122 UUIDs and JSON, that is simply ridiculous.
 With RON, that is perfectly OK.
+Consider "Hello world!" collaboratively written by two users, `bart` and `lisa` on 27 Nov 2017 around 9am GMT.
+
+A compressed frame:
+```
+*rga#hello@1UQ8yk+lisa!@(s+gritzko'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'
+```
+A nicely indented compressed frame:
+```
+*rga   #hello   @1UQ8yk+lisa     !
+                @(s+bart        'H'
+                @[r             'e'
+                @(t             'l'
+                @[T             'l'
+                @[i             'o'
+                @(w+lisa        ' '
+                @(x             'w'
+                @(y             'o'
+                @[1             'r'
+                @{a             'l'
+                @[2             'd'
+                @[k             '!'
+```
+A fully uncompressed frame:
+```
+*rga   #hello   @1UQ8yk+lisa       :0      !
+*rga   #hello   @1UQ8s+bart        :0     'H'
+*rga   #hello   @1UQ8sr+bart       :0     'e'
+*rga   #hello   @1UQ8t+bart        :0     'l'
+*rga   #hello   @1UQ8tT+bart       :0     'l'
+*rga   #hello   @1UQ8ti+bart       :0     'o'
+*rga   #hello   @1UQ8w+lisa        :0     ' '
+*rga   #hello   @1UQ8x+lisa        :0     'w'
+*rga   #hello   @1UQ8y+lisa        :0     'o'
+*rga   #hello   @1UQ8y1+lisa       :0     'r'
+*rga   #hello   @1UQ8y1a+lisa      :0     'l'
+*rga   #hello   @1UQ8y2+lisa       :0     'd'
+*rga   #hello   @1UQ8yk+lisa       :0     '!'
+```
 So, let's be precise. Let's put UUIDs on everything.
 
 ## Wire format (binary)

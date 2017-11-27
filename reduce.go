@@ -19,23 +19,26 @@ func (r EmptyReducer) Reduce(inputs Batch) (frame Frame) {
 
 type OmniReducer struct {
 	empty EmptyReducer
-	Types map[uint64]Reducer
+	Types map[UUID]Reducer
 }
 
 var REDUCER = OmniReducer{}
 
 func NewOmniReducer() (ret OmniReducer) {
-	ret.Types = make(map[uint64]Reducer)
+	ret.Types = make(map[UUID]Reducer)
+	for rdt, fct := range RDTYPES {
+		ret.Types[rdt] = fct()
+	}
 	return
 }
 
 func (omni OmniReducer) AddType(id UUID, r Reducer) {
-	omni.Types[id.Value()] = r
+	omni.Types[id] = r
 }
 
 
 func (omni OmniReducer) pickReducer(t UUID) Reducer {
-	r := omni.Types[t.Value()]
+	r := omni.Types[t]
 	if r == nil {
 		r = omni.empty
 	}
