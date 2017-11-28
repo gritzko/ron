@@ -86,7 +86,11 @@ var rga_3_tests = [][3]string{
 		"*rga#test@3:1'-';",
 		"*rga#test@3!@1'A'@3'-'@2'B'",
 	},
-	// TODo concurrent, eclipsed removes
+	{ // 15 eclipsed rm
+		"*rga#test@4!@1'A'@2:4'B'",
+		"*rga#test@3:2;",
+		"*rga#test@3!@1'A'@2:4'B'",
+	},
 	// TODO: real mess, trees and orphans
 }
 

@@ -113,16 +113,17 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 				ref = ron.ZERO_UUID
 			}
 			rm, ok := rga.rms[ev]
-			if ok && rm.LaterThan(ref) {
-				ref = rm
+			if ok {
+				if rm.LaterThan(ref) {
+					ref = rm
+				}
 				delete(rga.rms, ev)
 			}
 
 			result.AppendReducedRef(ref, *op)
 			rga.active.NextPrim()
 
-			t, ok := rga.traps[ev]
-			for ; ok && t < len(pending); t++ {
+			for t, ok := rga.traps[ev]; ok && t < len(pending); t++ {
 				if !pending[t].EOF() && pending[t].Ref() == ev {
 					rga.active.Put(pending[t])
 				} else {
