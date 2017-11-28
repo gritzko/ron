@@ -106,22 +106,24 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 		for !rga.active.IsEmpty() {
 			op := rga.active.Current()
-			spec.SetEvent(op.Event())
+			ev := op.Event()
+			spec.SetEvent(ev)
 			ref := op.Ref()
 			if op.IsRaw() {
 				ref = ron.ZERO_UUID
 			}
-			rm, ok := rga.rms[op.Event()]
-			if ok && rm.LaterThan(op.Ref()) {
+			rm, ok := rga.rms[ev]
+			if ok && rm.LaterThan(ref) {
 				ref = rm
-				delete(rga.rms, op.Event())
+				delete(rga.rms, ev)
 			}
 
 			result.AppendReducedRef(ref, *op)
 			rga.active.NextPrim()
 
-			for t, ok := rga.traps[op.Event()]; ok && t < len(pending); t++ {
-				if !pending[t].EOF() && pending[t].Ref() == op.Event() {
+			t, ok := rga.traps[ev]
+			for ; ok && t < len(pending); t++ {
+				if !pending[t].EOF() && pending[t].Ref() == ev {
 					rga.active.Put(pending[t])
 				} else {
 					break

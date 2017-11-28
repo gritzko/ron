@@ -13,7 +13,7 @@ var rga_3_tests = [][3]string{
 	{ // 0+o
 		"*rga#textB!",
 		"*rga#textB@time'A'",
-		"*rga#textB@time!'A'",
+		"*rga#textB@time!@'A'",
 	},
 	{ // s+o
 		"*rga#test@1!@'A'",
@@ -80,6 +80,11 @@ var rga_3_tests = [][3]string{
 		"*rga#test@5!@1:4a'A'@5:0'E'@3:0'C'@2:5'B'",
 		"*rga#test@7!@1:4a'A'@6:0'F'@3:7'C'@4:0'D'@2:5'B'",
 		"*rga#test@7!@1:4a'A'@6:0'F'@5'E'@3:7'C'@4:0'D'@2:5'B'",
+	},
+	{ // 14 s+ins
+		"*rga#test@2!@1'A'@2'B'",
+		"*rga#test@3:1'-';",
+		"*rga#test@3!@1'A'@3'-'@2'B'",
 	},
 	// TODo concurrent, eclipsed removes
 	// TODO: real mess, trees and orphans
