@@ -51,11 +51,13 @@ var rga_3_tests = [][3]string{
 		"*rga#test@4!@1:4'A'@3:0'C'",
 		"*rga#test@4!@1:4'A'@3:0'C'@2'B'",
 	},
+
 	{ // 8) o+rm
 		"*rga#test@2:1'B'",
 		"*rga#test@3:2;",
 		"*rga#test@3:1!@2:3'B'",
 	},
+
 	{ // p+rm
 		"*rga#test@3:1!@2:0'B'@3'C'",
 		"*rga#test@4:2;",
@@ -91,7 +93,37 @@ var rga_3_tests = [][3]string{
 		"*rga#test@3:2;",
 		"*rga#test@3!@1'A'@2:4'B'",
 	},
-	// TODO: real mess, trees and orphans
+	// CUT BRANCHES
+	{ // 16 unapplied remove
+		"*rga#test@2!@1'A'@2'B'",
+		"*rga#test@4:3;",
+		"*rga#test@4!@1'A'@2'B'@4:rm!:3,",
+	},
+	{ // 17 unapplied remove applied
+		"*rga#test@4!@1'A'@2'B'@4:rm!:3,",
+		"*rga#test@3:2'C'",
+		"*rga#test@3!@1'A'@2'B'@3:4'C'",
+	},
+	{ // 18 unapplied patch
+		"*rga#test@2!@1'A'@2'B'",
+		"*rga#test@5:3!@4:0'D'@5'E'",
+		"*rga#test@5!@1'A'@2'B'@5:3!@4:0'D'@5'E'",
+	},
+	{ // 19 unapplied patch applied
+		"*rga#test@2!@1'A'@2'B'@5:3!@4:0'D'@5'E'",
+		"*rga#test@3:2'C';",
+		"*rga#test@3!@1'A'@2'B'@3'C'@4'D'@5'E'",
+	},
+	{ // 20 unapplied patch - ins+rm
+		"*rga#test@2!@1'A'@2'B'",
+		"*rga#test@6:3!@4:0'D'@5'E'@6:rm!:3,",
+		"*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,",
+	},
+	{ // 21 unapplied ins+rm patch applied
+		"*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,",
+		"*rga#test@3:2!@'C'",
+		"*rga#test@3!@1'A'@2'B'@3:6'C'@4:0'D'@5'E'",
+	},
 }
 
 func TestRGA_Reduce(t *testing.T) {
@@ -103,16 +135,19 @@ func TestRGA_Reduce(t *testing.T) {
 			ron.ParseFrameString(test[1]),
 		}
 		rga := MakeRGAReducer()
+		//fmt.Printf("%d\n%s\n%s\n",i, test[0], test[1])
 		frameC := rga.Reduce(frames[0:2])
-		//fmt.Println(frameA.String(), frameB.String(), frameC.String())
 		if frameC.String() != C {
 			t.Fail()
 			fmt.Printf("\n-------------------------\nwrong result at %d: \nhave [ %s ]\nneed [ %s ]\n\n", i, frameC.String(), C)
-		} else {
-			//fmt.Printf("%d OK: %s\n", i, C)
 		}
 
 	}
+}
+
+
+func TestRGA_Reduce2(t *testing.T) {
+
 }
 
 // reduceAll: 4-line tables (state, ch1, ch2, result)

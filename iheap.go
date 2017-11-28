@@ -109,7 +109,7 @@ func (heap *FrameHeap) remove(i int) {
 
 func (heap *FrameHeap) next(i int) {
 	heap.iters[i].Next()
-	if heap.iters[i].EOF() {
+	if heap.iters[i].EOF() || heap.iters[i].IsHeader() {
 		heap.remove(i)
 	} else {
 		heap.sink(i)

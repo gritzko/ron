@@ -34,7 +34,7 @@ func MakeRGAReducer() ron.Reducer {
 	return rga
 }
 
-// [ ] multiframe handling: the O(N) multiframe merge
+// [x] multiframe handling: the O(N) multiframe merge
 // [ ] undo/redo
 
 func AddMax(rmmap map[ron.UUID]ron.UUID, event, target ron.UUID) {
@@ -64,7 +64,7 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 	// multiframe parts must be atomically applied, hence same version id
 	spec := ron.NewSpec(rdtype, object, event, ron.ZERO_UUID)
 	_produce := [4]ron.Frame{}
-	produce := _produce[:0]
+	produce := ron.Batch(_produce[:0])
 	pending := rga.ins[:0]
 
 	for k := 0; k < len(batch); k++ {
@@ -76,9 +76,9 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 				pending = append(pending, b)
 			}
 		} else {
-			if b.Ref() == RM_UUID { // rm batch
+			if b.Ref() == RM_UUID { // rm batch, must be the last
 				b.Next()
-				for !b.EOF() {
+				for !b.EOF() && !b.IsHeader() {
 					AddMax(rga.rms, b.Event(), b.Ref())
 					b.Next()
 				}
@@ -133,13 +133,14 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 		}
 
-		produce = append(produce, result)
+		produce = append(produce, result.Restart())
 
 		for i < len(pending) && pending[i].EOF() {
 			i++
 		}
 	}
 
+	// a separate frame for all the removes we don't have a target for
 	if len(rga.rms) > 0 {
 		result := ron.MakeFrame(1024)
 		spec.SetEvent(event)
@@ -158,20 +159,34 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 			result.AppendEmptyReducedOp(spec)
 			delete(rga.rms, key)
 		}
-		produce = append(produce, result)
+		produce = append(produce, result.Restart())
 
 	}
-	// safety: ceil for inserted subtrees - SANITY SCAN!!!
+
 	rga.ins = pending[:0] // reuse memory
 	for x := range rga.traps {
 		delete(rga.traps, x)
 	}
 
-	if len(produce) == 1 {
-		return produce[0]
-	} else {
-		return ron.BatchFrames(produce)
+	l := len(produce)
+	for i := 0; i < len(pending); i++ {
+		if !pending[i].EOF() {
+			produce = append(produce, pending[i].Split()...)
+		}
 	}
+
+	if len(produce)==1 {
+		return produce[0]
+	} else if l==len(produce) {
+		return produce.Join()
+	} else {
+		//for i:=0; i<len(produce); i++ {
+		//	fmt.Printf("    %d %s\n", i, produce[i].String())
+		//}
+		produce[0], produce[len(produce)-1] = produce[len(produce)-1], produce[0]
+		return rga.Reduce(produce)
+	}
+	// [ ] TODO safety: ceil for inserted subtrees - unified sanity checker
 }
 
 func init() {
