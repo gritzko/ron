@@ -434,25 +434,4 @@ func TestFrame_ParseStream(t *testing.T) {
 	}
 }
 
-/*
-func TestFrame_SplitMultiframe(t *testing.T) {
-	splits := []string{
-		"*lww#test!:a=1#best:0!:b=2:c=3:d=4;",
-		"*lww#test!:a=1",
-		"*lww#best!:b=2:c=3",
-		"*lww#best:d=4;",
-	}
-	multi := ParseFrameString(splits[0])
-	monos, err := multi.SplitMultiframe(nil)
-	if err != nil {
-		t.Fail()
-		t.Log(err)
-	}
-	for i := 0; i < len(monos); i++ {
-		if monos[i].String() != splits[i+1] {
-			t.Fail()
-			t.Logf("split fail:\n'%s'\nshould be\n'%s'\n", monos[i].String(), splits[i+1])
-		}
-	}
-}
-*/
+

@@ -369,45 +369,33 @@ func MakeQueryFrame(headerSpec Spec) Frame {
 	return cur.Close()
 }
 
-var BATCH_UUID = NewName("batch")
+// overall, serialized batches are used in rare cases
+// (delivery fails, cross-key transactions)
+// hence, we don't care about performance that much
+// still, may consider explicit-length formats at some point
+func (frame *Frame) Split() Batch {
+	ret := Batch{}
+	for !frame.EOF() {
+		next := NewFrame()
+		next.Append(*frame)
+		frame.Next()
+		for !frame.EOF() && frame.Term()==TERM_REDUCED {
+			next.Append(*frame)
+			frame.Next()
+		}
+		ret = append(ret, next.Restart())
+	}
+	return ret
+}
 
-func BatchFrames(batch Batch) Frame {
-	ret := MakeFrame(1024)
-	// FIXME check ids
-	spec := NewSpec(
-		BATCH_UUID,
-		batch[0].Object(),
-		batch[len(batch)-1].Event(),
-		ZERO_UUID,
-	)
-	ret.AppendStateHeader(spec)
+func (batch Batch) Join() Frame {
+	size := 0
+	for _, f := range batch {
+		size += len(f.Body)
+	}
+	ret := MakeFrame(size)
 	for _, f := range batch {
 		ret.AppendFrame(f)
 	}
 	return ret.Restart()
-}
-
-func SplitBatch(frame Frame) Batch {
-	// overall, serialized batches are used in rare cases
-	// (delivery fails, cross-key transactions)
-	// hence, we don't care about performance that much
-	// still, may consider explicit-length formats at some point
-	if frame.Type() == BATCH_UUID {
-		frame.Next()
-	}
-	ret := Batch{}
-	for !frame.EOF() {
-		if !frame.IsHeader() {
-			break
-		}
-		cur := MakeFrame(1024)
-		cur.Append(frame)
-		frame.Next()
-		for !frame.EOF() && !frame.IsHeader() {
-			cur.Append(frame)
-			frame.Next()
-		}
-		ret = append(ret, cur)
-	}
-	return ret
 }

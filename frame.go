@@ -194,7 +194,7 @@ func (frame Frame) Rest() []byte {
 
 // Split returns two frames: one from the start to the current position (exclusive),
 // another from the current pos (incl) to the end. The right one is "stripped".
-func (frame Frame) Split() (left, right Frame) {
+func (frame Frame) Split2() (left, right Frame) {
 	// TODO text vs binary
 	left = ParseFrame(frame.Body[0:frame.Parser.offset])
 	right = NewBufferFrame(make([]byte, 0, 128+frame.Len()-frame.Parser.position))
