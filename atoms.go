@@ -61,6 +61,13 @@ func (a Atom) UUID() UUID {
 var BIT32 = uint64(1)<<32
 var BIT33 = uint64(1)<<33
 
+// We can't rely on standard floats cause they MUTATE THE VALUE.
+// If 3.141592 is parsed then serialized, it becomes 3.141591(9)
+// or something, that is entirely platform-dependent.
+// Hence, we work that around by storing a 64-bit integer 3141592 and
+// a 32-bit exponent.
+// Overall, floats are NOT commutative. Any floating arithmetic
+// is highly discouraged inside CRDT type implementations.
 func (a Atom) Float() float64 {
 	pow := int(a[1]&INT32_FULL)
 	if a[1]&BIT33 != 0 {

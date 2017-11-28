@@ -131,7 +131,7 @@ type Checker interface {
 // ## NEW ORDER ##
 // [x] @~! explicit frame terminator - or ;  frame.Close() frame.Join()
 // [-] parser-private adaptor fns  _set_digit()
-// [ ] unified grammar files: Java, C++, Go
+// [x] unified grammar files: Java, C++, Go
 // [-] Op: 4 UUIDs, []byte atoms
 // [x] Iterator, ret code, error/incomplete input
 // [-] separate atom parser
@@ -143,11 +143,11 @@ type Checker interface {
 // [x] Cursor API:  SetObject(uuid), AddInteger(int), Append()
 //                  AppendFrame(), AppendAll(), AppendRange()
 // [ ] Nice sigs, frame.read.stream, frame.write.format
-// [ ] No Rewind(), just Clone()
+// [x] No Rewind(), just Clone()
 //
-// [ ] Minimize copying in Frame.Parse()
-// [ ] clonable Frames (by value)
-// [ ] Atom parser/iterator
+// [x] Minimize copying in Frame.Parse()
+// [x] clonable Frames (by value)
+// [x] Atom parser/iterator
 // [ ] frame splitting ("op" and "rest", no reset?, more tests)
 //
 // [ ] AppendXXX(t,o,e,r) - Spec... spread sign

@@ -171,7 +171,9 @@ With RON, that is perfectly OK.
 Consider "Hello world!" collaboratively written by two users, `bart` and `lisa` on 27 Nov 2017 around 9am GMT.
 A compressed RGA (Replicated Growable Array) frame would look like:
 ```
-*rga#1UQ8p+bart@1UQ8yk+lisa!@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'@(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
+*rga#1UQ8p+bart@1UQ8yk+lisa!
+    @(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'
+    @(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
 ```
 If nicely indented, the frame is easier to read:
 ```
