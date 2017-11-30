@@ -5,7 +5,11 @@ RON's focus is on continuous data synchronization.
 Every RON *object* may naturally have an unlimited number of *replicas* that synchronize incrementally, mostly in real-time.
 RON data always merges correctly and deterministically.
 
-RON is information-centric: it aims to liberate the data from its location, storage, application or transport. There is no "master" replica. Every replica is as good as the other one. Every event has an *origin* but there is no such thing as a "source of truth". Every single object, event or data type is uniquely identified and globally addressable.
+RON is information-centric: it aims to liberate the data from its location, storage, application or transport.
+There is no "master" replica, no "source of truth". Every event has an *origin*, but every replica is as good as the other one.
+Every single object, event or data type is uniquely identified and globally referenceable.
+RON metadata makes objects completely independent of the context.
+A program may read RON object versions and/or updates from a filesystem, a database, a message bus and/or a local cache, in any order, and merge them correctly.
 
 Consider JSON. It expresses relations by element positioning:
 ```
