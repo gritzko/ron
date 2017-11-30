@@ -1,9 +1,11 @@
 # Swarm Replicated Object Notation 2.0.1 #
 
 Swarm Replicated Object Notation is a format for *distributed live data*.
-RON's focus is data synchronization.
-RON assumes that every *object* naturally has an unlimited number of *replicas* that synchronize incrementally.
-RON is information-centric, it aims to liberate the data from its location, storage, application or transport.
+RON's focus is on continuous data synchronization.
+Every RON *object* may naturally have an unlimited number of *replicas* that synchronize incrementally, mostly in real-time.
+RON data always merges correctly and deterministically.
+
+RON is information-centric: it aims to liberate the data from its location, storage, application or transport. There is no "master" replica. Every replica is as good as the other one. Every event has an *origin* but there is no such thing as a "source of truth". Every single object, event or data type is uniquely identified and globally addressable.
 
 Consider JSON. It expresses relations by element positioning:
 ```

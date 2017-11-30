@@ -256,3 +256,16 @@ func (spec Spec) SetEvent (uuid UUID) {
 func (spec Spec) SetRef (uuid UUID) {
 	spec[SPEC_REF] = Atom(uuid)
 }
+
+// Verify the syntax, return the offset where error was found. -1 means OK.
+func (frame Frame) Verify () int {
+	ve := frame.Restart()
+	for !ve.EOF() {
+		ve.Next()
+	}
+	if ve.Offset() != len(ve.Body) {
+		 return ve.Offset()
+	} else {
+		return -1
+	}
+}
