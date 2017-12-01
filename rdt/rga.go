@@ -189,6 +189,28 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 	// [ ] TODO safety: ceil for inserted subtrees - unified sanity checker
 }
 
+
+type TxtMapper struct {
+
+}
+
+func (txt TxtMapper) Map (batch ron.Batch) string {
+	if len(batch)==0 {
+		return ""
+	}
+	rga := batch[0]
+	if rga.Type()!=RGA_UUID || !rga.IsHeader() {
+		return ""
+	}
+	ret := []byte{}
+	for rga.Next(); !rga.EOF() && !rga.IsHeader(); rga.Next() {
+		if rga.Ref().IsZero() {
+			ret = append(ret, rga.RawString(0)...)
+		}
+	}
+	return string(ret)
+}
+
 func init() {
 	ron.RDTYPES[RGA_UUID] = MakeRGAReducer
 }

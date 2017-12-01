@@ -146,8 +146,17 @@ func TestRGA_Reduce(t *testing.T) {
 }
 
 
-func TestRGA_Reduce2(t *testing.T) {
-
+func TestRGA_Mapper(t *testing.T) {
+	frame := "*rga#1UQ8p+bart@1UQ8yk+lisa!"+
+		"@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'"+
+		"@(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'"
+	right := "Hello world!"
+	var txt TxtMapper
+	hello := txt.Map(ron.Batch{ron.ParseFrameString(frame)})
+	if hello != right {
+		t.Fail()
+		t.Logf("'%s' != '%s'", hello, right)
+	}
 }
 
 // reduceAll: 4-line tables (state, ch1, ch2, result)

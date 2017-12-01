@@ -435,3 +435,18 @@ func TestFrame_ParseStream(t *testing.T) {
 }
 
 
+func TestAtom_UUID(t *testing.T) {
+	str := "*lww#1TUAQ+gritzko@`:bar=1 #(R@`:foo > (Q"
+	frame := ParseFrameString(str)
+	uuid1 := frame.Object()
+	uuid2 := frame.Event()
+	if uuid1 != uuid2 {
+		t.Fail()
+	}
+	frame.Next()
+	uuid3 := frame.Atom(0).UUID()
+	if uuid1 != uuid3 {
+		t.Fail()
+	}
+}
+

@@ -108,6 +108,9 @@ func (a Atom) EscString(body []byte) []byte {
 }
 
 func (frame Frame) RawString(idx int) string {
+	if frame.atoms[idx+4].Type()!=ATOM_STRING {
+		return ""
+	}
 	return frame.atoms[idx+4].RawString(frame.Body)
 }
 

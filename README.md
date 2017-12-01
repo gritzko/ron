@@ -9,7 +9,7 @@ RON is information-centric: it aims to liberate the data from its location, stor
 There is no "master" replica, no "source of truth". Every event has an *origin*, but every replica is as good as the other one.
 Every single object, event or data type is uniquely identified and globally referenceable.
 RON metadata makes objects completely independent of the context.
-A program may read RON object versions and/or updates from a filesystem, a database, a message bus and/or a local cache, in any order, and merge them correctly.
+A program may read RON object versions and/or updates from the network,  filesystem, database, message bus and/or local cache, in any order, and merge them correctly.
 
 Consider JSON. It expresses relations by element positioning:
 ```

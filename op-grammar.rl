@@ -107,6 +107,11 @@
     }
 
     action uuid_atom_start {
+        if (atm==4) {
+            atoms[atm] = atoms[SPEC_OBJECT];
+        } else if (atoms[atm-1].Type()==ATOM_UUID) {
+            atoms[atm] = atoms[atm-1];
+        }
     }
     action uuid_atom_end {
         atoms[atm][1] |= ((uint64)(ATOM_UUID))<<62;
@@ -162,6 +167,8 @@
     # 64-bit (double) float 
     FLOAT_ATOM = ( [\-+]? @float_sgn [0-9]+ @float_dgt "." [0-9]+ @float_frac_dgt ([eE] [\-+]? @float_e_sgn digit+ @float_e_dgt)? ) >float_atom_start %float_atom_end ;
 
+    UUID_ATOM = UUID >uuid_atom_start %uuid_atom_end;
+
     # JSON-escaped string 
     UNIESC = "\\u" [0-9a-fA-F]{4};
     ESC = "\\" [^\n\r];
@@ -173,7 +180,7 @@
             "=" space* INT_ATOM  |
             "^" space* FLOAT_ATOM |
             ['] STRING_ATOM ['] |
-            ">" space* UUID
+            ">" space* UUID_ATOM
             ) >atom_start %atom_end space*;
     # op value - an atom, an atom tuple, or empty 
     ATOMS = ATOM+ %atoms >atoms_start;

@@ -198,6 +198,14 @@ type Reducer interface {
 	Reduce(batch Batch) Frame
 }
 
+type Mapper interface {
+	Map(batch Batch) interface{}
+}
+
+type StringMapper interface {
+	Map(batch Batch) string
+}
+
 type ReducerMaker func () Reducer
 
 var RDTYPES map[UUID]ReducerMaker
