@@ -57,70 +57,7 @@ type Checker interface {
 	Check(frame Frame) error
 }
 
-// Frame Open Q
-// [x] ERRORS   !!!=code"text"
-// [x]  including length limits!!!
-// [x] ron CLI
-// [x] whitespace
-// [x] sign = 0 1 2 3  50% footprint red!!! UUID{} ~ ZERO_UUID, upper bits
-//			Origin() vs Replica(), 128 bits, google memory layouts
-// [x] end -- test
-// [x] Op fields/array/GetUUID(i) [4]UUID  -- GetUUID(i), ABC
-// [x] Format - nil context
-// [x] open/closed frame => static error strings "=400'parsing error'"
-//	   cause the end op can be displaced!!!
-
-// [ ] Compare tests!!! [1,2,3] - mix,sort,cmp (all types, derived is +1)
-// [x] void atom , -- sweet  "op1, op2, op3" is perfectly OK
-// [x] op.Atoms && tests
-// [x] typedef Spec [4]UUID,
-// [x] typedef Atoms, Atoms.Count()
-// [x] Location -> Reference
-// [x] ?!,; term/mark/kind/status/headerness
-// [x] AppendOp/Query/Patch/State - Spec/Atoms
-// [x] multiframe (still atomic)   Frame.Split(iterator)
-//
-// cli FIXME
-// [x] clean-up: uuid-grammar.rl (take from Java)
-// [x] iterator - parse error
-// [x] value parsing NEW DEAL - [2]uint64
-//		[ ] (all types - tables, safe ranges, length limits)
-//		[x] int
-//		[x] float
-//		[x] string
-//		[x] uuid (maybe same extension as hashes, ranges?)
-//			?;,.!:
-//			UUID EXTENSION hash%start<hash%end, on-demand parse
-//			to UUIDVector, remember offsets, defaults to `
-//			Extension bit!!!
-//		[x] int-in-uuid, float-in-uuid, string-in-uuid
-//			float is two ints: value and E? (read IEEE)
-//		[-] Spec -> QuadUUID, 4 values max
-//		[-] optionally, atom vectorization =1<2<3<4 OR arb number of atoms
-//		[-] Cursor, aka atom iterator
-// [x] lww - idempotency
-// [x] parse: imply . if no frame header seen previously (is_frame_open)
-// [x] parse: get rid of the "NEXT" hack, check ragel docs
-// [x] sorter: pre-detect errors, split multiframes, etc
 // [ ] parser: proper UTF-8 CHAR pattern
-// [ ] AppendRange, Iterator.offset, IsEmpty()
-// [x] Frame.Header() parsed header fast access
-// [x] Parsers: err = SMOE_ERROR
-// [x] FRAME IS A SLICE
-//      [x] no *Frame
-//      [x] fr = fr.Append(...)
-//      [x] first, last *Op
-// [x] MakeNameUUID("name")
-//
-// [x] continuation test *a!*b=1*c=1!*d,*e., clean cs states, fhold
-// [x] frame.State() OP PART ERROR
-//     for frame:=ParseFrame(); !frame.IsEmpty(); frame.Next() {}
-// [ ] trailing space test, Rest(), multiframes
-//
-// [ ] RGA reducer (fn, errors)
-//		[x] Reduce()
-//		[x] tab tests
-//		[ ] benchmark: 1mln ops
 //
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
@@ -128,62 +65,7 @@ type Checker interface {
 // [ ] iheap: seek the loop - reimpl (see UUIDHeap), bench
 // [ ] LWW: 1000x1000 array test
 //
-// ## NEW ORDER ##
-// [x] @~! explicit frame terminator - or ;  frame.Close() frame.Join()
-// [-] parser-private adaptor fns  _set_digit()
-// [x] unified grammar files: Java, C++, Go
-// [-] Op: 4 UUIDs, []byte atoms
-// [x] Iterator, ret code, error/incomplete input
-// [-] separate atom parser
-// [x] reader.Next() reader.ReadInt()...
-// [-] ron.Writer
-// [x] Frame, Reader, Writer inherit Op (see C++)
-// [x] type Batch []Frame, type Flow chan Batch
-// [ ] auto-gen ABC! (base64: take from the file)
-// [x] Cursor API:  SetObject(uuid), AddInteger(int), Append()
-//                  AppendFrame(), AppendAll(), AppendRange()
-// [ ] Nice sigs, frame.read.stream, frame.write.format
-// [x] No Rewind(), just Clone()
-//
-// [x] Minimize copying in Frame.Parse()
-// [x] clonable Frames (by value)
-// [x] Atom parser/iterator
-// [ ] frame splitting ("op" and "rest", no reset?, more tests)
-//
-// [ ] AppendXXX(t,o,e,r) - Spec... spread sign
-//
-// [x] reducer registry
-// [x] reducer flags (at least, formatting)
-// [x] nice base64 constant definitions (ron ... // "comment")
-// [-] error header   @~~~~~~~~~~:reference "error message" (to reduce)
-// [-] copy generic reduction errors
-// [x] struct Reducer - mimic Rocks, (a,b) or (a,b,c,d,...)
-// [x] prereduce - optional, may fail (RGA subtrees)
-// [x] Frame.Split() multiframe parsing  ;,,.,,!,. etc
-// [x] multiframe Sorter
-// [x] consider ?!,; instead of !.,; and ?
-// [x]   insert ; or , depending on the prev op
-// [ ] test redefs!
-// [x] test op term defaulting (Append, op before frame, etc)
 // [ ] ron.go --> cmd_reduce.go
-// [x] go fmt hook
-// [ ] test/benchmark hook
-// [x] reducers to ignore empty frames
-// [ ] Frame.Realloc() // put valuues on a new slab, release old slices
-// [x] clock.Authority, clock.See() bool
-// [x] ParseUUID sig
-// [-] far future: 64 bit uuid, 2bit type, 2bit 1..4 bytes of origin
-//
-// [x] formatting options
-// 		[x] indenting
-// 		[x] newlines
-// 		[x] trimming/zipping
-// 		[ ] redefs (bench - fast prefix - bit ops)
-//		[ ] tablist formatting!!!
-// [x] kill 2 impl of zip UUID
-// [x] test formatting
-// [ ] test redefaults - BACKTICK ONLY (replaces the quant)
-
 // [ ] strings: either escaped byte buffer or an unescaped string!!!!!!
 
 // Reducer is essentially a replicated data type.
