@@ -86,7 +86,7 @@ func (heap *FrameHeap) Put(i *Frame) {
 	if !i.EOF() && i.IsHeader() {
 		i.Next()
 	}
-	if !i.EOF() {
+	if !i.EOF() && !i.IsHeader() {
 		at := len(heap.iters)
 		heap.iters = append(heap.iters, i)
 		heap.raise(at)
