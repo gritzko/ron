@@ -76,11 +76,12 @@ func (frame Frame) Fill(clock Clock, env Environment) Frame {
 func (frame Frame) Reformat(format uint) Frame {
 	ret := MakeFrame(frame.Len())
 	ret.Serializer.Format = format
-	for !frame.EOF() {
-		ret.Append(frame)
-		frame.Next()
+    clone := frame.Clone()
+	for !clone.EOF() {
+		ret.Append(clone)
+		clone.Next()
 	}
-	return ret
+	return ret.Restart()
 }
 
 func (frame Frame) Clone() (clone Frame) {

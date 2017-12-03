@@ -181,7 +181,11 @@ A compressed RGA (Replicated Growable Array) frame would look like:
     @(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'
     @(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
 ```
-If nicely indented, the frame is easier to read:
+The `txt` mapper may convert the RGA frame into text:
+```
+*txt #1UQ8p+bart @1UQ8yk+lisa 'Hello world!'
+```
+If nicely indented, the compressed frame is easier to read:
 ```
 *rga #1UQ8p+bart @1UQ8yk+lisa     !
                  @(s+bart        'H'
@@ -217,11 +221,12 @@ If fully uncompressed, the frame takes more space:
 If rendered in JSON, the same document would probably start as
 ```
 {
-    _id: "3b127800-d350-11e7-8000-9a5db8000000",
-    _version: "98f38f80-d351-11e7-8000-c2dde5000000",
+    "_id": "3b127800-d350-11e7-8000-9a5db8000000",
+    "_version": "98f38f80-d351-11e7-8000-c2dde5000000",
     ...
 ```
-...which is already 90% of the size of the entire compressed frame above. Adding per-symbol metadata is difficult to do in idiomatic JSON and certainly quite expensive.
+...which is already 90% of the size of the entire compressed frame above.
+With idiomatic JSON, per-symbol metadata is both difficult and expensive.
 
 So, let's be precise. Let's put UUIDs on everything. RON makes it possible.
 

@@ -298,7 +298,9 @@ func (frame *Frame) AppendReduced(other Frame) {
 }
 
 func (frame *Frame) AppendEmpty(spec Spec, term int) {
-	tmp := Frame{atoms:spec, term:term}
+	atoms := make([]Atom, 0, 6)
+	atoms = append(atoms, spec[0:4]...)
+	tmp := Frame{atoms:atoms, term:term}
 	frame.Append(tmp)
 }
 
@@ -397,5 +399,6 @@ func (batch Batch) Join() Frame {
 	for _, f := range batch {
 		ret.AppendFrame(f)
 	}
+
 	return ret.Restart()
 }

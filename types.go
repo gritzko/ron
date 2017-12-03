@@ -3,6 +3,7 @@ package ron
 const INT60LEN = 10
 const MAX_ATOMS_PER_OP = 1 << 20
 
+// An atom is a constant of a RON type: int, float, string or UUID
 type Atom [2]uint64
 
 type UUID Atom

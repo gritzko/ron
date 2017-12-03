@@ -97,10 +97,13 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 		result := ron.MakeFrame(1024)
 
-		for spec.SetRef(pending[i].Ref()); i < len(pending) && !pending[i].EOF() && pending[i].Ref() == spec.Ref(); i++ {
+		at := pending[i].Ref()
+		for ; i < len(pending) && !pending[i].EOF() && pending[i].Ref() == at; i++ {
 			rga.active.Put(pending[i])
 		}
+		delete(rga.traps, at)
 
+		spec.SetRef(at)
 		spec.SetEvent(event)
 		result.AppendStateHeader(spec)
 
