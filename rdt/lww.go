@@ -2,6 +2,7 @@ package rdt
 
 import (
 	"github.com/gritzko/ron"
+	"fmt"
 )
 
 // LWW is a last-write-wins replicated data type that may host a variety of user-land data types, like:
@@ -22,7 +23,7 @@ var LWW_UUID = ron.NewName("lww")
 var DELTA_UUID = ron.NewName("d")
 
 func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
-	heap := ron.MakeFrameHeap(ron.PRIM_LOCATION|ron.SEC_EVENT|ron.SEC_DESC, len(inputs))
+	heap := ron.MakeFrameHeap(ron.RefComparator, ron.EventComparatorDesc, len(inputs))
 	spec := inputs[0].Spec()
 	spec.SetEvent(inputs[len(inputs)-1].Event())
 	haveState := false
@@ -30,6 +31,7 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 		if inputs[k].Ref().IsZero() && inputs[k].IsHeader() {
 			haveState = true
 		}
+		fmt.Printf("INPUT %s\n", inputs[k].OpString())
 		heap.Put(&inputs[k])
 	}
 	if !haveState {
@@ -38,7 +40,8 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 		spec.SetRef(ron.ZERO_UUID)
 	}
 	res.AppendStateHeader(spec)
-	for !heap.IsEmpty() {
+	for !heap.EOF() {
+		fmt.Printf("APPND %s\n", heap.Current().OpString())
 		res.AppendReduced(*heap.Current())
 		heap.NextPrim()
 	}

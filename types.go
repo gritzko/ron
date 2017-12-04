@@ -85,6 +85,9 @@ type Mapper interface {
 	Map(batch Batch) interface{}
 }
 
+// Compare two ops; >1 for a>b, <1 for a<b, 0 for equal.
+type Comparator func (a, b *Frame) int64
+
 type StringMapper interface {
 	Map(batch Batch) string
 }

@@ -27,7 +27,7 @@ var NO_ATOMS []ron.Atom
 
 func MakeRGAReducer() ron.Reducer {
 	var rga RGA
-	rga.active = ron.MakeFrameHeap(ron.PRIM_EVENT|ron.PRIM_DESC|ron.SEC_LOCATION|ron.SEC_DESC, 2)
+	rga.active = ron.MakeFrameHeap(ron.EventComparatorDesc, ron.RefComparatorDesc, 2)
 	rga.rms = make(map[ron.UUID]ron.UUID)
 	rga.ins = make([]*ron.Frame, 32)
 	rga.traps = make(map[ron.UUID]int)
@@ -107,7 +107,7 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 		spec.SetEvent(event)
 		result.AppendStateHeader(spec)
 
-		for !rga.active.IsEmpty() {
+		for !rga.active.EOF() {
 			op := rga.active.Current()
 			ev := op.Event()
 			spec.SetEvent(ev)

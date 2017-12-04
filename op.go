@@ -91,3 +91,11 @@ func (frame Frame) OpString() string {
 	cur.Append(frame)
 	return string(cur.Body)
 }
+
+func (frame Frame) Origin () uint64 {
+	return frame.atoms[SPEC_EVENT][1]
+}
+
+func (frame Frame) Time () uint64 {
+	return frame.atoms[SPEC_EVENT][0]
+}

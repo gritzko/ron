@@ -1,5 +1,7 @@
 package ron
 
+import "sort"
+
 //import "github.com/gritzko/RON"
 
 // FrameHeap is an iterator heap - gives the minimum available element
@@ -7,9 +9,8 @@ package ron
 type FrameHeap struct {
 	// Most of the time, a heap has 2 elements, optimize for that.
 	// Sometimes, it can get millions of elements, ensure that is O(NlogN)
-	iters               []*Frame
-	primary, secondary  int
-	prim_desc, sec_desc bool
+	iters              []*Frame
+	primary, secondary Comparator
 }
 
 // sort modes, e.g. PRIM_EVENT|PRIM_DESC|SEC_LOCATION
@@ -26,26 +27,19 @@ const (
 	SEC_LOCATION  = SPEC_REF << 3
 )
 
-func MakeFrameHeap(mode, size int) (ret FrameHeap) {
+func MakeFrameHeap(primary, secondary Comparator, size int) (ret FrameHeap) {
 	ret.iters = make([]*Frame, 1, size+1)
-	ret.prim_desc = (mode & PRIM_DESC) != 0
-	ret.sec_desc = (mode & SEC_DESC) != 0
-	ret.primary = mode & 3
-	ret.secondary = (mode >> 3) & 3
+	ret.primary = primary
+	ret.secondary = secondary
 	return
 }
 
 func (heap FrameHeap) less(i, j int) bool {
-	c := Compare(UUID(heap.iters[i].atoms[heap.primary]), UUID(heap.iters[j].atoms[heap.primary]))
-	if c == 0 {
-		c = Compare(UUID(heap.iters[i].atoms[heap.secondary]), UUID(heap.iters[j].atoms[heap.secondary]))
-		if heap.sec_desc {
-			c = -c
-		}
-	} else if heap.prim_desc {
-		c = -c
+	c := heap.primary(heap.iters[i], heap.iters[j])
+	if c == 0 && heap.secondary != nil {
+		c = heap.secondary(heap.iters[i], heap.iters[j])
 	}
-	//fmt.Printf("CMP %s %s %d\n", h.iters[i].String(), h.iters[j].String(), c)
+	//fmt.Printf("CMP %s %s GOT %d\n", heap.iters[i].OpString(), heap.iters[j].OpString(), c)
 	return c < 0
 }
 
@@ -80,6 +74,12 @@ func (heap FrameHeap) Len() int { return len(heap.iters) - 1 }
 func (heap FrameHeap) swap(i, j int) {
 	//fmt.Printf("SWAP %d %d\n", i, j)
 	heap.iters[i], heap.iters[j] = heap.iters[j], heap.iters[i]
+}
+
+func (heap *FrameHeap) PutAll(b Batch) {
+	for i := 0; i < len(b); i++ {
+		heap.Put(&b[i])
+	}
 }
 
 func (heap *FrameHeap) Put(i *Frame) {
@@ -121,26 +121,32 @@ func (heap *FrameHeap) Next() (frame *Frame) {
 	return heap.Current()
 }
 
-func (heap *FrameHeap) nexteq(i int, uuid UUID) {
-	if heap.iters[i].UUID(heap.primary) == uuid {
-		j := i << 1
-		if j < len(heap.iters) {
-			if j+1 < len(heap.iters) { // FIXME rightmost first!
-				heap.nexteq(j+1, uuid)
-			}
-			heap.nexteq(j, uuid)
+func (heap FrameHeap) listEqs(at int, eqs *[]int) {
+	*eqs = append(*eqs, at)
+	l := at << 1
+	if l < len(heap.iters) {
+		if 0 == heap.primary(heap.iters[1], heap.iters[l]) {
+			heap.listEqs(l, eqs)
 		}
-		heap.next(i)
-		for i < len(heap.iters) && heap.iters[i].UUID(heap.primary) == uuid {
-			heap.next(i) // FIXME this fix (recheck after removal)
+		r := l | 1
+		if r < len(heap.iters) {
+			if 0 == heap.primary(heap.iters[1], heap.iters[r]) {
+				heap.listEqs(r, eqs)
+			}
 		}
 	}
 }
 
 func (heap *FrameHeap) NextPrim() (frame *Frame) {
-	if !heap.IsEmpty() {
-		event := heap.iters[1].UUID(heap.primary)
-		heap.nexteq(1, event)
+	var _eqs [16]int
+	eqs := _eqs[0:0:16]
+	heap.listEqs(1, &eqs)
+	if len(eqs) > 1 {
+		sort.Ints(eqs)
+	}
+	for i := len(eqs) - 1; i >= 0; i-- {
+		heap.next(eqs[i])
+		heap.sink(eqs[i])
 	}
 	return heap.Current()
 }
@@ -149,13 +155,13 @@ func (heap *FrameHeap) PutFrame(frame Frame) {
 	heap.Put(&frame)
 }
 
-func (heap *FrameHeap) IsEmpty() bool {
+func (heap *FrameHeap) EOF() bool {
 	return len(heap.iters) == 1
 }
 
 func (heap *FrameHeap) Frame() Frame {
 	cur := MakeFrame(128)
-	for !heap.IsEmpty() {
+	for !heap.EOF() {
 		cur.Append(*heap.Current())
 		heap.Next()
 	}
@@ -164,4 +170,20 @@ func (heap *FrameHeap) Frame() Frame {
 
 func (heap *FrameHeap) Clear() {
 	heap.iters = heap.iters[:1]
+}
+
+func EventComparator(a, b *Frame) int64 {
+	return a.Event().Compare(b.Event())
+}
+
+func EventComparatorDesc(a, b *Frame) int64 {
+	return b.Event().Compare(a.Event())
+}
+
+func RefComparator(a, b *Frame) int64 {
+	return a.Ref().Compare(b.Ref())
+}
+
+func RefComparatorDesc(a, b *Frame) int64 {
+	return b.Ref().Compare(a.Ref())
 }

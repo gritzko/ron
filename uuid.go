@@ -34,6 +34,14 @@ func (uuid UUID) IsName() bool {
 	return uuid.Scheme()==UUID_NAME
 }
 
+func (a UUID) Compare(b UUID) int64 {
+	c := int64(a[0]) - int64(b[0])
+	if c==0 {
+		c = int64(a[1]) - int64(b[1])
+	}
+	return c
+}
+
 func (a UUID) LaterThan(b UUID) bool {
 	if a.Value() == b.Value() {
 		return a.Origin() > b.Origin()

@@ -18,3 +18,10 @@ func ParseFrameString(frame string) Frame {
 	return ParseFrame([]byte(frame))
 }
 
+func ParseStringBatch(strFrames []string) Batch {
+	ret := Batch{}
+	for _, s := range strFrames {
+		ret = append(ret, ParseFrameString(s))
+	}
+	return ret
+}
