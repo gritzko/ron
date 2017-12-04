@@ -100,6 +100,8 @@ type Batch []Frame
 
 type RawUUID []byte
 
+type VVector map[uint64]uint64
+
 type Environment map[uint64]UUID
 
 var BASE64 = string(BASE_PUNCT)
