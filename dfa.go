@@ -1785,6 +1785,8 @@ func (frame *Frame) Parse() {
 			goto st0
 		case 13:
 			goto st0
+		case 34:
+			goto st0
 		case 39:
 			goto tr25
 		case 92:
@@ -1801,11 +1803,13 @@ func (frame *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:1952
+//line dfa.go:1954
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 10:
 			goto st0
 		case 13:
+			goto st0
+		case 34:
 			goto st0
 		case 39:
 			goto tr28
@@ -1833,7 +1837,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:1987
+//line dfa.go:1991
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr76
@@ -2000,7 +2004,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:2187
+//line dfa.go:2191
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr84
@@ -2284,7 +2288,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:2515
+//line dfa.go:2519
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st7
@@ -2316,7 +2320,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:2549
+//line dfa.go:2553
 		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto tr33
 		}
@@ -2340,7 +2344,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:2576
+//line dfa.go:2580
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr92
@@ -2629,7 +2633,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:2909
+//line dfa.go:2913
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st9
@@ -2706,7 +2710,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:2992
+//line dfa.go:2996
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr100
@@ -2832,7 +2836,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:3119
+//line dfa.go:3123
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr110
@@ -3134,7 +3138,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof10
 		}
 	st_case_10:
-//line dfa.go:3465
+//line dfa.go:3469
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto st10
@@ -3169,7 +3173,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof11
 		}
 	st_case_11:
-//line dfa.go:3502
+//line dfa.go:3506
 		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto tr41
 		}
@@ -3196,7 +3200,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof12
 		}
 	st_case_12:
-//line dfa.go:3532
+//line dfa.go:3536
 		if (frame.Body)[(frame.Parser.position)] == 46 {
 			goto st13
 		}
@@ -3225,7 +3229,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof29
 		}
 	st_case_29:
-//line dfa.go:3562
+//line dfa.go:3566
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr119
@@ -3296,7 +3300,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof15
 		}
 	st_case_15:
-//line dfa.go:3634
+//line dfa.go:3638
 		if 48 <= (frame.Body)[(frame.Parser.position)] && (frame.Body)[(frame.Parser.position)] <= 57 {
 			goto tr45
 		}
@@ -3312,7 +3316,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof30
 		}
 	st_case_30:
-//line dfa.go:3651
+//line dfa.go:3655
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr119
@@ -3387,7 +3391,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:3727
+//line dfa.go:3731
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr128
@@ -3506,7 +3510,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:3844
+//line dfa.go:3848
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr139
@@ -3590,7 +3594,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:3929
+//line dfa.go:3933
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 10:
 			goto st0
@@ -3658,7 +3662,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:3998
+//line dfa.go:4002
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr46
@@ -3737,7 +3741,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:4077
+//line dfa.go:4081
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr54
@@ -3847,7 +3851,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:4184
+//line dfa.go:4188
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr64
@@ -3931,7 +3935,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:4269
+//line dfa.go:4273
 		switch (frame.Body)[(frame.Parser.position)] {
 		case 32:
 			goto tr14
@@ -4227,7 +4231,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:146
 
-//line dfa.go:4534
+//line dfa.go:4538
 			}
 		}
 
@@ -4250,7 +4254,7 @@ func (frame *Frame) Parse() {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:76
-//line dfa.go:4559
+//line dfa.go:4563
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
@@ -4265,12 +4269,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 	atoms := [1]Atom{Atom(ctx_uuid)}
 
-//line dfa.go:4577
+//line dfa.go:4581
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4582
+//line dfa.go:4586
 	{
 		if p == pe {
 			goto _test_eof
@@ -4358,7 +4362,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4675
+//line dfa.go:4679
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4451,7 +4455,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:4769
+//line dfa.go:4773
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4499,7 +4503,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:4817
+//line dfa.go:4821
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4579,7 +4583,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:4894
+//line dfa.go:4898
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4651,7 +4655,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:46
 				atoms[atm][1] = ((uint64)(UUID_NAME)) << 60
 
-//line dfa.go:4961
+//line dfa.go:4965
 			}
 		}
 

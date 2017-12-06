@@ -172,7 +172,7 @@
     # JSON-escaped string 
     UNIESC = "\\u" [0-9a-fA-F]{4};
     ESC = "\\" [^\n\r];
-    CHAR = [^'\n\r\\];
+    CHAR = [^"'\n\r\\];
     STRING_ATOM = (UNIESC|ESC|CHAR)* %string_atom_end >string_atom_start;
 
     # an atom (int, float, string or UUID) 
