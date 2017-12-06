@@ -10,19 +10,17 @@ import (
 type Clock struct {
 	offset    time.Duration
 	lastSeen  UUID
-	Mode      int
+	Mode      UUID
 	MinLength int
 }
 
-const (
-	CLOCK_CALENDAR = iota
-	CLOCK_EPOCH    // TODO implement behavior
-	CLOCK_LAMPORT
-)
+var CLOCK_CALENDAR = NewName("Gregorian")
+var CLOCK_EPOCH    = NewName("Epoch") // TODO implement behavior
+var CLOCK_LAMPORT  = NewName("Lamportian")
 
 var MAX_BIT_GRAB uint64 = 1 << 20
 
-func NewClock(replica uint64, mode, minLen int) Clock {
+func NewClock(replica uint64, mode UUID, minLen int) Clock {
 	origin := (replica & INT60_FULL) | UUID_UPPER_BITS[UUID_EVENT]
 	return Clock{lastSeen: NewEventUUID(0, origin), Mode: mode, MinLength: minLen}
 }
