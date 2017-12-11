@@ -33,6 +33,17 @@ var lww_3_tests = [][3]string{
 		"*lww#test@new:key'new_value'",
 		"*lww#test@new!:key'new_value'",
 	},
+	{
+		// lww array 2x2
+		//     0   1
+		//   +--------+
+		// 0 | 0  '1' |
+		// 1 | 1   2  |
+		//   +--------+
+		"*lww#array@1! :0%0 = 0,  :1%0 = -1",
+		"*lww#array@2! :0%1 '1',  :1%0 = 1,  :1%1 = 2",
+		"*lww#array@2!@1:%=0@2:%1'1':1%0=1:%1=2",
+	},
 }
 
 func TestLWW_Reduce(t *testing.T) {
