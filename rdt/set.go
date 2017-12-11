@@ -37,3 +37,7 @@ func (cs Set) Reduce(batch ron.Batch) ron.Frame {
 	}
 	return ret
 }
+
+func init () {
+	ron.RDTYPES[SET_UUID] = MakeSetReducer
+}

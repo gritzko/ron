@@ -51,3 +51,7 @@ func (cs CausalSet) Reduce(batch ron.Batch) ron.Frame {
 	}
 	return ret
 }
+
+func init () {
+	ron.RDTYPES[CAUSAL_SET_UUID] = MakeCausalSetReducer
+}
