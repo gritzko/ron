@@ -12,7 +12,7 @@ type CausalSet struct {
 
 var CAUSAL_SET_UUID = ron.NewName("cas")
 
-func CSetComparator(af, bf *ron.Frame) int64 {
+func SetComparator(af, bf *ron.Frame) int64 {
 	a, b := af.Event(), bf.Event()
 	if !af.Ref().IsZero() {
 		a = af.Ref()
@@ -25,7 +25,7 @@ func CSetComparator(af, bf *ron.Frame) int64 {
 
 func MakeCausalSetReducer() ron.Reducer {
 	ret := CausalSet{
-		heap: ron.MakeFrameHeap(CSetComparator, ron.RefComparatorDesc, 128),
+		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 128),
 		}
 	return ret
 }
