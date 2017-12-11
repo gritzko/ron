@@ -175,6 +175,14 @@ func (batch Batch) String() (ret string) {
 	return
 }
 
+func (batch Batch) Len() int {
+	ret := 0
+	for _, f := range batch {
+		ret += len(f.Body)
+	}
+	return ret
+}
+
 func (frame *Frame) AppendBytes(data []byte) {
 	frame.Body = append(frame.Body, data...)
 }
