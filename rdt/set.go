@@ -13,7 +13,7 @@ var SET_UUID = ron.NewName("set")
 
 func MakeSetReducer() ron.Reducer {
 	ret := Set{
-		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 128),
+		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 16),
 	}
 	return ret
 }
@@ -21,11 +21,8 @@ func MakeSetReducer() ron.Reducer {
 func (cs Set) Reduce(batch ron.Batch) ron.Frame {
 	ret := ron.MakeFrame(batch.Len())
 	ref := DELTA_UUID
-	for i:=0; i<len(batch); i++ {
-		if batch[i].IsHeader() && batch[i].Ref().IsZero() {
-			ref = ron.ZERO_UUID
-			break
-		}
+	if batch.HasFullState() {
+		ref = ron.ZERO_UUID
 	}
 	ret.AppendStateHeader(ron.NewSpec(
 		SET_UUID,

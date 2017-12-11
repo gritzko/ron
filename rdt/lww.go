@@ -2,7 +2,6 @@ package rdt
 
 import (
 	"github.com/gritzko/ron"
-	"fmt"
 )
 
 // LWW is a last-write-wins replicated data type that may host a variety of user-land data types, like:
@@ -26,22 +25,16 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 	heap := ron.MakeFrameHeap(ron.RefComparator, ron.EventComparatorDesc, len(inputs))
 	spec := inputs[0].Spec()
 	spec.SetEvent(inputs[len(inputs)-1].Event())
-	haveState := false
-	for k:=0; k<len(inputs); k++ {
-		if inputs[k].Ref().IsZero() && inputs[k].IsHeader() {
-			haveState = true
-		}
-		fmt.Printf("INPUT %s\n", inputs[k].OpString())
-		heap.Put(&inputs[k])
-	}
-	if !haveState {
-		spec.SetRef(DELTA_UUID)
-	} else {
+	if inputs.HasFullState() {
 		spec.SetRef(ron.ZERO_UUID)
+	} else {
+		spec.SetRef(DELTA_UUID)
+	}
+	for k:=0; k<len(inputs); k++ {
+		heap.Put(&inputs[k])
 	}
 	res.AppendStateHeader(spec)
 	for !heap.EOF() {
-		fmt.Printf("APPND %s\n", heap.Current().OpString())
 		res.AppendReduced(*heap.Current())
 		heap.NextPrim()
 	}

@@ -10,12 +10,12 @@ func TestCausalSet_Reduce(t *testing.T) {
 		{
 			"*cas#test1@1=1",
 			"*cas#test1@2=2",
-			"*cas#test1@2!@=2@1=1",
+			"*cas#test1@2:d!:0=2@1=1",
 		},
 		{
 			"*cas#test1@1=1",
 			"*cas#test1@2:1;",
-			"*cas#test1@2!",
+			"*cas#test1@2:d!",
 		},
 		{
 			"*cas#test1@2!@=2@1=1",

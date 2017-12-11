@@ -25,18 +25,22 @@ func SetComparator(af, bf *ron.Frame) int64 {
 
 func MakeCausalSetReducer() ron.Reducer {
 	ret := CausalSet{
-		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 128),
+		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 16),
 		}
 	return ret
 }
 
 func (cs CausalSet) Reduce(batch ron.Batch) ron.Frame {
 	ret := ron.MakeFrame(batch.Len())
+	ref := DELTA_UUID
+	if batch.HasFullState() {
+		ref = ron.ZERO_UUID
+	}
 	ret.AppendStateHeader(ron.NewSpec(
 		CAUSAL_SET_UUID,
 		batch[0].Object(),
 		batch[len(batch)-1].Event(),
-		ron.ZERO_UUID,
+		ref,
 	))
 	cs.heap.PutAll(batch)
 	for !cs.heap.EOF() {

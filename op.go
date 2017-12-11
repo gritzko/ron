@@ -36,6 +36,10 @@ func (frame Frame) IsHeader() bool {
 	return frame.Term() == TERM_HEADER
 }
 
+func (frame Frame) IsFullState () bool {
+	return frame.IsHeader() && frame.Ref().IsZero()
+}
+
 func (frame Frame) IsFramed() bool {
 	return frame.Term() == TERM_REDUCED
 }

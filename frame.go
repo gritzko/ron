@@ -183,6 +183,15 @@ func (batch Batch) Len() int {
 	return ret
 }
 
+func (batch Batch) HasFullState() bool {
+	for _, f := range batch {
+		if f.IsFullState() {
+			return true
+		}
+	}
+	return false
+}
+
 func (frame *Frame) AppendBytes(data []byte) {
 	frame.Body = append(frame.Body, data...)
 }
