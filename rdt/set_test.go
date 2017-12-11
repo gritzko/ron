@@ -18,6 +18,11 @@ func TestSet_Reduce(t *testing.T) {
 			"*set#test1@2!:1,",
 		},
 		{
+			"*set#test1@3:1;",
+			"*set#test1@4:2;",
+			"*set#test1@4:d!:2,@3:1,",
+		},
+		{
 			"*set#test1@2!@=2@1=1",
 			"*set#test1@5!@=5@3:2,@4:1,",
 			"*set#test1@5!@=5@3:2,@4:1,",

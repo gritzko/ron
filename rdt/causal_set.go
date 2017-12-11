@@ -44,7 +44,7 @@ func (cs CausalSet) Reduce(batch ron.Batch) ron.Frame {
 	))
 	cs.heap.PutAll(batch)
 	for !cs.heap.EOF() {
-		if cs.heap.Current().Ref().IsZero() {
+		if cs.heap.Current().Ref().IsZero() || !ref.IsZero() {
 			ret.AppendReduced(*cs.heap.Current())
 		}
 		cs.heap.NextPrim()
