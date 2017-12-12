@@ -39,12 +39,12 @@
 
     action uuid_sep {
         hlf = 1;
-        atoms[atm][hlf] &= INT60_FULL;
-        atoms[atm][hlf] |= ((uint64)(ABC[fc]))<<60;
+        atoms[atm][1] &= INT60_FULL;
+        atoms[atm][1] |= ((uint64)(ABC[fc]))<<60;
     }
 
     action end_name {
-        atoms[atm][1] = ((uint64)(UUID_NAME)) << 60;
+        atoms[atm][1] = UUID_NAME_FLAG;
     }
 
     # Base64 value
@@ -74,7 +74,7 @@
             >start_uuid
            ;
 
-# main := UUID;
+    # main := UUID;
 
 }%%
 

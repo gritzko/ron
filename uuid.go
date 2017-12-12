@@ -162,3 +162,5 @@ func (uuid UUID) Error() string {
 		return ""
 	}
 }
+
+var UUID_NAME_FLAG = ((uint64)(UUID_NAME)) << 60

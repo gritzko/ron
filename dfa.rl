@@ -6,7 +6,6 @@ import "errors"
 %% machine RON;
 %% write data;
 %% access frame.Parser.;
-%% variable p frame.Parser.position;
 %% variable data frame.Body;
 %% variable cs frame.Parser.state;
 const RON_EOF = -1
@@ -51,6 +50,7 @@ func (frame *Frame) Parse() {
     atm, hlf, dgt := frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt;
     atoms := frame.atoms;
     var e_sgn, e_val, e_frac int
+    p := frame.Parser.position;
 
 	%%{
 
@@ -61,6 +61,7 @@ func (frame *Frame) Parse() {
 	}%%
 
     frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = atm, hlf, dgt;
+    frame.Parser.position = p;
     frame.atoms = atoms;
 
     if !frame.Parser.streaming && frame.Parser.state<RON_first_final && frame.Parser.state>0 {

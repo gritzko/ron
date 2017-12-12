@@ -308,6 +308,12 @@ func (frame *Frame) AppendEmptyReducedOp(spec Spec) {
 	frame.AppendEmpty(spec, TERM_REDUCED)
 }
 
+func NewRawOp(t, o, e, r UUID) Frame {
+    frame := NewFrame()
+    frame.AppendEmpty(NewSpec(t,o,e,r), TERM_RAW)
+    return frame
+}
+
 func (frame *Frame) AppendAmended(spec Spec, values Frame, term int) {
 	tmp := values.Clone()
 	tmp.term = term

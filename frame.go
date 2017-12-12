@@ -170,7 +170,7 @@ func (batch Batch) WriteAll(w io.Writer) (err error) {
 
 func (batch Batch) String() (ret string) {
 	for _, frame := range batch {
-		ret += frame.String()
+		ret += frame.String() + "\n"
 	}
 	return
 }

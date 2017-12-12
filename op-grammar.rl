@@ -11,34 +11,33 @@
 
     action spec_uuid_start {
         n = (int)(ABC[fc]);
+        hlf = 0;
+        dgt = 0;
         if (n < atm) { 
             // wrong UUID order; must be type-object-event-ref
-            fnext *RON_error;
+            //fnext *RON_error;
+            fnext *RON_start;
+            p--;
             fbreak;
         } else { 
             // start parsing the UUID
             atm = n;
-            hlf = 0;
-            dgt = 0;
         }
     }
 
     action spec_uuid_end {
         // OK, save the UUID
         atm++;
-        hlf = 0;
-        dgt = 0;
     }
 
     action atom_start {
+        hlf = 0;
         dgt = 0;
         atoms = append(atoms, Atom{})
     }
     action atom_end {
         // TODO max size for int/float/string
         atm++;
-        hlf = 0;
-        dgt = 0;
     }
 
     action int_atom_start {
@@ -99,10 +98,10 @@
     }
 
     action string_atom_start {
-        atoms[atm][0] = ((uint64)(frame.Parser.position))<<32;
+        atoms[atm][0] = ((uint64)(p))<<32;
     }
     action string_atom_end {
-        atoms[atm][0] |= uint64(frame.Parser.position);
+        atoms[atm][0] |= uint64(p);
         atoms[atm][1] = ((uint64)(ATOM_STRING))<<62;
     }
 
@@ -132,10 +131,10 @@
 
     action op_start {
         hlf = 0;
-        if (frame.Parser.position>frame.Parser.offset) {
+        if (p>frame.Parser.offset) {
             // one op is done, so stop parsing for now
             // make sure the parser restarts with the next op
-            frame.Parser.position--;
+            p--;
             fnext *RON_start;
             fbreak;
         } else {
@@ -189,7 +188,7 @@
     OPTERM = [,;!?] @opterm space*;
 
     # a RON op; types: (0) raw op (1) reduced op (2) frame header (3) query header 
-    OP = space* ( SPEC_UUID+ >op_start %spec_end ) ( ATOMS OPTERM? | OPTERM ) %op_end;
+    OP = space* ( SPEC_UUID+ >op_start %spec_end ) <: ( ATOMS? OPTERM? ) %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
     DOT = "." @frame_end;

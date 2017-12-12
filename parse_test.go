@@ -266,7 +266,7 @@ func TestXParseOpWhitespace(t *testing.T) {
 
 func TestXParseMalformedOp(t *testing.T) {
 	var tests = []string{
-		"#novalue",
+		"novalue",
 		"# broken - uuid?",
 		"#too-many@values!!??=5=6^7.0^8.0'extra'",
 		"#invalid-float ^31.41.5",
@@ -385,9 +385,17 @@ func TestOp_ParseFloat(t *testing.T) {
 }
 
 func TestParse_SpecOnly(t *testing.T) {
-	str := "#test#test#test"
+	str := "#test:)1#test:)2#test:)3"
 	frame := ParseFrameString(str)
-	if !frame.EOF() {
+	c := 0
+	for !frame.EOF() {
+		c++
+		if frame.Ref().Value() != uint64(c) {
+			t.Fail()
+		}
+		frame.Next()
+	}
+	if c != 3 {
 		t.Fail()
 	}
 }
@@ -396,9 +404,9 @@ func TestParse_Errors(t *testing.T) {
 	frames := []string{
 		"#test>linkмусор",
 		"#string'unfinishe",
-		"#id#id#id",
-		"#bad@term",
-		"#no-term",
+		"#id,,",
+		"#bad@term??",
+		"#no-term?-",
 		"#notfloat^a",
 		"#notesc'\\'",
 		"*type=1NT",
@@ -410,7 +418,6 @@ func TestParse_Errors(t *testing.T) {
 		if !frame.EOF() {
 			t.Fail()
 			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, frame.Offset())
-			break
 		}
 	}
 }
@@ -434,7 +441,6 @@ func TestFrame_ParseStream(t *testing.T) {
 	}
 }
 
-
 func TestAtom_UUID(t *testing.T) {
 	str := "*lww#1TUAQ+gritzko@`:bar=1 #(R@`:foo > (Q"
 	frame := ParseFrameString(str)
@@ -449,4 +455,3 @@ func TestAtom_UUID(t *testing.T) {
 		t.Fail()
 	}
 }
-
