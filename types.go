@@ -60,11 +60,22 @@ type Checker interface {
 
 // [ ] parser: proper UTF-8 CHAR pattern
 //
+// [ ] tough counter (T-Counter)
+// [ ] op-based counter
+//
+// [ ] consistent header.Event(): max, ++ ?
+//
+// [x] sweeten the grammar (@1@2@3), last_at
+// [ ] *0 fast-append
+//
+// [ ] lww json mapper (strings only)
+//
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
 // [ ] LWW: out-of-order entries - restart the algo (with alloc)
 // [ ] iheap: seek the loop - reimpl (see UUIDHeap), bench
 // [ ] LWW: 1000x1000 array test
+// [ ] ACI property tests for everything
 //
 // [ ] ron.go --> cmd_reduce.go
 // [ ] strings: either escaped byte buffer or an unescaped string!!!!!!
