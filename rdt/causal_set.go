@@ -1,6 +1,8 @@
 package rdt
 
-import "github.com/gritzko/ron"
+import (
+	"github.com/gritzko/ron"
+)
 
 // Causal set, assumes causally consistent op delivery.
 // Hence, no tombstones.
@@ -8,6 +10,7 @@ import "github.com/gritzko/ron"
 // Equal elements possible.
 type CausalSet struct {
 	heap ron.FrameHeap
+	AlwaysFull bool
 }
 
 var CAUSAL_SET_UUID = ron.NewName("cas")
@@ -33,7 +36,7 @@ func MakeCausalSetReducer() ron.Reducer {
 func (cs CausalSet) Reduce(batch ron.Batch) ron.Frame {
 	ret := ron.MakeFrame(batch.Len())
 	ref := DELTA_UUID
-	if batch.HasFullState() {
+	if cs.AlwaysFull || batch.HasFullState() {
 		ref = ron.ZERO_UUID
 	}
 	ret.AppendStateHeader(ron.NewSpec(
