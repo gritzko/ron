@@ -5,37 +5,47 @@ import "errors"
 
 %% machine RON;
 %% write data;
-%% access frame.Parser.;
+%% access ps.;
 %% variable data frame.Body;
-%% variable cs frame.Parser.state;
-const RON_EOF = -1
+%% variable cs ps.state;
+
+// The parser reached end-of-input (in block mode) or
+// the closing dot (in streaming mode) successfully.
+// The rest of the input is frame.Rest()
+const RON_FULL_STOP = -1;
 
 
 // Parse consumes one op from data[], unless the buffer ends earlier.
-// Fills atoms[], returns op term (TERM_RAW etc) or TERM_ERROR
+// Fills atoms[]
 func (frame *Frame) Parse() {
 
-    if frame.Parser.position >= len(frame.Body) {
-        if !frame.Parser.streaming {
-            frame.Parser.state = RON_error
-        }
-        return 
+    ps := &frame.Parser
+
+    switch ps.state {
+        case RON_error:
+            if ps.position!=0 {
+                return
+            }
+	        %% write init;
+            if len(frame.atoms)<DEFAULT_ATOMS_ALLOC {
+                frame.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
+            }
+
+        case RON_FULL_STOP:
+            ps.state = RON_error
+            return
+
+        case RON_start:
+            ps.offset = ps.position;
+            frame.atoms = frame.atoms[:4];
+            ps.atm, ps.hlf, ps.dgt = 0, 0, 0;
     }
 
-    if frame.Parser.state==RON_error {
-        if frame.Parser.position==0 {
-	        %% write init;
-            frame.atoms = make([]Atom, 4, 8)
-        } else {
-            return
+    if ps.position >= len(frame.Body) {
+        if !ps.streaming {
+            ps.state = RON_error
         }
-    } else if frame.Parser.state==RON_EOF {
-        frame.Parser.state = RON_error
-        return
-    } else if frame.Parser.state==RON_start {
-        frame.Parser.offset = frame.Parser.position;
-        frame.atoms = frame.atoms[:4];
-        frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = 0, 0, 0;
+        return 
     }
 
 	pe, eof := len(frame.Body), len(frame.Body)
@@ -43,14 +53,14 @@ func (frame *Frame) Parse() {
     _ = eof
     _ = pe // FIXME kill
 
-    if frame.Parser.streaming {
+    if ps.streaming {
         eof = -1
     }
 
-    atm, hlf, dgt := frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt;
+    atm, hlf, dgt := ps.atm, ps.hlf, ps.dgt;
     atoms := frame.atoms;
     var e_sgn, e_val, e_frac int
-    p := frame.Parser.position;
+    p := ps.position;
 
 	%%{
 
@@ -60,12 +70,17 @@ func (frame *Frame) Parse() {
 	    write exec;
 	}%%
 
-    frame.Parser.atm, frame.Parser.hlf, frame.Parser.dgt = atm, hlf, dgt;
-    frame.Parser.position = p;
+    ps.atm, ps.hlf, ps.dgt = atm, hlf, dgt;
+    ps.position = p;
     frame.atoms = atoms;
 
-    if !frame.Parser.streaming && frame.Parser.state<RON_first_final && frame.Parser.state>0 {
-        frame.Parser.state = RON_error
+    if !ps.streaming && p>=eof {
+        if ps.state<RON_first_final && ps.state!=RON_FULL_STOP {
+            ps.state = RON_error
+        } else {
+            // in the block mode, the final dot is optional/implied
+            ps.state = RON_FULL_STOP
+        }
     }
 
 }

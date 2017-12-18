@@ -21,7 +21,7 @@ type ParserState struct {
 	offset int
 	// parsing byte offset
 	position int
-	// whether the frame might get more data
+	// parser mode: streaming (might get more bytes) / block (complete frame)
 	streaming bool
 }
 
@@ -129,6 +129,8 @@ var ZERO_UUID = NewNameUUID(0, 0)
 var NEVER_UUID = NewNameUUID(INT60_INFINITY, 0)
 
 var ERROR_UUID = NewNameUUID(INT60_ERROR, 0)
+
+const DEFAULT_ATOMS_ALLOC = 6
 
 func init() {
 

@@ -2,6 +2,7 @@ package ron
 
 import (
 	"io"
+	"fmt"
 )
 
 func OpenFrame(data []byte) Frame {
@@ -13,22 +14,30 @@ func OpenFrame(data []byte) Frame {
 
 func MakeFormattedFrame(format uint, prealloc_bytes int) (ret Frame) {
 	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, 6)
+	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
 	ret.Serializer.Format = format
 	return
 }
 
 func MakeFrame(prealloc_bytes int) (ret Frame) {
 	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, 6)
+	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
 	return
 }
 
-func MakeStreamedFrame(prealloc_bytes int) (ret Frame) {
-	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, 6)
+func ParseStream (buf []byte) Frame {
+	ret := MakeFrame(1000+len(buf))
+	ret.AppendBytes(buf)
 	ret.Parser.streaming = true
-	ret.Parser.state = RON_start
+	ret.Next()
+	return ret
+}
+
+func MakeStream(prealloc_bytes int) (ret Frame) {
+	ret.Body = make([]byte, 0, prealloc_bytes)
+	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
+	ret.Parser.streaming = true
+	//ret.Parser.state = RON_start
 	return
 }
 
@@ -117,8 +126,8 @@ func (frame *Frame) Next() bool {
 	if frame.Parser.state == RON_error {
 		return false
 	}
-	if frame.Parser.streaming && (frame.Parser.state != RON_start && frame.Parser.state != RON_EOF) {
-		return false
+	if frame.Parser.streaming {
+		return frame.IsComplete()
 	}
 	return true
 }
@@ -131,6 +140,7 @@ func (frame Frame) Len() int {
 	return len(frame.Body)
 }
 
+// True if we are past the last op
 func (frame Frame) EOF() bool {
 	return frame.Parser.state == RON_error
 }
@@ -145,26 +155,28 @@ func (frame Frame) Offset() int {
 	return frame.Parser.position
 }
 
-// [ ] needs a formal state machine
+// Whether op parsing is complete (not always the case for the streaming mode)
 func (frame Frame) IsComplete() bool {
-	return frame.Parser.state == RON_start || frame.Parser.state == RON_EOF
+    return frame.Parser.state == RON_start || frame.Parser.state == RON_FULL_STOP
+}
+
+func (ps ParserState) State () int {
+	return ps.state
 }
 
 // Write a frame to a stream (non-trivial because of event mark rewrites)
 func (frame Frame) Write(w io.Writer) error {
 	_, err := w.Write(frame.Body)
-	w.Write(FRAME_TERM_ARR[:])
+	fmt.Printf("WROTE: '%s'\n", string(frame.Body))
 	return err
 }
 
 // Write a batch as a multi-frame
+// FIXME merge into a solid frame
 func (batch Batch) WriteAll(w io.Writer) (err error) {
 	for i := 0; i < len(batch) && err == nil; i++ {
 		err = batch[i].Write(w)
 	}
-	//if err == nil {
-	//	w.Write(FRAME_TERM_ARR[:])
-	//}
 	return
 }
 
@@ -181,6 +193,10 @@ func (batch Batch) Len() int {
 		ret += len(f.Body)
 	}
 	return ret
+}
+
+func (batch Batch) IsEmpty() bool {
+    return len(batch)>0
 }
 
 func (batch Batch) HasFullState() bool {

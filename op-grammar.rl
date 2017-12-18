@@ -152,7 +152,7 @@
     }
 
     action frame_end {
-        fnext *RON_EOF;
+        fnext *RON_FULL_STOP;
     }
 
     # one of op spec UUIDs: type, object, event id or a reference 

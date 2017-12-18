@@ -212,23 +212,23 @@ func TestFrame_Next(t *testing.T) {
 			t.Fail()
 			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
 		} else {
-			//t.Logf("OK %d %s", i, frame.Type().String())
+			t.Logf("OK %d %s", i, frame.Type().String())
 		}
 		i++
 		names += frame.Type().String()
 		frame.Parse()
 	}
 	if i != len(ops) || names != "abcde" {
-		t.Logf("bad end: %d not %d, at %d", i, len(ops), frame.Offset())
+		t.Logf("bad end: %d not %d, at %d, '%s' should be 'abcde'", i, len(ops), frame.Offset(), names)
 		t.Fail()
 	}
 }
 
 func TestFrame_EOF2(t *testing.T) {
 	multi := []byte("*a#A:1!:2=2:3=3.*b#B:1?:2=2.")
-	states := []int{RON_start, RON_start, RON_EOF, RON_start, RON_EOF}
+	states := []int{RON_start, RON_start, RON_FULL_STOP, RON_start, RON_FULL_STOP}
 	o := 0
-	frame := MakeStreamedFrame(128)
+	frame := MakeStream(128)
 	for i := 0; i < len(multi); i++ {
 		frame.AppendBytes(multi[i : i+1])
 		if frame.Next() {
@@ -239,15 +239,47 @@ func TestFrame_EOF2(t *testing.T) {
 			} else {
 				//t.Logf("OK state %d at pos %d op %d", frame.Parser.state, frame.Parser.position, o)
 			}
-			if frame.Parser.state == RON_EOF {
-				frame = MakeStreamedFrame(1024)
+			if frame.Parser.state == RON_FULL_STOP {
+				frame = MakeStream(1024)
 			}
 			o++
+
 		}
+		t.Log(i, frame.Parser.State())
 	}
 	if o != len(states) {
 		t.Fail()
 		t.Logf("%d ops, needed %d", o, len(states))
+	}
+}
+
+func TestFrame_EOF(t *testing.T) {
+	var streams = []string{
+		"#id . #one! #two! #three!. ",
+		"...",
+		"#first#incomplete",
+	}
+	var states = [][]int {
+		{RON_FULL_STOP, RON_error, RON_start, RON_start, RON_FULL_STOP, RON_error},
+		{RON_FULL_STOP, RON_error, RON_error, RON_error},
+		{RON_start},
+	}
+	for k, stream := range streams {
+		frame := ParseStream([]byte{})
+		// feed by 1 char
+		// EOF -> Rest()
+		s := 0
+		for i:=0; i<len(stream); i++ {
+			frame.AppendBytes([]byte(stream[i:i+1]))
+			frame.Next()
+			if frame.IsComplete() {
+				if frame.Parser.State()!=states[k][s] {
+					t.Logf("stream %d offset %d got %d need %d", k, i, frame.Parser.State(), states[k][s])
+					t.Fail()
+				}
+				s++
+			}
+		}
 	}
 }
 
@@ -424,7 +456,7 @@ func TestParse_Errors(t *testing.T) {
 
 func TestFrame_ParseStream(t *testing.T) {
 	str := "*op1=123*op2!*op3!."
-	frame := MakeStreamedFrame(1024)
+	frame := MakeStream(1024)
 	count := 0
 	for i := 0; i < len(str); i++ {
 		frame.Body = append(frame.Body, str[i])
