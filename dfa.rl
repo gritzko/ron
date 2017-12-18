@@ -27,6 +27,7 @@ func (frame *Frame) Parse() {
                 return
             }
 	        %% write init;
+            frame.Position = -1
             if len(frame.atoms)<DEFAULT_ATOMS_ALLOC {
                 frame.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
             }
@@ -74,13 +75,21 @@ func (frame *Frame) Parse() {
     ps.position = p;
     frame.atoms = atoms;
 
-    if !ps.streaming && p>=eof {
-        if ps.state<RON_first_final && ps.state!=RON_FULL_STOP {
-            ps.state = RON_error
-        } else {
-            // in the block mode, the final dot is optional/implied
-            ps.state = RON_FULL_STOP
-        }
+    switch {
+        case ps.state==RON_error:
+            frame.Position = -1
+        case ps.state>=RON_first_final: // one of end states
+            if !ps.streaming && p>=eof {
+                // in the block mode, the final dot is optional/implied
+                ps.state = RON_FULL_STOP
+            }
+        case ps.state==RON_FULL_STOP:
+        case ps.state==RON_start:
+        default:
+            if !ps.streaming {
+                ps.state = RON_error
+                frame.Position = -1
+            }
     }
 
 }

@@ -212,7 +212,7 @@ func TestFrame_Next(t *testing.T) {
 			t.Fail()
 			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
 		} else {
-			t.Logf("OK %d %s", i, frame.Type().String())
+			//t.Logf("OK %d %s", i, frame.Type().String())
 		}
 		i++
 		names += frame.Type().String()
@@ -260,8 +260,8 @@ func TestFrame_EOF(t *testing.T) {
 		"#first#incomplete",
 	}
 	var states = [][]int {
-		{RON_FULL_STOP, RON_error, RON_start, RON_start, RON_FULL_STOP, RON_error},
-		{RON_FULL_STOP, RON_error, RON_error, RON_error},
+		{RON_FULL_STOP, RON_start, RON_start, RON_FULL_STOP},
+		{RON_FULL_STOP, RON_FULL_STOP, RON_FULL_STOP},
 		{RON_start},
 	}
 	for k, stream := range streams {
@@ -272,13 +272,27 @@ func TestFrame_EOF(t *testing.T) {
 		for i:=0; i<len(stream); i++ {
 			frame.AppendBytes([]byte(stream[i:i+1]))
 			frame.Next()
+			//t.Log(k, i, stream[i:i+1], frame.Position, frame.Parser.State(), frame.IsComplete())
 			if frame.IsComplete() {
+				if s>len(states[k]) {
+					t.Fail()
+					t.Logf("stream %d offset %d got %d need nothing", k, i, frame.Parser.State())
+					break
+				}
 				if frame.Parser.State()!=states[k][s] {
 					t.Logf("stream %d offset %d got %d need %d", k, i, frame.Parser.State(), states[k][s])
 					t.Fail()
+					break
 				}
 				s++
+				if frame.Parser.State()==RON_FULL_STOP {
+					frame = ParseStream(frame.Rest())
+				}
 			}
+		}
+		if s!=len(states[k]) {
+			t.Logf("need %d complete states, got %d", len(states[k]), s)
+			t.Fail()
 		}
 	}
 }

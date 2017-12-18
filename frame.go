@@ -2,7 +2,6 @@ package ron
 
 import (
 	"io"
-	"fmt"
 )
 
 func OpenFrame(data []byte) Frame {
@@ -157,7 +156,7 @@ func (frame Frame) Offset() int {
 
 // Whether op parsing is complete (not always the case for the streaming mode)
 func (frame Frame) IsComplete() bool {
-    return frame.Parser.state == RON_start || frame.Parser.state == RON_FULL_STOP
+    return (frame.Parser.state == RON_start && frame.Position>=0) || frame.Parser.state == RON_FULL_STOP
 }
 
 func (ps ParserState) State () int {
@@ -167,7 +166,7 @@ func (ps ParserState) State () int {
 // Write a frame to a stream (non-trivial because of event mark rewrites)
 func (frame Frame) Write(w io.Writer) error {
 	_, err := w.Write(frame.Body)
-	fmt.Printf("WROTE: '%s'\n", string(frame.Body))
+	//fmt.Printf("WROTE: '%s'\n", string(frame.Body))
 	return err
 }
 

@@ -14,9 +14,9 @@
         hlf = 0;
         dgt = 0;
         if (n < atm) { 
-            // wrong UUID order; must be type-object-event-ref
-            //fnext *RON_error;
+            // parse #op1#op2#op3 without Ragel state explosion
             fnext *RON_start;
+            frame.Position++
             p--;
             fbreak;
         } else { 
@@ -143,6 +143,7 @@
     }
 
     action op_end {
+        frame.Position++
     }
 
     action spec_end {
