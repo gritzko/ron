@@ -13,20 +13,6 @@ type FrameHeap struct {
 	primary, secondary Comparator
 }
 
-// sort modes, e.g. PRIM_EVENT|PRIM_DESC|SEC_LOCATION
-const (
-	PRIM_DESC     = 4
-	PRIM_TYPE     = SPEC_TYPE
-	PRIM_OBJECT   = SPEC_OBJECT
-	PRIM_EVENT    = SPEC_EVENT
-	PRIM_LOCATION = SPEC_REF
-	SEC_DESC      = 32
-	SEC_TYPE      = SPEC_TYPE << 3
-	SEC_OBJECT    = SPEC_OBJECT << 3
-	SEC_EVENT     = SPEC_EVENT << 3
-	SEC_LOCATION  = SPEC_REF << 3
-)
-
 func MakeFrameHeap(primary, secondary Comparator, size int) (ret FrameHeap) {
 	ret.iters = make([]*Frame, 1, size+1)
 	ret.primary = primary
@@ -118,6 +104,9 @@ func (heap *FrameHeap) next(i int) {
 
 func (heap *FrameHeap) Next() (frame *Frame) {
 	heap.next(1)
+	for len(heap.iters)>1 && heap.iters[1].Type()==COMMENT_UUID { // skip comments
+		heap.next(1)
+	}
 	return heap.Current()
 }
 

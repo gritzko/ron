@@ -334,6 +334,30 @@ func TestXParseMalformedOp(t *testing.T) {
 	}
 }
 
+func TestParseComment (t *testing.T) {
+	tests := [][]string{
+		{
+			"*lww#object@time!:field'value' *~'comment'! *rga!.",
+			"*rga!",
+			},
+		{
+			"*lww#object@time! :field'value', *~'comment', *lww:another'value'.",
+			"*lww :another'value',",
+			},
+	}
+	for k, test := range tests {
+		frame := ParseFrameString(test[0])
+		correct := ParseFrameString(test[1])
+		for frame.Parser.State()!=RON_FULL_STOP {
+			frame.Next()
+		}
+		if ! frame.Equal(correct) {
+			t.Fail()
+			t.Logf("%d need \n'%s'\n got \n'%s'\n", k, correct.OpString(), frame.OpString())
+		}
+	}
+}
+
 /*
 func TestOp_ParseFloat(t *testing.T) {
 	var tests = []string{

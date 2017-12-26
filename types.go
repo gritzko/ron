@@ -70,6 +70,9 @@ type Checker interface {
 //
 // [ ] lww json mapper (strings only)
 //
+// [ ] non-ideomatic Frame behavior (copy->shared atoms array)
+//     fix:  parser uses cur *Atom, _atoms [6]Atom atoms []Atom
+//
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
 // [ ] LWW: out-of-order entries - restart the algo (with alloc)
@@ -127,6 +130,8 @@ const UUID_NAME_UPPER_BITS = uint64(UUID_NAME) << 60
 var ZERO_UUID = NewNameUUID(0, 0)
 
 var NEVER_UUID = NewNameUUID(INT60_INFINITY, 0)
+
+var COMMENT_UUID = NEVER_UUID
 
 var ERROR_UUID = NewNameUUID(INT60_ERROR, 0)
 

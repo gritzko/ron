@@ -20,13 +20,12 @@
             p--;
             fbreak;
         } else { 
-            // start parsing the UUID
+            // next UUID
             atm = n;
         }
     }
 
     action spec_uuid_end {
-        // OK, save the UUID
         atm++;
     }
 

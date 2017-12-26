@@ -71,6 +71,12 @@ func (frame *Frame) Parse() {
 	    write exec;
 	}%%
 
+    if atoms[SPEC_TYPE]==Atom(COMMENT_UUID) && frame.IsComplete() {
+        atoms[SPEC_OBJECT] = Atom(ZERO_UUID)
+        atoms[SPEC_EVENT] = Atom(ZERO_UUID)
+        atoms[SPEC_REF] = Atom(ZERO_UUID)
+    }
+
     ps.atm, ps.hlf, ps.dgt = atm, hlf, dgt;
     ps.position = p;
     frame.atoms = atoms;
