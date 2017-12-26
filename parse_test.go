@@ -358,6 +358,21 @@ func TestParseComment (t *testing.T) {
 	}
 }
 
+func TestFormatComment(t *testing.T) {
+	frameStr := "*lww#obj@time!:key1'value1' *~'comment'! *ack@time!"
+	frame := ParseFrameString(frameStr)
+	clone := frame.Reformat(0)
+	for !frame.EOF() && !clone.EOF() {
+		if !frame.Equal(clone) {
+			t.Fail()
+			t.Logf("%s != %s", frame.OpString(), clone.OpString())
+			break
+		}
+		frame.Next()
+		clone.Next()
+	}
+}
+
 /*
 func TestOp_ParseFloat(t *testing.T) {
 	var tests = []string{

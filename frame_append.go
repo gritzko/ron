@@ -174,7 +174,11 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 	start := len(frame.Body)
 	flags := frame.Serializer.Format
 	skips := 0
-	for t := 0; t < 4; t++ {
+	k := 4
+	if spec[SPEC_TYPE]==Atom(COMMENT_UUID) {
+		k = 1
+	}
+	for t := 0; t < k; t++ {
 		if 0 != flags&FORMAT_GRID {
 			rest := t*22 - (len(frame.Body) - start)
 			frame.Body = append(frame.Body, SPACES88[:rest]...)
