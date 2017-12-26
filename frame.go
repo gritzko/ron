@@ -89,7 +89,7 @@ func (frame Frame) Reformat(format uint) Frame {
 		ret.Append(clone)
 		clone.Next()
 	}
-	return ret.Restart()
+	return ret.Rewind()
 }
 
 func (frame Frame) Clone() (clone Frame) {
@@ -131,7 +131,7 @@ func (frame *Frame) Next() bool {
 	return true
 }
 
-func (frame Frame) Restart() Frame {
+func (frame Frame) Rewind() Frame {
 	return ParseFrame(frame.Body)
 }
 
@@ -215,6 +215,12 @@ func NewFrame() Frame {
 	return NewBufferFrame(make([]byte, 0, 1024))
 }
 
+func NewQuery(t,o,e,r UUID) Frame {
+	ret := NewFrame()
+	ret.AppendQueryHeader(NewSpec(t,o,e,r))
+	return ret
+}
+
 func NewFormattedFrame(format uint) (ret Frame) {
 	ret = NewFrame()
 	ret.Serializer.Format = format
@@ -292,7 +298,7 @@ func (spec Spec) SetRef (uuid UUID) {
 
 // Verify the syntax, return the offset where error was found. -1 means OK.
 func (frame Frame) Verify () int {
-	ve := frame.Restart()
+	ve := frame.Rewind()
 	for !ve.EOF() {
 		ve.Next()
 	}
@@ -301,4 +307,45 @@ func (frame Frame) Verify () int {
 	} else {
 		return -1
 	}
+}
+
+// When we copy a frame by value, we keep a reference to the slice
+// of atom values. Hence, we can't iterate without messing up the
+// original frame (fixme).
+// Hence, Unshare()
+func (frame *Frame) Unshare () {
+	newAtoms := make([]Atom, len(frame.atoms))
+	copy(newAtoms, frame.atoms)
+	frame.atoms = newAtoms
+}
+
+func (frame Frame) Equal (other Frame) bool {
+	ret := true
+	frame.Unshare()
+	other.Unshare()
+	for ret && !frame.EOF() && !other.EOF() {
+		ret = ret && frame.Term()== other.Term()
+		for i:=0; i<4 && ret; i++ {
+			ret = ret && frame.atoms[i]== other.atoms[i]
+		}
+		ret = ret && frame.Count()== other.Count()
+		// TODO atoms
+		frame.Next()
+		other.Next()
+	}
+	ret = ret && frame.EOF()
+	ret = ret && other.EOF()
+	return ret
+}
+
+func (batch Batch) Equal (other Batch) bool {
+	if len(batch)!=len(other) {
+		return false
+	}
+	for i:=0; i<len(batch); i++ {
+		if !batch[i].Equal(other[i]) {
+			return false
+		}
+	}
+	return true
 }

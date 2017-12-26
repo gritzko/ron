@@ -136,7 +136,7 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 
 		}
 
-		produce = append(produce, result.Restart())
+		produce = append(produce, result.Rewind())
 
 		for i < len(pending) && pending[i].EOF() {
 			i++
@@ -162,7 +162,7 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 			result.AppendEmptyReducedOp(spec)
 			delete(rga.rms, key)
 		}
-		produce = append(produce, result.Restart())
+		produce = append(produce, result.Rewind())
 
 	}
 

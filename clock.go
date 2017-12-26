@@ -16,7 +16,7 @@ type Clock struct {
 
 var CLOCK_CALENDAR = NewName("Gregorian")
 var CLOCK_EPOCH    = NewName("Epoch") // TODO implement behavior
-var CLOCK_LAMPORT  = NewName("Lamportian")
+var CLOCK_LAMPORT  = NewName("Lamport")
 
 var MAX_BIT_GRAB uint64 = 1 << 20
 

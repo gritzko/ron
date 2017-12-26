@@ -172,7 +172,7 @@ func TestParseFrame(t *testing.T) {
 	}
 	t.Logf(frame.String())
 	// recover, compare
-	iter := frame.Restart()
+	iter := frame.Rewind()
 	for k := 0; k < ops; k++ {
 		if iter.EOF() {
 			t.Fail()

@@ -391,7 +391,7 @@ func (frame *Frame) Split() Batch {
 			next.Append(*frame)
 			frame.Next()
 		}
-		ret = append(ret, next.Restart())
+		ret = append(ret, next.Rewind())
 	}
 	return ret
 }
@@ -406,5 +406,5 @@ func (batch Batch) Join() Frame {
 		ret.AppendFrame(f)
 	}
 
-	return ret.Restart()
+	return ret.Rewind()
 }
