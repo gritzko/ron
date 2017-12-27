@@ -63,6 +63,11 @@ func (frame Frame) IsEmpty() bool {
 	return len(frame.Body) == 0
 }
 
+
+func (frame Frame) IsComment() bool {
+	return frame.Type()==COMMENT_UUID
+}
+
 func (frame Frame) UUID(idx int) UUID {
 	return UUID(frame.atoms[idx])
 }
