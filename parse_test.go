@@ -371,6 +371,10 @@ func TestFormatComment(t *testing.T) {
 		frame.Next()
 		clone.Next()
 	}
+	q := ParseFrameString("*~?")
+	if !q.IsQuery() {
+		t.Fail()
+	}
 }
 
 func TestParseTermDuplet (t *testing.T) {

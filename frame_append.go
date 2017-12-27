@@ -277,7 +277,12 @@ func (frame *Frame) Append(other Frame) {
 
 	frame.appendAtoms(other)
 
-	if other.IsHeader() || (other.IsRaw() && !frame.IsRaw()) || other.Count() == 0 {
+	defaultTerm := TERM_REDUCED
+	if frame.term == TERM_RAW {
+		defaultTerm = TERM_RAW
+	}
+
+	if other.term!=defaultTerm || other.Count() == 0 {
 		frame.Body = append(frame.Body, TERM_PUNCT[other.term])
 	}
 
