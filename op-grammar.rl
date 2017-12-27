@@ -11,8 +11,7 @@
 
     action spec_uuid_start {
         n = (int)(ABC[fc]);
-        hlf = 0;
-        dgt = 0;
+        hlf, dgt = 0, 0;
         if (n < atm) { 
             // parse #op1#op2#op3 without Ragel state explosion
             fnext *RON_start;
@@ -30,12 +29,10 @@
     }
 
     action atom_start {
-        hlf = 0;
-        dgt = 0;
+        hlf, dgt = 0, 0;
         atoms = append(atoms, Atom{})
     }
     action atom_end {
-        // TODO max size for int/float/string
         atm++;
     }
 
@@ -49,6 +46,7 @@
     action int_digit {
         atoms[atm][0] *= 10;
         atoms[atm][0] += (uint64)(fc-'0');
+        // TODO max size for int/float/string
     }
     action int_atom_end {
         atoms[atm][1] |= ((uint64)(ATOM_INT))<<62;
@@ -62,6 +60,7 @@
     action float_dgt {
         atoms[atm][0] *= 10;
         atoms[atm][0] += (uint64)(fc-'0');
+        // TODO max size for int/float/string
     }
     action float_sgn {
         if (fc=='-') {
@@ -72,6 +71,7 @@
         atoms[atm][0] *= 10;
         atoms[atm][0] += (uint64)(fc-'0');
         e_frac++;
+        // TODO max size for int/float/string
     }
     action float_e_sgn {
         if (fc=='-') {
@@ -81,6 +81,7 @@
     action float_e_dgt {
         e_val *= 10;
         e_val += int(fc-'0');
+        // TODO max size for int/float/string
     }
     action float_atom_end {
         if (e_sgn==-1) {
@@ -187,8 +188,12 @@
     # an optional op terminator (raw, reduced, header, query)
     OPTERM = [,;!?] @opterm space*;
 
-    # a RON op; types: (0) raw op (1) reduced op (2) frame header (3) query header 
-    OP = space* ( SPEC_UUID+ >op_start %spec_end ) <: ( ATOMS? OPTERM? ) %op_end;
+    # a RON op "specifier" (four UUIDs for its type, object, event, and ref)
+    SPEC = SPEC_UUID+ %spec_end ;
+
+    # a RON op
+    # op types: (0) raw op (1) reduced op (2) frame header (3) query header 
+    OP = space* ( SPEC ATOMS? OPTERM? | ATOMS OPTERM? | OPTERM) $2 %1 >op_start %op_end;
 
     # optional frame terminator; mandatory in the streaming mode 
     DOT = "." @frame_end;

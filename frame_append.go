@@ -174,23 +174,30 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 	start := len(frame.Body)
 	flags := frame.Serializer.Format
 	skips := 0
+
+	do_grid := flags&FORMAT_GRID != 0
+	do_space := flags&FORMAT_SPACE != 0
+	do_noskip := flags&FORMAT_NOSKIP != 0
+	do_redef := flags&FORMAT_REDEFAULT != 0
+
 	k := 4
 	if spec[SPEC_TYPE]==Atom(COMMENT_UUID) {
 		k = 1
 	}
+
 	for t := 0; t < k; t++ {
-		if 0 != flags&FORMAT_GRID {
+		if do_grid {
 			rest := t*22 - (len(frame.Body) - start)
 			frame.Body = append(frame.Body, SPACES88[:rest]...)
-		} else if 0 != flags&FORMAT_SPACE && t > 0 {
+		} else if do_space && t > 0 {
 			frame.Body = append(frame.Body, ' ')
 		}
-		if (spec[t] == context[t]) && (0 == flags&FORMAT_NOSKIP) {
+		if !do_noskip && spec[t] == context[t] {
 			skips++
 			continue
 		}
 		frame.Body = append(frame.Body, SPEC_PUNCT[uint(t)])
-		if t > 0 && 0 != flags&FORMAT_REDEFAULT {
+		if t > 0 && do_redef {
 			ctxAt := 0
 			ctxUUID := UUID(spec[t-1])
 			ctxPL := sharedPrefix(UUID(spec[t]), ctxUUID)

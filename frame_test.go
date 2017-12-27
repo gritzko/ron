@@ -56,18 +56,19 @@ func TestBatchFrames(t *testing.T) {
 }
 
 func TestFrame_SplitMultiframe(t *testing.T) {
+	multiStr := "*lww#test!:a=1#best:0!:b=2:c=3:d=4;"
 	splits := []string{
-		"*lww#test!:a=1#best:0!:b=2:c=3:d=4;",
 		"*lww#test!:a=1",
 		"*lww#best!:b=2:c=3",
 		"*lww#best:d=4",
 	}
-	multi := ParseFrameString(splits[0])
+	multi := ParseFrameString(multiStr)
+
 	monos := multi.Split()
 	for i := 0; i < len(monos); i++ {
-		if monos[i].String() != splits[i+1] {
+		if monos[i].String() != splits[i] {
 			t.Fail()
-			t.Logf("split fail:\n'%s'\nshould be\n'%s'\n", monos[i].String(), splits[i+1])
+			t.Logf("split fail at %d:\n'%s'\nshould be\n'%s'\n", i ,monos[i].String(), splits[i])
 		}
 	}
 }

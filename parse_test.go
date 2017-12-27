@@ -373,6 +373,26 @@ func TestFormatComment(t *testing.T) {
 	}
 }
 
+func TestParseTermDuplet (t *testing.T) {
+	frameStr := "*lww#object@time+orig?! :keyA 'А' :keyB 'Б'"
+	frame := ParseFrameString(frameStr)
+	if !frame.IsQuery() {
+		t.Log("no query parsed")
+		t.Fail()
+	}
+	obj := frame.Object()
+	frame.Next()
+	if frame.EOF() || !frame.IsHeader() || frame.Object()!=obj {
+		t.Log("state header not parsed")
+		t.Fail()
+	}
+	frame.Next()
+	if frame.EOF() || frame.Term()!=TERM_REDUCED || frame.Object()!=obj {
+		t.Log("inner op not parsed")
+		t.Fail()
+	}
+}
+
 /*
 func TestOp_ParseFloat(t *testing.T) {
 	var tests = []string{
@@ -489,8 +509,8 @@ func TestParse_Errors(t *testing.T) {
 	frames := []string{
 		"#test>linkмусор",
 		"#string'unfinishe",
-		"#id,,",
-		"#bad@term??",
+		"#id<",
+		"#bad@term=?",
 		"#no-term?-",
 		"#notfloat^a",
 		"#notesc'\\'",
@@ -500,7 +520,7 @@ func TestParse_Errors(t *testing.T) {
 	for k, f := range frames {
 		buf := []byte(f)
 		frame := ParseFrame(buf)
-		if !frame.EOF() {
+		if frame.Parser.State()!=RON_error {
 			t.Fail()
 			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, frame.Offset())
 		}
