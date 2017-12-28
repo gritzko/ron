@@ -324,16 +324,25 @@ func (frame *Frame) Unshare () {
 	frame.atoms = newAtoms
 }
 
+// IsEqual checks for single-op equality
+func (frame Frame) IsEqual (other Frame) bool {
+	if frame.EOF() || other.EOF() {
+		return frame.EOF() && other.EOF()
+	}
+	ret := frame.Term()== other.Term()
+	for i:=0; i<4 && ret; i++ { // FIXME strings are difficult
+		ret = ret && frame.atoms[i]== other.atoms[i]
+	}
+	ret = ret && frame.Count()== other.Count()
+	return ret
+}
+
 func (frame Frame) Equal (other Frame) bool {
 	ret := true
 	frame.Unshare()
 	other.Unshare()
 	for ret && !frame.EOF() && !other.EOF() {
-		ret = ret && frame.Term()== other.Term()
-		for i:=0; i<4 && ret; i++ {
-			ret = ret && frame.atoms[i]== other.atoms[i]
-		}
-		ret = ret && frame.Count()== other.Count()
+		ret = ret && frame.IsEqual(other)
 		// TODO atoms
 		frame.Next()
 		other.Next()
@@ -343,14 +352,25 @@ func (frame Frame) Equal (other Frame) bool {
 	return ret
 }
 
+// Equal checks two batches for op-by-op equality (irrespectively of frame borders)
 func (batch Batch) Equal (other Batch) bool {
-	if len(batch)!=len(other) {
-		return false
-	}
-	for i:=0; i<len(batch); i++ {
-		if !batch[i].Equal(other[i]) {
+	bi, oi := 0, 0
+	bf := Frame{}
+	of := Frame{}
+	for (!bf.EOF() || bi<len(batch)) && (!of.EOF() || oi<len(other)) {
+		for bf.EOF() && bi<len(batch) {
+			bf = batch[bi].Clone()
+			bi++
+		}
+		for of.EOF() && oi<len(other) {
+			of = other[oi].Clone()
+			oi++
+		}
+		if !bf.IsEqual(of) {
 			return false
 		}
+		bf.Next()
+		of.Next()
 	}
-	return true
+	return bi==len(batch) && oi==len(other)
 }

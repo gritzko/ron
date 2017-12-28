@@ -72,3 +72,16 @@ func TestFrame_SplitMultiframe(t *testing.T) {
 		}
 	}
 }
+
+
+func TestBatch_Equal(t *testing.T) {
+	b1 := ParseStringBatch([]string{ "*one", "*two" })
+	b2 := ParseStringBatch([]string{ "*one*two" })
+	if !b1.Equal(b2) {
+		t.Fail()
+	}
+	b2 = append(b2, ParseFrameString("*three"))
+	if b1.Equal(b2) {
+		t.Fail()
+	}
+}
