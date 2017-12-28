@@ -321,6 +321,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:128
@@ -329,7 +332,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr32:
 		(ps.state) = 15
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -345,6 +348,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:128
@@ -355,20 +361,14 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:128
 		frame.term = int(ABC[(frame.Body)[p]])
 
 		goto st15
 	tr55:
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:128
 		frame.term = int(ABC[(frame.Body)[p]])
@@ -493,10 +493,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:128
 		frame.term = int(ABC[(frame.Body)[p]])
@@ -508,10 +505,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:128
 		frame.term = int(ABC[(frame.Body)[p]])
@@ -526,10 +520,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:128
 		frame.term = int(ABC[(frame.Body)[p]])
@@ -540,7 +531,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof15
 		}
 	st_case_15:
-//line dfa.go:604
+//line dfa.go:595
 		switch (frame.Body)[p] {
 		case 32:
 			goto st15
@@ -590,6 +581,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -612,7 +606,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr33:
 		(ps.state) = 16
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -628,6 +622,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -703,7 +700,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -719,6 +716,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -743,7 +743,7 @@ func (frame *Frame) Parse() {
 		(ps.state) = 16
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -759,6 +759,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -789,7 +792,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -805,6 +808,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -835,7 +841,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -851,6 +857,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -883,7 +892,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -899,6 +908,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -939,7 +951,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -955,6 +967,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -987,7 +1002,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -1003,6 +1018,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -1038,7 +1056,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -1054,6 +1072,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:12
@@ -1157,7 +1178,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:1214
+//line dfa.go:1235
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr39
@@ -1253,7 +1274,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:1315
+//line dfa.go:1336
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr51
@@ -1353,7 +1374,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:1423
+//line dfa.go:1444
 		switch (frame.Body)[p] {
 		case 32:
 			goto st18
@@ -1403,6 +1424,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -1417,7 +1441,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr34:
 		(ps.state) = 2
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -1433,6 +1457,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -1449,10 +1476,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -1465,10 +1489,7 @@ func (frame *Frame) Parse() {
 
 		goto st2
 	tr57:
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -1592,10 +1613,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -1613,10 +1631,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -1637,10 +1652,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -1657,7 +1669,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:1776
+//line dfa.go:1788
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1681,7 +1693,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:1801
+//line dfa.go:1813
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1715,7 +1727,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:1838
+//line dfa.go:1850
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr62
@@ -1827,7 +1839,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:1967
+//line dfa.go:1979
 		switch (frame.Body)[p] {
 		case 32:
 			goto st20
@@ -1870,7 +1882,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr35:
 		(ps.state) = 21
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1882,12 +1894,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1896,12 +1905,8 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr58:
 		(ps.state) = 21
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
-
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:152
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1915,7 +1920,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1925,7 +1930,7 @@ func (frame *Frame) Parse() {
 	tr74:
 		(ps.state) = 21
 //line ./op-grammar.rl:125
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1942,7 +1947,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1959,7 +1964,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -1978,7 +1983,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2005,7 +2010,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2024,7 +2029,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2046,7 +2051,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2060,12 +2065,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2079,12 +2081,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2101,12 +2100,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:155
@@ -2118,7 +2114,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof21
 		}
 	st_case_21:
-//line dfa.go:2326
+//line dfa.go:2323
 		goto st0
 	tr5:
 		(ps.state) = 4
@@ -2135,6 +2131,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -2149,7 +2148,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr36:
 		(ps.state) = 4
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -2165,6 +2164,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -2181,10 +2183,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2197,10 +2196,7 @@ func (frame *Frame) Parse() {
 
 		goto st4
 	tr59:
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2324,10 +2320,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2345,10 +2338,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2369,10 +2359,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2389,7 +2376,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:2646
+//line dfa.go:2634
 		switch (frame.Body)[p] {
 		case 32:
 			goto st4
@@ -2421,7 +2408,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:2680
+//line dfa.go:2668
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr17
 		}
@@ -2447,7 +2434,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:2709
+//line dfa.go:2697
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr78
@@ -2502,6 +2489,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -2516,7 +2506,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr37:
 		(ps.state) = 6
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -2532,6 +2522,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -2548,10 +2541,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2564,10 +2554,7 @@ func (frame *Frame) Parse() {
 
 		goto st6
 	tr60:
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2691,10 +2678,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2712,10 +2696,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2736,10 +2717,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -2756,7 +2734,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:3067
+//line dfa.go:3046
 		switch (frame.Body)[p] {
 		case 32:
 			goto st6
@@ -2833,7 +2811,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:3150
+//line dfa.go:3129
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr86
@@ -2959,7 +2937,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:3277
+//line dfa.go:3256
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr96
@@ -3027,6 +3005,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -3041,7 +3022,7 @@ func (frame *Frame) Parse() {
 		goto _again
 	tr38:
 		(ps.state) = 7
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 		frame.Position++
 
 //line ./op-grammar.rl:132
@@ -3057,6 +3038,9 @@ func (frame *Frame) Parse() {
 			}
 		} else {
 			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
 		}
 
 //line ./op-grammar.rl:120
@@ -3073,10 +3057,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -3089,10 +3070,7 @@ func (frame *Frame) Parse() {
 
 		goto st7
 	tr61:
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -3216,10 +3194,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -3237,10 +3212,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -3261,10 +3233,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 		atm++
 
-//line ./op-grammar.rl:149
-		if frame.term != TERM_RAW {
-			frame.term = TERM_REDUCED
-		}
+//line ./op-grammar.rl:152
 
 //line ./op-grammar.rl:120
 		atm = 4
@@ -3281,7 +3250,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:3648
+//line dfa.go:3618
 		switch (frame.Body)[p] {
 		case 32:
 			goto st7
@@ -3316,7 +3285,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:3685
+//line dfa.go:3655
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr25
 		}
@@ -3345,7 +3314,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:3717
+//line dfa.go:3687
 		if (frame.Body)[p] == 46 {
 			goto st10
 		}
@@ -3375,7 +3344,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:3748
+//line dfa.go:3718
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr105
@@ -3446,7 +3415,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof12
 		}
 	st_case_12:
-//line dfa.go:3820
+//line dfa.go:3790
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr29
 		}
@@ -3463,7 +3432,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:3838
+//line dfa.go:3808
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr105
@@ -3538,7 +3507,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:3914
+//line dfa.go:3884
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr114
@@ -3657,7 +3626,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:4031
+//line dfa.go:4001
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr125
@@ -3741,7 +3710,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof13
 		}
 	st_case_13:
-//line dfa.go:4116
+//line dfa.go:4086
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -3809,7 +3778,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof29
 		}
 	st_case_29:
-//line dfa.go:4185
+//line dfa.go:4155
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr134
@@ -3890,7 +3859,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof30
 		}
 	st_case_30:
-//line dfa.go:4266
+//line dfa.go:4236
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr143
@@ -4002,7 +3971,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:4375
+//line dfa.go:4345
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr154
@@ -4088,7 +4057,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:4462
+//line dfa.go:4432
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr51
@@ -4266,33 +4235,27 @@ func (frame *Frame) Parse() {
 		if p == eof {
 			switch ps.state {
 			case 15:
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 20:
 //line ./op-grammar.rl:125
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 18:
-//line ./op-grammar.rl:149
-				if frame.term != TERM_RAW {
-					frame.term = TERM_REDUCED
-				}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 16, 17, 32:
 //line ./op-grammar.rl:27
 				atm++
 
-//line ./op-grammar.rl:149
-				if frame.term != TERM_RAW {
-					frame.term = TERM_REDUCED
-				}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 19:
@@ -4301,7 +4264,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 30:
@@ -4310,12 +4273,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 				atm++
 
-//line ./op-grammar.rl:149
-				if frame.term != TERM_RAW {
-					frame.term = TERM_REDUCED
-				}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 29:
@@ -4324,12 +4284,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 				atm++
 
-//line ./op-grammar.rl:149
-				if frame.term != TERM_RAW {
-					frame.term = TERM_REDUCED
-				}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 22:
@@ -4341,7 +4298,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 25, 26:
@@ -4363,7 +4320,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 23:
@@ -4375,7 +4332,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 31:
@@ -4387,12 +4344,9 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:27
 				atm++
 
-//line ./op-grammar.rl:149
-				if frame.term != TERM_RAW {
-					frame.term = TERM_REDUCED
-				}
+//line ./op-grammar.rl:152
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 27:
@@ -4406,7 +4360,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 24:
@@ -4420,7 +4374,7 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
 			case 28:
@@ -4437,10 +4391,10 @@ func (frame *Frame) Parse() {
 
 //line ./op-grammar.rl:125
 
-//line ./op-grammar.rl:145
+//line ./op-grammar.rl:148
 				frame.Position++
 
-//line dfa.go:4801
+//line dfa.go:4756
 			}
 		}
 
@@ -4483,7 +4437,7 @@ func (frame *Frame) Parse() {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:107
-//line dfa.go:4846
+//line dfa.go:4801
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
@@ -4498,12 +4452,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 	atoms := [1]Atom{Atom(ctx_uuid)}
 
-//line dfa.go:4864
+//line dfa.go:4819
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4869
+//line dfa.go:4824
 	{
 		if p == pe {
 			goto _test_eof
@@ -4591,7 +4545,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4962
+//line dfa.go:4917
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4684,7 +4638,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:5056
+//line dfa.go:5011
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4732,7 +4686,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:5104
+//line dfa.go:5059
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4812,7 +4766,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:5181
+//line dfa.go:5136
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4884,7 +4838,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:46
 				atoms[atm][1] = UUID_NAME_FLAG
 
-//line dfa.go:5248
+//line dfa.go:5203
 			}
 		}
 

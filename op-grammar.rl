@@ -139,6 +139,9 @@
             fbreak;
         } else {
             //op_idx++;
+            if (frame.term!=TERM_RAW) {
+                frame.term = TERM_REDUCED;
+            }
         }
     }
 
@@ -147,9 +150,6 @@
     }
 
     action spec_end {
-        if (frame.term!=TERM_RAW) {
-            frame.term = TERM_REDUCED;
-        }
     }
 
     action frame_end {
