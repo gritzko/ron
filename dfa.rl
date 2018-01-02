@@ -28,9 +28,7 @@ func (frame *Frame) Parse() {
             }
 	        %% write init;
             frame.Position = -1
-            if len(frame.atoms)<DEFAULT_ATOMS_ALLOC {
-                frame.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
-            }
+            frame.atoms = frame._atoms[:4]
 
         case RON_FULL_STOP:
             ps.state = RON_error
@@ -38,7 +36,7 @@ func (frame *Frame) Parse() {
 
         case RON_start:
             ps.offset = ps.position;
-            frame.atoms = frame.atoms[:4];
+            frame.atoms = frame._atoms[:4];
             ps.atm, ps.hlf, ps.dgt = 0, 0, 0;
     }
 

@@ -135,7 +135,7 @@ func (uuid UUID) ToScheme(scheme uint) UUID {
 }
 
 func (uuid UUID) IsZero() bool {
-	return uuid.Value() == 0 && uuid.Origin() == 0
+	return uuid.Value() == 0
 }
 
 func (uuid UUID) IsError() bool {

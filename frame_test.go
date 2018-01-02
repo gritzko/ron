@@ -85,3 +85,17 @@ func TestBatch_Equal(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestFrame_Copy (t *testing.T) {
+	a := ParseFrameString("*~'comment' *lww#obj!")
+	b := a
+	if b.Type()!=COMMENT_UUID {
+		t.Log("improper copy")
+		t.Fail()
+	}
+	b.Next()
+	if a.Type()!=COMMENT_UUID {
+		t.Log("the copy is still linked")
+		t.Fail()
+	}
+}

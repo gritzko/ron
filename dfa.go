@@ -41,9 +41,7 @@ func (frame *Frame) Parse() {
 
 //line dfa.rl:30
 		frame.Position = -1
-		if len(frame.atoms) < DEFAULT_ATOMS_ALLOC {
-			frame.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
-		}
+		frame.atoms = frame._atoms[:4]
 
 	case RON_FULL_STOP:
 		ps.state = RON_error
@@ -51,7 +49,7 @@ func (frame *Frame) Parse() {
 
 	case RON_start:
 		ps.offset = ps.position
-		frame.atoms = frame.atoms[:4]
+		frame.atoms = frame._atoms[:4]
 		ps.atm, ps.hlf, ps.dgt = 0, 0, 0
 	}
 
@@ -76,7 +74,7 @@ func (frame *Frame) Parse() {
 	var e_sgn, e_val, e_frac int
 	p := ps.position
 
-//line dfa.go:89
+//line dfa.go:87
 	{
 		if p == pe {
 			goto _test_eof
@@ -531,7 +529,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof15
 		}
 	st_case_15:
-//line dfa.go:595
+//line dfa.go:593
 		switch (frame.Body)[p] {
 		case 32:
 			goto st15
@@ -1178,7 +1176,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof16
 		}
 	st_case_16:
-//line dfa.go:1235
+//line dfa.go:1233
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr39
@@ -1274,7 +1272,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof17
 		}
 	st_case_17:
-//line dfa.go:1336
+//line dfa.go:1334
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr51
@@ -1374,7 +1372,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line dfa.go:1444
+//line dfa.go:1442
 		switch (frame.Body)[p] {
 		case 32:
 			goto st18
@@ -1669,7 +1667,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:1788
+//line dfa.go:1786
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1693,7 +1691,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:1813
+//line dfa.go:1811
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1727,7 +1725,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof19
 		}
 	st_case_19:
-//line dfa.go:1850
+//line dfa.go:1848
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr62
@@ -1839,7 +1837,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line dfa.go:1979
+//line dfa.go:1977
 		switch (frame.Body)[p] {
 		case 32:
 			goto st20
@@ -2114,7 +2112,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof21
 		}
 	st_case_21:
-//line dfa.go:2323
+//line dfa.go:2321
 		goto st0
 	tr5:
 		(ps.state) = 4
@@ -2376,7 +2374,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:2634
+//line dfa.go:2632
 		switch (frame.Body)[p] {
 		case 32:
 			goto st4
@@ -2408,7 +2406,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:2668
+//line dfa.go:2666
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr17
 		}
@@ -2434,7 +2432,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof22
 		}
 	st_case_22:
-//line dfa.go:2697
+//line dfa.go:2695
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr78
@@ -2734,7 +2732,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line dfa.go:3046
+//line dfa.go:3044
 		switch (frame.Body)[p] {
 		case 32:
 			goto st6
@@ -2811,7 +2809,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof23
 		}
 	st_case_23:
-//line dfa.go:3129
+//line dfa.go:3127
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr86
@@ -2937,7 +2935,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line dfa.go:3256
+//line dfa.go:3254
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr96
@@ -3250,7 +3248,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line dfa.go:3618
+//line dfa.go:3616
 		switch (frame.Body)[p] {
 		case 32:
 			goto st7
@@ -3285,7 +3283,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line dfa.go:3655
+//line dfa.go:3653
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr25
 		}
@@ -3314,7 +3312,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line dfa.go:3687
+//line dfa.go:3685
 		if (frame.Body)[p] == 46 {
 			goto st10
 		}
@@ -3344,7 +3342,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof25
 		}
 	st_case_25:
-//line dfa.go:3718
+//line dfa.go:3716
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr105
@@ -3415,7 +3413,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof12
 		}
 	st_case_12:
-//line dfa.go:3790
+//line dfa.go:3788
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr29
 		}
@@ -3432,7 +3430,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof26
 		}
 	st_case_26:
-//line dfa.go:3808
+//line dfa.go:3806
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr105
@@ -3507,7 +3505,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof27
 		}
 	st_case_27:
-//line dfa.go:3884
+//line dfa.go:3882
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr114
@@ -3626,7 +3624,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line dfa.go:4001
+//line dfa.go:3999
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr125
@@ -3710,7 +3708,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof13
 		}
 	st_case_13:
-//line dfa.go:4086
+//line dfa.go:4084
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -3778,7 +3776,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof29
 		}
 	st_case_29:
-//line dfa.go:4155
+//line dfa.go:4153
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr134
@@ -3859,7 +3857,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof30
 		}
 	st_case_30:
-//line dfa.go:4236
+//line dfa.go:4234
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr143
@@ -3971,7 +3969,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line dfa.go:4345
+//line dfa.go:4343
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr154
@@ -4057,7 +4055,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof32
 		}
 	st_case_32:
-//line dfa.go:4432
+//line dfa.go:4430
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr51
@@ -4394,7 +4392,7 @@ func (frame *Frame) Parse() {
 //line ./op-grammar.rl:148
 				frame.Position++
 
-//line dfa.go:4756
+//line dfa.go:4754
 			}
 		}
 
@@ -4403,7 +4401,7 @@ func (frame *Frame) Parse() {
 		}
 	}
 
-//line dfa.rl:72
+//line dfa.rl:70
 
 	if atoms[SPEC_TYPE] == Atom(COMMENT_UUID) && frame.IsComplete() {
 		atoms[SPEC_OBJECT] = Atom(ZERO_UUID)
@@ -4436,15 +4434,15 @@ func (frame *Frame) Parse() {
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line dfa.rl:107
-//line dfa.go:4801
+//line dfa.rl:105
+//line dfa.go:4799
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line dfa.rl:108
+//line dfa.rl:106
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	_ = eof
 
@@ -4452,12 +4450,12 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 	atoms := [1]Atom{Atom(ctx_uuid)}
 
-//line dfa.go:4819
+//line dfa.go:4817
 	{
 		cs = UUID_start
 	}
 
-//line dfa.go:4824
+//line dfa.go:4822
 	{
 		if p == pe {
 			goto _test_eof
@@ -4545,7 +4543,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line dfa.go:4917
+//line dfa.go:4915
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4638,7 +4636,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line dfa.go:5011
+//line dfa.go:5009
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4686,7 +4684,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line dfa.go:5059
+//line dfa.go:5057
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4766,7 +4764,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line dfa.go:5136
+//line dfa.go:5134
 		switch data[p] {
 		case 43:
 			goto tr7
@@ -4838,7 +4836,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 //line ./uuid-grammar.rl:46
 				atoms[atm][1] = UUID_NAME_FLAG
 
-//line dfa.go:5203
+//line dfa.go:5201
 			}
 		}
 
@@ -4847,7 +4845,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line dfa.rl:123
+//line dfa.rl:121
 
 	if cs < UUID_first_final || dgt > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

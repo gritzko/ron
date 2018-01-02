@@ -13,14 +13,12 @@ func OpenFrame(data []byte) Frame {
 
 func MakeFormattedFrame(format uint, prealloc_bytes int) (ret Frame) {
 	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
 	ret.Serializer.Format = format
 	return
 }
 
 func MakeFrame(prealloc_bytes int) (ret Frame) {
 	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
 	return
 }
 
@@ -34,7 +32,6 @@ func ParseStream (buf []byte) Frame {
 
 func MakeStream(prealloc_bytes int) (ret Frame) {
 	ret.Body = make([]byte, 0, prealloc_bytes)
-	ret.atoms = make([]Atom, 4, DEFAULT_ATOMS_ALLOC)
 	ret.Parser.streaming = true
 	//ret.Parser.state = RON_start
 	return
@@ -314,16 +311,6 @@ func (frame Frame) Verify () int {
 	}
 }
 
-// When we copy a frame by value, we keep a reference to the slice
-// of atom values. Hence, we can't iterate without messing up the
-// original frame (fixme).
-// Hence, Unshare()
-func (frame *Frame) Unshare () {
-	newAtoms := make([]Atom, len(frame.atoms))
-	copy(newAtoms, frame.atoms)
-	frame.atoms = newAtoms
-}
-
 // IsEqual checks for single-op equality
 func (frame Frame) IsEqual (other Frame) bool {
 	if frame.EOF() || other.EOF() {
@@ -339,8 +326,6 @@ func (frame Frame) IsEqual (other Frame) bool {
 
 func (frame Frame) Equal (other Frame) bool {
 	ret := true
-	frame.Unshare()
-	other.Unshare()
 	for ret && !frame.EOF() && !other.EOF() {
 		ret = ret && frame.IsEqual(other)
 		// TODO atoms
@@ -374,3 +359,8 @@ func (batch Batch) Equal (other Batch) bool {
 	}
 	return bi==len(batch) && oi==len(other)
 }
+
+func (batch *Batch) AppendFrame(f Frame) {
+    *batch = append(*batch, f)
+}
+

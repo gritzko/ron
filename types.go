@@ -45,6 +45,7 @@ type Frame struct {
 	Position int
 	// ints hosts the current op: 4 pairs for spec uuid entries, the rest is values (also pairs).
 	// General convention: hte first int is hte value, the second is flags and other stuff.
+	_atoms [DEFAULT_ATOMS_ALLOC]Atom
 	atoms []Atom
 	// Op terminator (see OP_TERM)
 	term int
@@ -69,9 +70,12 @@ type Checker interface {
 // [ ] *0 fast-append
 //
 // [ ] lww json mapper (strings only)
+// [x] vim syn file: string json escaping
 //
-// [ ] non-ideomatic Frame behavior (copy->shared atoms array)
+// [x] non-idiomatic Frame behavior (copy->shared atoms array)
 //     fix:  parser uses cur *Atom, _atoms [6]Atom atoms []Atom
+//
+// [ ] make rewinds *very* explicit, test (query/header differs?)
 //
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing

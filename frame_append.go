@@ -118,33 +118,33 @@ func (frame *Frame) appendUUID(uuid UUID, context UUID) {
 var zeros []byte = []byte("0000000000")
 
 func (frame *Frame) appendFloat(a Atom) {
-	if a[0]==0 {
+	if a[0] == 0 {
 		frame.Body = append(frame.Body, "0.0"...)
 		return
 	}
 	intStr := fmt.Sprintf("%d", a[0])
-	e := int(a[1]&INT32_FULL)
-	if a[1]&BIT32!=0 {
+	e := int(a[1] & INT32_FULL)
+	if a[1]&BIT32 != 0 {
 		frame.Body = append(frame.Body, '-')
 	}
-	if a[1]&BIT33!=0 { // neg e
+	if a[1]&BIT33 != 0 { // neg e
 		ip := len(intStr) - e
-		if ip>0 { // integer part
+		if ip > 0 { // integer part
 			frame.Body = append(frame.Body, intStr[:ip]...)
 			frame.Body = append(frame.Body, '.')
 			tail := intStr[ip:]
-			for len(tail)>1 && tail[len(tail)-1]=='0' {
+			for len(tail) > 1 && tail[len(tail)-1] == '0' {
 				tail = tail[:len(tail)-1]
 			}
 			frame.Body = append(frame.Body, tail...)
-		} else if ip==0 {
+		} else if ip == 0 {
 			frame.Body = append(frame.Body, '0', '.')
 			frame.Body = append(frame.Body, intStr...)
 		} else {
-			de := 1-ip
+			de := 1 - ip
 			frame.Body = append(frame.Body, intStr[:1]...)
 			frame.Body = append(frame.Body, '.')
-			if len(intStr)>1 {
+			if len(intStr) > 1 {
 				frame.Body = append(frame.Body, intStr[1:]...)
 			} else {
 				frame.Body = append(frame.Body, '0')
@@ -154,7 +154,7 @@ func (frame *Frame) appendFloat(a Atom) {
 			frame.Body = append(frame.Body, exp...)
 		}
 	} else {
-		if e+len(intStr)<=10 {
+		if e+len(intStr) <= 10 {
 			frame.Body = append(frame.Body, intStr...)
 			frame.Body = append(frame.Body, zeros[:e]...)
 			frame.Body = append(frame.Body, ".0"...)
@@ -181,7 +181,7 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 	do_redef := flags&FORMAT_REDEFAULT != 0
 
 	k := 4
-	if spec[SPEC_TYPE]==Atom(COMMENT_UUID) {
+	if spec[SPEC_TYPE] == Atom(COMMENT_UUID) {
 		k = 1
 	}
 
@@ -217,7 +217,7 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 			frame.appendUUID(UUID(spec[t]), UUID(context[t]))
 		}
 	}
-	if skips==4 {
+	if skips == 4 {
 		frame.Body = append(frame.Body, '@')
 	}
 }
@@ -266,7 +266,7 @@ func (frame *Frame) Append(other Frame) {
 	}
 
 	if len(frame.atoms) == 0 {
-		frame.atoms = make([]Atom, 4, 6)
+		frame.atoms = frame._atoms[:4]
 	}
 	frame.appendSpec(other.atoms[0:4], frame.atoms[0:4])
 
@@ -282,7 +282,7 @@ func (frame *Frame) Append(other Frame) {
 		defaultTerm = TERM_RAW
 	}
 
-	if other.term!=defaultTerm || other.Count() == 0 {
+	if other.term != defaultTerm || other.Count() == 0 {
 		frame.Body = append(frame.Body, TERM_PUNCT[other.term])
 	}
 
@@ -316,7 +316,7 @@ func (frame *Frame) AppendReduced(other Frame) {
 func (frame *Frame) AppendEmpty(spec Spec, term int) {
 	atoms := make([]Atom, 0, 6)
 	atoms = append(atoms, spec[0:4]...)
-	tmp := Frame{atoms:atoms, term:term}
+	tmp := Frame{atoms: atoms, term: term}
 	frame.Append(tmp)
 }
 
@@ -324,10 +324,18 @@ func (frame *Frame) AppendEmptyReducedOp(spec Spec) {
 	frame.AppendEmpty(spec, TERM_REDUCED)
 }
 
+func NewOpFrame(t, o, e, r UUID, term int) Frame {
+	frame := NewFrame()
+	frame.AppendEmpty(NewSpec(t, o, e, r), term)
+	return frame.Rewind()
+}
+
 func NewRawOp(t, o, e, r UUID) Frame {
-    frame := NewFrame()
-    frame.AppendEmpty(NewSpec(t,o,e,r), TERM_RAW)
-    return frame
+	return NewOpFrame(t, o, e, r, TERM_RAW)
+}
+
+func NewStateHeader(t, o, e, r UUID) Frame {
+	return NewOpFrame(t, o, e, r, TERM_HEADER)
 }
 
 func (frame *Frame) AppendAmended(spec Spec, values Frame, term int) {
@@ -341,7 +349,7 @@ func (frame *Frame) AppendSpecValT(spec Spec, value Atom, term int) {
 	var atoms [5]Atom
 	copy(atoms[:], spec)
 	atoms[4] = value
-	tmp := Frame{atoms:atoms[:], term:term}
+	tmp := Frame{atoms: atoms[:], term: term}
 	frame.Append(tmp)
 }
 
@@ -403,7 +411,7 @@ func (frame *Frame) Split() Batch {
 		next := NewFrame()
 		next.Append(*frame)
 		frame.Next()
-		for !frame.EOF() && frame.Term()==TERM_REDUCED {
+		for !frame.EOF() && frame.Term() == TERM_REDUCED {
 			next.Append(*frame)
 			frame.Next()
 		}
