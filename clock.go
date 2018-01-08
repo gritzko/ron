@@ -14,9 +14,9 @@ type Clock struct {
 	MinLength int
 }
 
-var CLOCK_CALENDAR = NewName("Gregorian")
+var CLOCK_CALENDAR = NewName("Calendar")
 var CLOCK_EPOCH    = NewName("Epoch") // TODO implement behavior
-var CLOCK_LAMPORT  = NewName("Lamport")
+var CLOCK_LAMPORT  = NewName("Logical")
 
 var MAX_BIT_GRAB uint64 = 1 << 20
 
