@@ -395,6 +395,16 @@ func (frame *Frame) Close() Frame {
 	return ParseFrame(frame.Body)
 }
 
+func (frame *Frame) AddReducedOp (event, ref UUID, atoms ...Atom) {
+	tmp := Frame{term: TERM_REDUCED}
+	a := tmp._atoms[:0]
+	a = append(a, frame.atoms[:2]...)
+	a = append(a, Atom(event), Atom(ref))
+	a = append(a, atoms...)
+	tmp.atoms = a
+	frame.Append(tmp)
+}
+
 func MakeQueryFrame(headerSpec Spec) Frame {
 	cur := MakeFrame(128)
 	cur.AppendQueryHeader(headerSpec)

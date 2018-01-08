@@ -364,3 +364,36 @@ func (batch *Batch) AppendFrame(f Frame) {
     *batch = append(*batch, f)
 }
 
+func (frame Frame) HasUUIDAt(i int) bool {
+	return frame.Count()>i && frame.Atom(i).Type()==ATOM_UUID
+}
+
+func (frame Frame) HasIntAt(i int) bool {
+	return frame.Count()>i && frame.Atom(i).Type()==ATOM_INT
+}
+
+func (frame Frame) GetUUID (i int) UUID {
+	if frame.Count()<=i {
+		return ZERO_UUID
+	}
+	atom := frame.Atom(i)
+	if atom.Type()!=ATOM_UUID {
+		return ZERO_UUID
+	}
+	return atom.UUID()
+}
+
+func (frame Frame) GetInteger (i int) int64 {
+	if frame.Count()<=i {
+		return 0
+	}
+	atom := frame.Atom(i)
+	if atom.Type()!=ATOM_INT {
+		return 0
+	}
+	return atom.Integer()
+}
+
+func (frame Frame) GetInt (i int) int {
+	return int(frame.GetInteger(i))
+}

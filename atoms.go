@@ -20,6 +20,10 @@ func NewIntegerAtom(i int64) (a Atom) {
 	return
 }
 
+func NewIntAtom (i int) Atom {
+	return NewIntegerAtom(int64(i))
+}
+
 func NewStringRangeAtom(from, till int) Atom {
 	return Atom{uint64((from << 32) | till), ATOM_STRING_62}
 }
