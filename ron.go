@@ -23,6 +23,8 @@ type ParserState struct {
 	position int
 	// parser mode: streaming (might get more bytes) / block (complete frame)
 	streaming bool
+	// which spec uuids are omitted/defaults in the current op
+	omitted uint8
 }
 
 type SerializerState struct {
@@ -68,6 +70,9 @@ type Checker interface {
 //
 // [x] sweeten the grammar (@1@2@3), last_at
 // [ ] *0 fast-append
+// [ ] slice-append: remember prevFrame, prevPos
+//
+// [x] header to zero defaults. less smartness!
 //
 // [ ] lww json mapper (strings only)
 // [x] vim syn file: string json escaping
@@ -132,6 +137,7 @@ const INT60_FLAGS = uint64(15) << 60
 const UUID_NAME_UPPER_BITS = uint64(UUID_NAME) << 60
 
 var ZERO_UUID = NewNameUUID(0, 0)
+var ZERO_UUID_ATOM = Atom(ZERO_UUID)
 
 var NEVER_UUID = NewNameUUID(INT60_INFINITY, 0)
 

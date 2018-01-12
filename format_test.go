@@ -103,7 +103,7 @@ func BenchmarkUnzip(b *testing.B) {
 
 func TestOp_String(t *testing.T) {
 	// FIXME EMPTY_OP.String() is ".0#0..." !!!
-	str := "*lww#object@time-origin:loc=1"
+	str := "*lww#object@time-origin:loc=1,"
 	op := ParseFrameString(str)
 	if op.Count() != 1 || op.Atom(0).Type() != ATOM_INT {
 		t.Fail()
@@ -147,7 +147,7 @@ func TestFormatOptions(t *testing.T) {
 	formats := []sample{
 		{
 			FORMAT_FRAME_LINES | FORMAT_HEADER_SPACE,
-			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more:a=1;",
+            "*lww#test! @1:key'value'@2:number=1\n*rga#text@3:0'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more@0:a=1;", // TODO drop :0 @0
 		},
 	}
 	for k, f := range formats {
@@ -160,6 +160,7 @@ func TestFormatOptions(t *testing.T) {
 		if formatted.String() != f.correct {
 			t.Fail()
 			t.Logf("incorrect format at %d\n---\n%s\n---should be---\n%s\n", k, formatted.String(), f.correct)
+            t.Logf("parsed as %s\n", formatted.Rewind().Reformat(FRAME_FORMAT_CARPET).String())
 		}
 	}
 }

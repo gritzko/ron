@@ -342,7 +342,7 @@ func TestParseComment (t *testing.T) {
 			},
 		{
 			"*lww#object@time! :field'value', *~'comment', *lww:another'value'.",
-			"*lww :another'value',",
+			"*lww #object @time :another'value',",
 			},
 	}
 	for k, test := range tests {
@@ -561,6 +561,22 @@ func TestAtom_UUID(t *testing.T) {
 	frame.Next()
 	uuid3 := frame.Atom(0).UUID()
 	if uuid1 != uuid3 {
+		t.Fail()
+	}
+}
+
+func TestParserState_Omitted (t *testing.T) {
+	frame := ParseFrameString("*type#id!@ev@ev:")
+	if frame.Parser.omitted != 4|8 {
+		t.Logf("omitted is %d for %s", frame.Parser.omitted, frame.OpString())
+		t.Fail()
+	}
+	frame.Next()
+	if frame.Parser.omitted != 1|2|8 {
+		t.Fail()
+	}
+	frame.Next()
+	if frame.Parser.omitted != 1|2 {
 		t.Fail()
 	}
 }

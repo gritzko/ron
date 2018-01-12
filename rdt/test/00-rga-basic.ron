@@ -1,25 +1,25 @@
 *~ 'empty state + an op' ?
 		*rga#textB!
 		*rga#textB@time'A';
-*~ 'produces a state' !
+*~ 'a state' !
 		*rga#textB@time!@'A'
 
 *~ 'a state plus an op'?
 		*rga#test@1!@'A'
-		*rga#test@2:1'B'
-*~ 'produces a merged state'!
+		*rga#test@2:1'B';
+*~ 'a merged state'!
 		*rga#test@2!@1'A'@2'B'
 
 *~ 'an op plus another op'?
 		*rga#test@2:1'B';
 		*rga#test@3:2'C';
-*~ 'form a subtree patch'!
+*~ 'a subtree patch'!
 		*rga#test@3:1!@2:0'B'@3'C'
 
 *~ 'a state plus a patch'?
 		*rga#test@1!@'A'
 		*rga#test@2:1!:0'B'
-*~ 'produces a merged state'!
+*~ 'a merged state'!
 		*rga#test@2!@1'A'@2'B'
 
 *~ 'a patch plus a patch'?
@@ -43,7 +43,7 @@
 *~ 'state + state with a new rm'?
 		*rga#test@2!@1'A'@2'B'
 		*rga#test@4!@1:4'A'@3:0'C'
-*~ 'rm applied'
+*~ 'rm applied'!
 		*rga#test@4!@1:4'A'@3:0'C'@2'B'
 
 *~ 'an op and a backspace rm'?
@@ -97,12 +97,13 @@
 *~'reorders: unapplicable remove'?
 		*rga#test@2!@1'A'@2'B'
 		*rga#test@4:3;
-*~ 'the rm is stashed in a separate rm frame'!
-		*rga#test@4!@1'A'@2'B'@4:rm!:3,
+*~ 'rm that is stashed in a separate rm frame'!
+		*rga#test@4!@1'A'@2'B'
+        *#@4:rm!:3,
 
 *~ 'for a stashed remove, the target arrives'?
-		*rga#test@4!@1'A'@2'B'@4:rm!:3,
-		*rga#test@3:2'C'
+		*rga#test@4!@1'A'@2'B' *#@4:rm!:3,
+		*rga#test@3:2'C';
 *~ 'target removed'!
 		*rga#test@3!@1'A'@2'B'@3:4'C'
 
@@ -110,22 +111,26 @@
 		*rga#test@2!@1'A'@2'B'
 		*rga#test@5:3!@4:0'D'@5'E'
 *~ 'the patch goes into a separate frame'!
-		*rga#test@5!@1'A'@2'B'@5:3!@4:0'D'@5'E'
+		*rga#test@5!@1'A'@2'B'
+        *#@5:3!@4:0'D'@5'E'
 
-*~ 'the stashed patch becomes applicable (teh missing link arrives)'?
-		*rga#test@2!@1'A'@2'B'@5:3!@4:0'D'@5'E'
+*~ 'the stashed patch becomes applicable (the missing link arrives)'?
+		*rga#test@2!@1'A'@2'B' *#@5:3!@4:0'D'@5'E'
 		*rga#test@3:2'C';
 *~ 'the patch is applied'!
 		*rga#test@3!@1'A'@2'B'@3'C'@4'D'@5'E'
 
 *~ 'an unappliecable patch with its own rm stash'?
 		*rga#test@2!@1'A'@2'B'
-		*rga#test@6:3!@4:0'D'@5'E'@6:rm!:3,
+		*rga#test@6:3!@4:0'D'@5'E'
+        *#@6:rm!:3,
 *~ 'all separate frames'!
-		*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,
+		*rga#test@6!@1'A'@2'B'
+        *#@6:3!@4:0'D'@5'E'
+        *#@6:rm!:3,
 
 *~ 'unapplied frames become applicable'?
-		*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,
+		*rga#test@6!@1'A'@2'B' *#@6:3!@4:0'D'@5'E' *#@6:rm!:3,
 		*rga#test@3:2!@'C'
 *~ 'all applied'!
 		*rga#test@3!@1'A'@2'B'@3:6'C'@4:0'D'@5'E'

@@ -3,6 +3,10 @@
     machine FRAME;
     include UUID "./uuid-grammar.rl";
 
+    action spec_start {
+        ps.omitted = 15;
+    }
+
     action redef_uuid {
         if (atm>0) {
             atoms[atm] = atoms[atm-1];
@@ -21,6 +25,7 @@
         } else { 
             // next UUID
             atm = n;
+            ps.omitted -= 1<<uint(n);
         }
     }
 
@@ -189,7 +194,7 @@
     OPTERM = [,;!?] @opterm space*;
 
     # a RON op "specifier" (four UUIDs for its type, object, event, and ref)
-    SPEC = SPEC_UUID+ %spec_end ;
+    SPEC = SPEC_UUID+ >spec_start %spec_end ;
 
     # a RON op
     # op types: (0) raw op (1) reduced op (2) frame header (3) query header 

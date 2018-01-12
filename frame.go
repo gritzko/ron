@@ -344,11 +344,11 @@ func (batch Batch) Equal (other Batch) bool {
 	of := Frame{}
 	for (!bf.EOF() || bi<len(batch)) && (!of.EOF() || oi<len(other)) {
 		for bf.EOF() && bi<len(batch) {
-			bf = batch[bi].Clone()
+			bf = batch[bi]
 			bi++
 		}
 		for of.EOF() && oi<len(other) {
-			of = other[oi].Clone()
+			of = other[oi]
 			oi++
 		}
 		if !bf.IsEqual(of) {
@@ -381,6 +381,10 @@ func (frame Frame) GetUUID (i int) UUID {
 		return ZERO_UUID
 	}
 	return atom.UUID()
+}
+
+func (frame Frame) GetString (i int) string {
+	return frame.RawString(i)
 }
 
 func (frame Frame) GetInteger (i int) int64 {

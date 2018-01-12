@@ -69,12 +69,6 @@ func (frame *Frame) Parse() {
 	    write exec;
 	}%%
 
-    if atoms[SPEC_TYPE]==Atom(COMMENT_UUID) && frame.IsComplete() {
-        atoms[SPEC_OBJECT] = Atom(ZERO_UUID)
-        atoms[SPEC_EVENT] = Atom(ZERO_UUID)
-        atoms[SPEC_REF] = Atom(ZERO_UUID)
-    }
-
     ps.atm, ps.hlf, ps.dgt = atm, hlf, dgt;
     ps.position = p;
     frame.atoms = atoms;
@@ -94,6 +88,15 @@ func (frame *Frame) Parse() {
                 ps.state = RON_error
                 frame.Position = -1
             }
+    }
+
+    //fmt.Println("omits", frame.IsComplete(), frame.term!=TERM_REDUCED,  ps.omitted, frame.Parser.state)
+    if frame.IsComplete() && frame.term!=TERM_REDUCED && ps.omitted!=0 {
+        for u := uint(0); u<4; u++ {
+            if ps.omitted&(1<<u) != 0 {
+                frame.atoms[u] = Atom(ZERO_UUID)
+            }
+        }
     }
 
 }

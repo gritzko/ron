@@ -3,7 +3,7 @@ package ron
 import "testing"
 
 func TestFrame_Split(t *testing.T) {
-	frame := ParseFrameString("*lww#id1!:val=1#id2:0!:val=2")
+	frame := ParseFrameString("*lww#id1!:val=1*#id2:0!:val=2")
 	h1 := "*lww#id1!:val=1"
 	h2 := "*lww#id2!:val=2"
 	frame.Next()
@@ -33,7 +33,7 @@ func TestBatchFrames(t *testing.T) {
 	batch = append(batch, ParseFrameString(frame1))
 	batch = append(batch, ParseFrameString(frame2))
 	frame12 := batch.Join()
-	batchStr := "*lww#A@1!:a=1:b=2:c=3@2:0!:d=4"
+	batchStr := "*lww#A@1!:a=1:b=2:c=3*#@2:0!:d=4"
 	if frame12.String() != batchStr {
 		t.Logf("\n%s != \n%s\n", frame12.String(), batchStr)
 		t.Fail()
@@ -56,7 +56,7 @@ func TestBatchFrames(t *testing.T) {
 }
 
 func TestFrame_SplitMultiframe(t *testing.T) {
-	multiStr := "*lww#test!:a=1#best:0!:b=2:c=3:d=4;"
+	multiStr := "*lww#test!:a=1*#best:0!:b=2:c=3*#:d=4;"
 	splits := []string{
 		"*lww#test!:a=1",
 		"*lww#best!:b=2:c=3",
@@ -97,5 +97,14 @@ func TestFrame_Copy (t *testing.T) {
 	if a.Type()!=COMMENT_UUID {
 		t.Log("the copy is still linked")
 		t.Fail()
+	}
+}
+
+func TestFrame_Split2(t *testing.T) {
+	frame := ParseFrameString("*rga#test@4!@1'A'@2'B'*#@4:rm!:3,")
+	split := frame.Split()
+	if ! split.Equal(Batch{frame}) {
+		t.Fail()
+		t.Logf("split fail, \n%s\nbecame\n%s", frame.String(), split.String())
 	}
 }

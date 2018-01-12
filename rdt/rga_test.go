@@ -3,146 +3,17 @@ package rdt
 import (
 	"github.com/gritzko/ron"
 	"testing"
-	"fmt"
+//	"fmt"
+//	"math/rand"
+//	"time"
 )
 
-
-// 3-part tables: first all inserts, then all deletes
-var rga_3_tests = [][3]string{
-
-	{ // 0+o
-		"*rga#textB!",
-		"*rga#textB@time'A'",
-		"*rga#textB@time!@'A'",
-	},
-	{ // s+o
-		"*rga#test@1!@'A'",
-		"*rga#test@2:1'B'",
-		"*rga#test@2!@1'A'@2'B'",
-	},
-	{ // o+o
-		"*rga#test@2:1'B'",
-		"*rga#test@3:2'C'",
-		"*rga#test@3:1!@2:0'B'@3'C'",
-	},
-	{ // s+p
-		"*rga#test@1!@'A'",
-		"*rga#test@2:1!:0'B'",
-		"*rga#test@2!@1'A'@2'B'",
-	},
-	{ // 4) p+p
-		"*rga#test@2:1!:0'B'",
-		"*rga#test@3:2!:0'C'",
-		"*rga#test@3:1!@2:0'B'@3'C'",
-	},
-
-	{ // s+s
-		"*rga#test@1!@'A'",
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@2!@1'A'@2'B'",
-	},
-	{ // 6) s1+s2 merge
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@3!@1'A'@3'C'",
-		"*rga#test@3!@1'A'@3'C'@2'B'",
-	},
-	{ // s1+s(rm) merge
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@4!@1:4'A'@3:0'C'",
-		"*rga#test@4!@1:4'A'@3:0'C'@2'B'",
-	},
-
-	{ // 8) o+rm
-		"*rga#test@2:1'B'",
-		"*rga#test@3:2;",
-		"*rga#test@3:1!@2:3'B'",
-	},
-
-	{ // p+rm
-		"*rga#test@3:1!@2:0'B'@3'C'",
-		"*rga#test@4:2;",
-		"*rga#test@4:1!@2:4'B'@3:0'C'",
-	},
-	{ // 10 s+rms
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@4:rm!@3:1,@4:2,",
-		"*rga#test@4!@1:3'A'@2:4'B'",
-	},
-	{ // s(rm)+s(rm) merge
-		"*rga#test@5!@1:4a'A'@2:5'B'",
-		"*rga#test@4!@1:4'A'@3:0'C'",
-		"*rga#test@4!@1:4a'A'@3:0'C'@2:5'B'",
-	},
-	{ // 12 s(rm)+s(rm) merge
-		"*rga#test@3!@1:4a'A'@3:0'C'@2:5'B'",
-		"*rga#test@4!@1:4a'A'@3:0'C'@4:0'D'@2:5'B'",
-		"*rga#test@4!@1:4a'A'@3:0'C'@4'D'@2:5'B'",
-	},
-	{ // s(rm)+s(rm) merge
-		"*rga#test@5!@1:4a'A'@5:0'E'@3:0'C'@2:5'B'",
-		"*rga#test@7!@1:4a'A'@6:0'F'@3:7'C'@4:0'D'@2:5'B'",
-		"*rga#test@7!@1:4a'A'@6:0'F'@5'E'@3:7'C'@4:0'D'@2:5'B'",
-	},
-	{ // 14 s+ins
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@3:1'-';",
-		"*rga#test@3!@1'A'@3'-'@2'B'",
-	},
-	{ // 15 eclipsed rm
-		"*rga#test@4!@1'A'@2:4'B'",
-		"*rga#test@3:2;",
-		"*rga#test@3!@1'A'@2:4'B'",
-	},
-	// CUT BRANCHES
-	{ // 16 unapplied remove
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@4:3;",
-		"*rga#test@4!@1'A'@2'B'@4:rm!:3,",
-	},
-	{ // 17 unapplied remove applied
-		"*rga#test@4!@1'A'@2'B'@4:rm!:3,",
-		"*rga#test@3:2'C'",
-		"*rga#test@3!@1'A'@2'B'@3:4'C'",
-	},
-	{ // 18 unapplied patch
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@5:3!@4:0'D'@5'E'",
-		"*rga#test@5!@1'A'@2'B'@5:3!@4:0'D'@5'E'",
-	},
-	{ // 19 unapplied patch applied
-		"*rga#test@2!@1'A'@2'B'@5:3!@4:0'D'@5'E'",
-		"*rga#test@3:2'C';",
-		"*rga#test@3!@1'A'@2'B'@3'C'@4'D'@5'E'",
-	},
-	{ // 20 unapplied patch - ins+rm
-		"*rga#test@2!@1'A'@2'B'",
-		"*rga#test@6:3!@4:0'D'@5'E'@6:rm!:3,",
-		"*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,",
-	},
-	{ // 21 unapplied ins+rm patch applied
-		"*rga#test@6!@1'A'@2'B'@6:3!@4:0'D'@5'E'@6:rm!:3,",
-		"*rga#test@3:2!@'C'",
-		"*rga#test@3!@1'A'@2'B'@3:6'C'@4:0'D'@5'E'",
-	},
-}
-
-func TestRGA_Reduce(t *testing.T) {
-	for i := 0; i < len(rga_3_tests); i++ {
-		test := rga_3_tests[i]
-		C := test[2]
-		frames := [2]ron.Frame{
-			ron.ParseFrameString(test[0]),
-			ron.ParseFrameString(test[1]),
-		}
-		rga := MakeRGAReducer()
-		//fmt.Printf("%d\n%s\n%s\n",i, test[0], test[1])
-		frameC := rga.Reduce(frames[0:2])
-		if frameC.String() != C {
-			t.Fail()
-			fmt.Printf("\n-------------------------\nwrong result at %d: \nhave [ %s ]\nneed [ %s ]\n\n", i, frameC.String(), C)
-		}
-
-	}
+func TestRGA_Primers (t *testing.T) {
+	RunRONTest(
+		t,
+		MakeRGAReducer(),
+		"test/00-rga-basic.ron",
+		)
 }
 
 
@@ -159,4 +30,75 @@ func TestRGA_Mapper(t *testing.T) {
 	}
 }
 
-// reduceAll: 4-line tables (state, ch1, ch2, result)
+/*
+func TestHelloWorld(t *testing.T) {
+
+	var src = [13]string {
+		"*rga#1UQ8p+bart!",
+		"*rga#1UQ8p+bart@1UQ8s+bart:0'H'",
+		"*rga#1UQ8p+bart@1UQ8sr+bart:1UQ8s+bart'e'",
+		"*rga#1UQ8p+bart@1UQ8t+bart:1UQ8sr+bart'l'",
+		"*rga#1UQ8p+bart@1UQ8tT+bart:1UQ8t+bart'l'",
+		"*rga#1UQ8p+bart@1UQ8ti+bart:1UQ8tT+bart'o'",
+		"*rga#1UQ8p+bart@1UQ8w+lisa:1UQ8ti+bart' '",
+		"*rga#1UQ8p+bart@1UQ8x+lisa:1UQ8w+lisa'w'",
+		"*rga#1UQ8p+bart@1UQ8y+lisa:1UQ8x+lisa'o'",
+		"*rga#1UQ8p+bart@1UQ8y1+lisa:1UQ8y+lisa'r'",
+		"*rga#1UQ8p+bart@1UQ8y1a+lisa:1UQ8y1+lisa'l'",
+		"*rga#1UQ8p+bart@1UQ8y2+lisa:1UQ8y1a+lisa'd'",
+		"*rga#1UQ8p+bart@1UQ8yk+lisa:1UQ8y2+lisa'!'",
+	}
+
+	count := 1000
+
+	for i:=0; i<count; i++ {
+
+		seed := time.Now().UnixNano()
+		//fmt.Printf("ACI test seed %d\n", seed)
+		seed = 1512325615325939065
+		r := rand.New(rand.NewSource(seed))
+
+		data := make([]string, 13)
+		perm := r.Perm(len(src))
+		for i, v := range perm { // this way we test COMMUTATIVITY
+			data[v] = src[i]
+		}
+		frames := []ron.Frame{}
+		for i := 0; i < len(data); i++ {
+			frames = append(frames, ron.ParseFrameString(data[i]))
+		}
+
+		rga := MakeRGAReducer()
+
+		for len(frames) > 1 {
+			from := int(r.Uint32()) % len(frames)
+			till := int(r.Uint32()) % (len(frames) - from)
+			till += from + 1
+			//fmt.Printf("\nReduce %d..%d of %d\n", from, till, len(frames))
+			for _, f := range frames[from:till] {
+				fmt.Printf("+ %s\n", f.String())
+			}
+			// this way we test ASSOCIATIVITYz
+			frameC := rga.Reduce(frames[from:till]).Reformat(ron.FRAME_FORMAT_LIST)
+			fmt.Printf("---\n%s\n\n", frameC.String())
+			f := make(ron.Batch, 0, len(frames))
+			f = append(f, frames[:from]...)
+			f = append(f, frameC)
+			f = append(f, frames[till:]...)
+			frames = f
+		}
+
+		right := "Hello world!"
+		var txt TxtMapper
+		hello := txt.Map(ron.Batch{frames[0]})
+		if hello != right {
+			t.Fail()
+			t.Logf("'%s' != '%s', seed %d", hello, right, seed)
+			break
+		} else {
+			t.Logf("%d %d %s\n", i, seed, hello)
+		}
+
+	}
+}
+*/

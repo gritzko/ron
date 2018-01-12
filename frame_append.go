@@ -169,11 +169,13 @@ func (frame *Frame) appendFloat(a Atom) {
 	}
 }
 
-func (frame *Frame) appendSpec(spec, context []Atom) {
+func (frame *Frame) appendSpec(other Frame) {
 
 	start := len(frame.Body)
 	flags := frame.Serializer.Format
 	skips := 0
+	spec := other.atoms[:4]
+	context := frame.atoms[:4]
 
 	do_grid := flags&FORMAT_GRID != 0
 	do_space := flags&FORMAT_SPACE != 0
@@ -192,7 +194,7 @@ func (frame *Frame) appendSpec(spec, context []Atom) {
 		} else if do_space && t > 0 {
 			frame.Body = append(frame.Body, ' ')
 		}
-		if !do_noskip && spec[t] == context[t] {
+		if !do_noskip && spec[t] == context[t] && (other.term==TERM_REDUCED || spec[t]==ZERO_UUID_ATOM) {
 			skips++
 			continue
 		}
@@ -268,7 +270,7 @@ func (frame *Frame) Append(other Frame) {
 	if len(frame.atoms) == 0 {
 		frame.atoms = frame._atoms[:4]
 	}
-	frame.appendSpec(other.atoms[0:4], frame.atoms[0:4])
+	frame.appendSpec(other)
 
 	if 0 != flags&FORMAT_GRID {
 		rest := 4*22 - (len(frame.Body) - start)
@@ -415,14 +417,14 @@ func MakeQueryFrame(headerSpec Spec) Frame {
 // (delivery fails, cross-key transactions)
 // hence, we don't care about performance that much
 // still, may consider explicit-length formats at some point
-func (frame *Frame) Split() Batch {
+func (frame Frame) Split() Batch {
 	ret := Batch{}
 	for !frame.EOF() {
 		next := NewFrame()
-		next.Append(*frame)
+		next.Append(frame)
 		frame.Next()
 		for !frame.EOF() && frame.Term() == TERM_REDUCED {
-			next.Append(*frame)
+			next.Append(frame)
 			frame.Next()
 		}
 		ret = append(ret, next.Rewind())
