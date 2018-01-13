@@ -15,7 +15,6 @@ import (
 // That is similar to e.g. Cassandra LWW.
 //
 type LWW struct {
-
 }
 
 var LWW_UUID = ron.NewName("lww")
@@ -30,7 +29,7 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 	} else {
 		spec.SetRef(DELTA_UUID)
 	}
-	for k:=0; k<len(inputs); k++ {
+	for k := 0; k < len(inputs); k++ {
 		heap.Put(&inputs[k])
 	}
 	res.AppendStateHeader(spec)
@@ -42,10 +41,10 @@ func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {
 	return
 }
 
-func MakeLWW () ron.Reducer {
+func MakeLWW() ron.Reducer {
 	return LWW{}
 }
 
-func init () {
+func init() {
 	ron.RDTYPES[LWW_UUID] = MakeLWW
 }

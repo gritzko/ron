@@ -22,8 +22,8 @@ func MakeFrame(prealloc_bytes int) (ret Frame) {
 	return
 }
 
-func ParseStream (buf []byte) Frame {
-	ret := MakeFrame(1000+len(buf))
+func ParseStream(buf []byte) Frame {
+	ret := MakeFrame(1000 + len(buf))
 	ret.AppendBytes(buf)
 	ret.Parser.streaming = true
 	ret.Next()
@@ -60,9 +60,8 @@ func (frame Frame) IsEmpty() bool {
 	return len(frame.Body) == 0
 }
 
-
 func (frame Frame) IsComment() bool {
-	return frame.Type()==COMMENT_UUID
+	return frame.Type() == COMMENT_UUID
 }
 
 func (frame Frame) UUID(idx int) UUID {
@@ -86,7 +85,7 @@ func (frame Frame) Fill(clock Clock, env Environment) Frame {
 func (frame Frame) Reformat(format uint) Frame {
 	ret := MakeFrame(frame.Len())
 	ret.Serializer.Format = format
-    clone := frame.Clone()
+	clone := frame.Clone()
 	for !clone.EOF() {
 		ret.Append(clone)
 		clone.Next()
@@ -98,9 +97,9 @@ func (frame Frame) Clone() (clone Frame) {
 	clone = frame
 	clone.atoms = make([]Atom, len(frame.atoms))
 	copy(clone.atoms, frame.atoms)
-    l := len(frame.Body)
-    // prevent from appending to the same buffer
-    clone.Body = frame.Body[0:l:l]
+	l := len(frame.Body)
+	// prevent from appending to the same buffer
+	clone.Body = frame.Body[0:l:l]
 	return
 }
 
@@ -158,10 +157,10 @@ func (frame Frame) Offset() int {
 
 // Whether op parsing is complete (not always the case for the streaming mode)
 func (frame Frame) IsComplete() bool {
-    return (frame.Parser.state == RON_start && frame.Position>=0) || frame.Parser.state == RON_FULL_STOP
+	return (frame.Parser.state == RON_start && frame.Position >= 0) || frame.Parser.state == RON_FULL_STOP
 }
 
-func (ps ParserState) State () int {
+func (ps ParserState) State() int {
 	return ps.state
 }
 
@@ -197,7 +196,7 @@ func (batch Batch) Len() int {
 }
 
 func (batch Batch) IsEmpty() bool {
-    return len(batch)>0
+	return len(batch) > 0
 }
 
 func (batch Batch) HasFullState() bool {
@@ -217,9 +216,9 @@ func NewFrame() Frame {
 	return NewBufferFrame(make([]byte, 0, 1024))
 }
 
-func NewQuery(t,o,e,r UUID) Frame {
+func NewQuery(t, o, e, r UUID) Frame {
 	ret := NewFrame()
-	ret.AppendQueryHeader(NewSpec(t,o,e,r))
+	ret.AppendQueryHeader(NewSpec(t, o, e, r))
 	return ret
 }
 
@@ -264,67 +263,67 @@ func (frame Frame) Atom(i int) Atom {
 	return frame.atoms[i+4]
 }
 
-func NewSpec (t,o,e,l UUID) Spec {
+func NewSpec(t, o, e, l UUID) Spec {
 	return Spec{Atom(t), Atom(o), Atom(e), Atom(l)}
 }
 
 func (frame Frame) Values() []Atom {
-    return frame.atoms[4:]
+	return frame.atoms[4:]
 }
 
-func (spec Spec) Type () UUID {
+func (spec Spec) Type() UUID {
 	return UUID(spec[SPEC_TYPE])
 }
-func (spec Spec) Object () UUID {
+func (spec Spec) Object() UUID {
 	return UUID(spec[SPEC_OBJECT])
 }
-func (spec Spec) Event () UUID {
+func (spec Spec) Event() UUID {
 	return UUID(spec[SPEC_EVENT])
 }
-func (spec Spec) Ref () UUID {
+func (spec Spec) Ref() UUID {
 	return UUID(spec[SPEC_REF])
 }
 
-func (spec Spec) SetType (uuid UUID) {
+func (spec Spec) SetType(uuid UUID) {
 	spec[SPEC_TYPE] = Atom(uuid)
 }
-func (spec Spec) SetObject (uuid UUID) {
+func (spec Spec) SetObject(uuid UUID) {
 	spec[SPEC_OBJECT] = Atom(uuid)
 }
-func (spec Spec) SetEvent (uuid UUID) {
+func (spec Spec) SetEvent(uuid UUID) {
 	spec[SPEC_EVENT] = Atom(uuid)
 }
-func (spec Spec) SetRef (uuid UUID) {
+func (spec Spec) SetRef(uuid UUID) {
 	spec[SPEC_REF] = Atom(uuid)
 }
 
 // Verify the syntax, return the offset where error was found. -1 means OK.
-func (frame Frame) Verify () int {
+func (frame Frame) Verify() int {
 	ve := frame.Rewind()
 	for !ve.EOF() {
 		ve.Next()
 	}
 	if ve.Offset() != len(ve.Body) {
-		 return ve.Offset()
+		return ve.Offset()
 	} else {
 		return -1
 	}
 }
 
 // IsEqual checks for single-op equality
-func (frame Frame) IsEqual (other Frame) bool {
+func (frame Frame) IsEqual(other Frame) bool {
 	if frame.EOF() || other.EOF() {
 		return frame.EOF() && other.EOF()
 	}
-	ret := frame.Term()== other.Term()
-	for i:=0; i<4 && ret; i++ { // FIXME strings are difficult
-		ret = ret && frame.atoms[i]== other.atoms[i]
+	ret := frame.Term() == other.Term()
+	for i := 0; i < 4 && ret; i++ { // FIXME strings are difficult
+		ret = ret && frame.atoms[i] == other.atoms[i]
 	}
-	ret = ret && frame.Count()== other.Count()
+	ret = ret && frame.Count() == other.Count()
 	return ret
 }
 
-func (frame Frame) Equal (other Frame) bool {
+func (frame Frame) Equal(other Frame) bool {
 	ret := true
 	for ret && !frame.EOF() && !other.EOF() {
 		ret = ret && frame.IsEqual(other)
@@ -338,16 +337,16 @@ func (frame Frame) Equal (other Frame) bool {
 }
 
 // Equal checks two batches for op-by-op equality (irrespectively of frame borders)
-func (batch Batch) Equal (other Batch) bool {
+func (batch Batch) Equal(other Batch) bool {
 	bi, oi := 0, 0
 	bf := Frame{}
 	of := Frame{}
-	for (!bf.EOF() || bi<len(batch)) && (!of.EOF() || oi<len(other)) {
-		for bf.EOF() && bi<len(batch) {
+	for (!bf.EOF() || bi < len(batch)) && (!of.EOF() || oi < len(other)) {
+		for bf.EOF() && bi < len(batch) {
 			bf = batch[bi]
 			bi++
 		}
-		for of.EOF() && oi<len(other) {
+		for of.EOF() && oi < len(other) {
 			of = other[oi]
 			oi++
 		}
@@ -357,47 +356,47 @@ func (batch Batch) Equal (other Batch) bool {
 		bf.Next()
 		of.Next()
 	}
-	return bi==len(batch) && oi==len(other)
+	return bi == len(batch) && oi == len(other)
 }
 
 func (batch *Batch) AppendFrame(f Frame) {
-    *batch = append(*batch, f)
+	*batch = append(*batch, f)
 }
 
 func (frame Frame) HasUUIDAt(i int) bool {
-	return frame.Count()>i && frame.Atom(i).Type()==ATOM_UUID
+	return frame.Count() > i && frame.Atom(i).Type() == ATOM_UUID
 }
 
 func (frame Frame) HasIntAt(i int) bool {
-	return frame.Count()>i && frame.Atom(i).Type()==ATOM_INT
+	return frame.Count() > i && frame.Atom(i).Type() == ATOM_INT
 }
 
-func (frame Frame) GetUUID (i int) UUID {
-	if frame.Count()<=i {
+func (frame Frame) GetUUID(i int) UUID {
+	if frame.Count() <= i {
 		return ZERO_UUID
 	}
 	atom := frame.Atom(i)
-	if atom.Type()!=ATOM_UUID {
+	if atom.Type() != ATOM_UUID {
 		return ZERO_UUID
 	}
 	return atom.UUID()
 }
 
-func (frame Frame) GetString (i int) string {
+func (frame Frame) GetString(i int) string {
 	return frame.RawString(i)
 }
 
-func (frame Frame) GetInteger (i int) int64 {
-	if frame.Count()<=i {
+func (frame Frame) GetInteger(i int) int64 {
+	if frame.Count() <= i {
 		return 0
 	}
 	atom := frame.Atom(i)
-	if atom.Type()!=ATOM_INT {
+	if atom.Type() != ATOM_INT {
 		return 0
 	}
 	return atom.Integer()
 }
 
-func (frame Frame) GetInt (i int) int {
+func (frame Frame) GetInt(i int) int {
 	return int(frame.GetInteger(i))
 }

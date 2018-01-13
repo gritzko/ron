@@ -37,7 +37,7 @@ func BenchmarkParseOp(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		frames = append(frames, []byte(framestr)...)
 	}
-    b.Logf("a frame of %d bytes\n", len(frames))
+	b.Logf("a frame of %d bytes\n", len(frames))
 	origin, _ := ParseUUID([]byte("1-origin"))
 	b.ResetTimer()
 	frame := ParseFrame(frames)

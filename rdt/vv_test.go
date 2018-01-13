@@ -1,12 +1,12 @@
 package rdt
 
 import (
-	"testing"
 	"github.com/gritzko/ron"
+	"testing"
 )
 
 func TestVV_Reduce(t *testing.T) {
-	vvs := []string {
+	vvs := []string{
 		"*vv#vec@1+a!@,",
 		"*vv#vec@3+b!@2+a,@3+b,@1+c,",
 		"*vv#vec@4+c!@3+b,@4+c,",

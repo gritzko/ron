@@ -104,7 +104,7 @@ func (heap *FrameHeap) next(i int) {
 
 func (heap *FrameHeap) Next() (frame *Frame) {
 	heap.next(1)
-	for len(heap.iters)>1 && heap.iters[1].Type()==COMMENT_UUID { // skip comments
+	for len(heap.iters) > 1 && heap.iters[1].Type() == COMMENT_UUID { // skip comments
 		heap.next(1)
 	}
 	return heap.Current()

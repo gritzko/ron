@@ -147,7 +147,7 @@ func TestFormatOptions(t *testing.T) {
 	formats := []sample{
 		{
 			FORMAT_FRAME_LINES | FORMAT_HEADER_SPACE,
-            "*lww#test! @1:key'value'@2:number=1\n*rga#text@3:0'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more@0:a=1;", // TODO drop :0 @0
+			"*lww#test! @1:key'value'@2:number=1\n*rga#text@3:0'T'! @6:3,@4'e'@5'x'@6't'\n*lww#more@0:a=1;", // TODO drop :0 @0
 		},
 	}
 	for k, f := range formats {
@@ -160,7 +160,7 @@ func TestFormatOptions(t *testing.T) {
 		if formatted.String() != f.correct {
 			t.Fail()
 			t.Logf("incorrect format at %d\n---\n%s\n---should be---\n%s\n", k, formatted.String(), f.correct)
-            t.Logf("parsed as %s\n", formatted.Rewind().Reformat(FRAME_FORMAT_CARPET).String())
+			t.Logf("parsed as %s\n", formatted.Rewind().Reformat(FRAME_FORMAT_CARPET).String())
 		}
 	}
 }

@@ -33,7 +33,7 @@ type SerializerState struct {
 
 // RON Frame is a vector of immutable RON ops.
 // A frame is always positioned on some op (initially, the first one).
-// In a sense, Frame is its own iterator: frame.Next(), returns true is the 
+// In a sense, Frame is its own iterator: frame.Next(), returns true is the
 // frame is re-positioned to the next op, false on error (EOF is an error too).
 // That is made to minimize boilerplate as Frames are forwarded based on the
 // frame header (the first op).
@@ -48,7 +48,7 @@ type Frame struct {
 	// ints hosts the current op: 4 pairs for spec uuid entries, the rest is values (also pairs).
 	// General convention: hte first int is hte value, the second is flags and other stuff.
 	_atoms [DEFAULT_ATOMS_ALLOC]Atom
-	atoms []Atom
+	atoms  []Atom
 	// Op terminator (see OP_TERM)
 	term int
 	// Frame body, raw bytes.
@@ -109,13 +109,13 @@ type Mapper interface {
 }
 
 // Compare two ops; >1 for a>b, <1 for a<b, 0 for equal.
-type Comparator func (a, b *Frame) int64
+type Comparator func(a, b *Frame) int64
 
 type StringMapper interface {
 	Map(batch Batch) string
 }
 
-type ReducerMaker func () Reducer
+type ReducerMaker func() Reducer
 
 var RDTYPES map[UUID]ReducerMaker
 

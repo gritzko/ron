@@ -36,7 +36,7 @@ func (frame Frame) IsHeader() bool {
 	return frame.Term() == TERM_HEADER
 }
 
-func (frame Frame) IsFullState () bool {
+func (frame Frame) IsFullState() bool {
 	return frame.IsHeader() && frame.Ref().IsZero()
 }
 
@@ -96,10 +96,10 @@ func (frame Frame) OpString() string {
 	return string(cur.Body)
 }
 
-func (frame Frame) Origin () uint64 {
+func (frame Frame) Origin() uint64 {
 	return frame.atoms[SPEC_EVENT][1]
 }
 
-func (frame Frame) Time () uint64 {
+func (frame Frame) Time() uint64 {
 	return frame.atoms[SPEC_EVENT][0]
 }

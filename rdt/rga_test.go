@@ -3,23 +3,22 @@ package rdt
 import (
 	"github.com/gritzko/ron"
 	"testing"
-//	"fmt"
-//	"math/rand"
-//	"time"
+	//	"fmt"
+	//	"math/rand"
+	//	"time"
 )
 
-func TestRGA_Primers (t *testing.T) {
+func TestRGA_Primers(t *testing.T) {
 	RunRONTest(
 		t,
 		MakeRGAReducer(),
 		"test/00-rga-basic.ron",
-		)
+	)
 }
 
-
 func TestRGA_Mapper(t *testing.T) {
-	frame := "*rga#1UQ8p+bart@1UQ8yk+lisa!"+
-		"@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'"+
+	frame := "*rga#1UQ8p+bart@1UQ8yk+lisa!" +
+		"@(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'" +
 		"@(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'"
 	right := "Hello world!"
 	var txt TxtMapper

@@ -194,7 +194,7 @@ func (frame *Frame) appendSpec(other Frame) {
 		} else if do_space && t > 0 {
 			frame.Body = append(frame.Body, ' ')
 		}
-		if !do_noskip && spec[t] == context[t] && (other.term==TERM_REDUCED || spec[t]==ZERO_UUID_ATOM) {
+		if !do_noskip && spec[t] == context[t] && (other.term == TERM_REDUCED || spec[t] == ZERO_UUID_ATOM) {
 			skips++
 			continue
 		}
@@ -397,7 +397,7 @@ func (frame *Frame) Close() Frame {
 	return ParseFrame(frame.Body)
 }
 
-func (frame *Frame) AddReducedOp (event, ref UUID, atoms ...Atom) {
+func (frame *Frame) AddReducedOp(event, ref UUID, atoms ...Atom) {
 	tmp := Frame{term: TERM_REDUCED}
 	a := tmp._atoms[:0]
 	a = append(a, frame.atoms[:2]...)

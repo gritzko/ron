@@ -20,7 +20,7 @@ func NewIntegerAtom(i int64) (a Atom) {
 	return
 }
 
-func NewIntAtom (i int) Atom {
+func NewIntAtom(i int) Atom {
 	return NewIntegerAtom(int64(i))
 }
 
@@ -62,8 +62,8 @@ func (a Atom) UUID() UUID {
 	return UUID(a)
 }
 
-var BIT32 = uint64(1)<<32
-var BIT33 = uint64(1)<<33
+var BIT32 = uint64(1) << 32
+var BIT33 = uint64(1) << 33
 
 // We can't rely on standard floats cause they MUTATE THE VALUE.
 // If 3.141592 is parsed then serialized, it becomes 3.141591(9)
@@ -73,7 +73,7 @@ var BIT33 = uint64(1)<<33
 // Overall, floats are NOT commutative. Any floating arithmetic
 // is highly discouraged inside CRDT type implementations.
 func (a Atom) Float() float64 {
-	pow := int(a[1]&INT32_FULL)
+	pow := int(a[1] & INT32_FULL)
 	if a[1]&BIT33 != 0 {
 		pow = -pow
 	}
@@ -113,7 +113,7 @@ func (a Atom) EscString(body []byte) []byte {
 
 func (frame Frame) RawString(idx int) string {
 	atom := frame.atoms[idx+4]
-	if atom.Type()!=ATOM_STRING {
+	if atom.Type() != ATOM_STRING {
 		return ""
 	}
 	return atom.RawString(frame.Body)

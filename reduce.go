@@ -36,7 +36,6 @@ func (omni OmniReducer) AddType(id UUID, r Reducer) {
 	omni.Types[id] = r
 }
 
-
 func (omni OmniReducer) pickReducer(t UUID) Reducer {
 	r := omni.Types[t]
 	if r == nil {
@@ -52,4 +51,3 @@ func (omni OmniReducer) Reduce(ins Batch) Frame {
 	// TODO sanity checks?
 	return r.Reduce(ins)
 }
-

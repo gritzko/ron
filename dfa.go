@@ -4447,7 +4447,6 @@ func (frame *Frame) Parse() {
 	}
 
 //line dfa.rl:70
-
 	ps.atm, ps.hlf, ps.dgt = atm, hlf, dgt
 	ps.position = p
 	frame.atoms = atoms
@@ -4483,6 +4482,7 @@ func (frame *Frame) Parse() {
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 //line dfa.rl:108
+
 //line dfa.go:4857
 	const UUID_start int = 1
 	const UUID_first_final int = 2
@@ -4875,10 +4875,8 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			switch cs {
 			case 4:
 //line ./uuid-grammar.rl:34
-
 			case 3:
 //line ./uuid-grammar.rl:37
-
 			case 5:
 //line ./uuid-grammar.rl:34
 //line ./uuid-grammar.rl:46
@@ -4894,7 +4892,6 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 	}
 
 //line dfa.rl:124
-
 	if cs < UUID_first_final || dgt > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))
 	} else {

@@ -178,9 +178,9 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 		}
 	}
 
-	if len(produce)==1 {
+	if len(produce) == 1 {
 		return produce[0]
-	} else if l==len(produce) {
+	} else if l == len(produce) {
 		return produce.Join()
 	} else {
 		//for i:=0; i<len(produce); i++ {
@@ -192,17 +192,15 @@ func (rga RGA) Reduce(batch ron.Batch) ron.Frame {
 	// [ ] TODO safety: ceil for inserted subtrees - unified sanity checker
 }
 
-
 type TxtMapper struct {
-
 }
 
-func (txt TxtMapper) Map (batch ron.Batch) string {
-	if len(batch)==0 {
+func (txt TxtMapper) Map(batch ron.Batch) string {
+	if len(batch) == 0 {
 		return ""
 	}
 	rga := batch[0]
-	if rga.Type()!=RGA_UUID || !rga.IsHeader() {
+	if rga.Type() != RGA_UUID || !rga.IsHeader() {
 		return ""
 	}
 	ret := []byte{}

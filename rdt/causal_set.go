@@ -9,7 +9,7 @@ import (
 // You can either add or remove an atom/tuple.
 // Equal elements possible.
 type CausalSet struct {
-	heap ron.FrameHeap
+	heap       ron.FrameHeap
 	AlwaysFull bool
 }
 
@@ -29,7 +29,7 @@ func SetComparator(af, bf *ron.Frame) int64 {
 func MakeCausalSetReducer() ron.Reducer {
 	ret := CausalSet{
 		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 16),
-		}
+	}
 	return ret
 }
 
@@ -55,6 +55,6 @@ func (cs CausalSet) Reduce(batch ron.Batch) ron.Frame {
 	return ret
 }
 
-func init () {
+func init() {
 	ron.RDTYPES[CAUSAL_SET_UUID] = MakeCausalSetReducer
 }

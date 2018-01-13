@@ -68,15 +68,14 @@ func TestFrame_SplitMultiframe(t *testing.T) {
 	for i := 0; i < len(monos); i++ {
 		if monos[i].String() != splits[i] {
 			t.Fail()
-			t.Logf("split fail at %d:\n'%s'\nshould be\n'%s'\n", i ,monos[i].String(), splits[i])
+			t.Logf("split fail at %d:\n'%s'\nshould be\n'%s'\n", i, monos[i].String(), splits[i])
 		}
 	}
 }
 
-
 func TestBatch_Equal(t *testing.T) {
-	b1 := ParseStringBatch([]string{ "*one", "*two" })
-	b2 := ParseStringBatch([]string{ "*one*two" })
+	b1 := ParseStringBatch([]string{"*one", "*two"})
+	b2 := ParseStringBatch([]string{"*one*two"})
 	if !b1.Equal(b2) {
 		t.Fail()
 	}
@@ -86,15 +85,15 @@ func TestBatch_Equal(t *testing.T) {
 	}
 }
 
-func TestFrame_Copy (t *testing.T) {
+func TestFrame_Copy(t *testing.T) {
 	a := ParseFrameString("*~'comment' *lww#obj!")
 	b := a
-	if b.Type()!=COMMENT_UUID {
+	if b.Type() != COMMENT_UUID {
 		t.Log("improper copy")
 		t.Fail()
 	}
 	b.Next()
-	if a.Type()!=COMMENT_UUID {
+	if a.Type() != COMMENT_UUID {
 		t.Log("the copy is still linked")
 		t.Fail()
 	}
@@ -103,7 +102,7 @@ func TestFrame_Copy (t *testing.T) {
 func TestFrame_Split2(t *testing.T) {
 	frame := ParseFrameString("*rga#test@4!@1'A'@2'B'*#@4:rm!:3,")
 	split := frame.Split()
-	if ! split.Equal(Batch{frame}) {
+	if !split.Equal(Batch{frame}) {
 		t.Fail()
 		t.Logf("split fail, \n%s\nbecame\n%s", frame.String(), split.String())
 	}

@@ -259,7 +259,7 @@ func TestFrame_EOF(t *testing.T) {
 		"...",
 		"#first#incomplete",
 	}
-	var states = [][]int {
+	var states = [][]int{
 		{RON_FULL_STOP, RON_start, RON_start, RON_FULL_STOP},
 		{RON_FULL_STOP, RON_FULL_STOP, RON_FULL_STOP},
 		{RON_start},
@@ -269,28 +269,28 @@ func TestFrame_EOF(t *testing.T) {
 		// feed by 1 char
 		// EOF -> Rest()
 		s := 0
-		for i:=0; i<len(stream); i++ {
-			frame.AppendBytes([]byte(stream[i:i+1]))
+		for i := 0; i < len(stream); i++ {
+			frame.AppendBytes([]byte(stream[i : i+1]))
 			frame.Next()
 			//t.Log(k, i, stream[i:i+1], frame.Position, frame.Parser.State(), frame.IsComplete())
 			if frame.IsComplete() {
-				if s>len(states[k]) {
+				if s > len(states[k]) {
 					t.Fail()
 					t.Logf("stream %d offset %d got %d need nothing", k, i, frame.Parser.State())
 					break
 				}
-				if frame.Parser.State()!=states[k][s] {
+				if frame.Parser.State() != states[k][s] {
 					t.Logf("stream %d offset %d got %d need %d", k, i, frame.Parser.State(), states[k][s])
 					t.Fail()
 					break
 				}
 				s++
-				if frame.Parser.State()==RON_FULL_STOP {
+				if frame.Parser.State() == RON_FULL_STOP {
 					frame = ParseStream(frame.Rest())
 				}
 			}
 		}
-		if s!=len(states[k]) {
+		if s != len(states[k]) {
 			t.Logf("need %d complete states, got %d", len(states[k]), s)
 			t.Fail()
 		}
@@ -334,24 +334,24 @@ func TestXParseMalformedOp(t *testing.T) {
 	}
 }
 
-func TestParseComment (t *testing.T) {
+func TestParseComment(t *testing.T) {
 	tests := [][]string{
 		{
 			"*lww#object@time!:field'value' *~'comment'! *rga!.",
 			"*rga!",
-			},
+		},
 		{
 			"*lww#object@time! :field'value', *~'comment', *lww:another'value'.",
 			"*lww #object @time :another'value',",
-			},
+		},
 	}
 	for k, test := range tests {
 		frame := ParseFrameString(test[0])
 		correct := ParseFrameString(test[1])
-		for frame.Parser.State()!=RON_FULL_STOP {
+		for frame.Parser.State() != RON_FULL_STOP {
 			frame.Next()
 		}
-		if ! frame.Equal(correct) {
+		if !frame.Equal(correct) {
 			t.Fail()
 			t.Logf("%d need \n'%s'\n got \n'%s'\n", k, correct.OpString(), frame.OpString())
 		}
@@ -377,7 +377,7 @@ func TestFormatComment(t *testing.T) {
 	}
 }
 
-func TestParseTermDuplet (t *testing.T) {
+func TestParseTermDuplet(t *testing.T) {
 	frameStr := "*lww#object@time+orig?! :keyA 'А' :keyB 'Б'"
 	frame := ParseFrameString(frameStr)
 	if !frame.IsQuery() {
@@ -386,12 +386,12 @@ func TestParseTermDuplet (t *testing.T) {
 	}
 	obj := frame.Object()
 	frame.Next()
-	if frame.EOF() || !frame.IsHeader() || frame.Object()!=obj {
+	if frame.EOF() || !frame.IsHeader() || frame.Object() != obj {
 		t.Log("state header not parsed")
 		t.Fail()
 	}
 	frame.Next()
-	if frame.EOF() || frame.Term()!=TERM_REDUCED || frame.Object()!=obj {
+	if frame.EOF() || frame.Term() != TERM_REDUCED || frame.Object() != obj {
 		t.Log("inner op not parsed")
 		t.Fail()
 	}
@@ -524,7 +524,7 @@ func TestParse_Errors(t *testing.T) {
 	for k, f := range frames {
 		buf := []byte(f)
 		frame := ParseFrame(buf)
-		if frame.Parser.State()!=RON_error {
+		if frame.Parser.State() != RON_error {
 			t.Fail()
 			t.Logf("mistakenly parsed %d [ %s ] %d\n", k, f, frame.Offset())
 		}
@@ -565,7 +565,7 @@ func TestAtom_UUID(t *testing.T) {
 	}
 }
 
-func TestParserState_Omitted (t *testing.T) {
+func TestParserState_Omitted(t *testing.T) {
 	frame := ParseFrameString("*type#id!@ev@ev:")
 	if frame.Parser.omitted != 4|8 {
 		t.Logf("omitted is %d for %s", frame.Parser.omitted, frame.OpString())
