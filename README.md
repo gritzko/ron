@@ -76,8 +76,9 @@ These are the key features of RON:
 * RON is not optimized for human consumption. It is a machine-to-machine
   language mostly. "Human" APIs are produced by mappers (see below).
 * RON employs compression for its metadata. The RON UUID syntax is specifically
-  fine-tuned for easy compression. Consider the above frame uncompressed:
+  fine-tuned for easy compression.
 
+Consider the above frame uncompressed:
 
     *lww #1TUAQ+gritzko @1TUAQ+gritzko :bar = 1
     *lww #1TUAR+gritzko @1TUAR+gritzko :foo > 1TUAQ+gritzko
@@ -217,10 +218,10 @@ The compressed frame will be just a bit longer than bare JSON:
 
     *lww#1D4ICC+XU5eRJ@`{E! :keyA'valueA' @{1:keyB'valueB'
 
-That is impressive given the amount of metadata (and you can't replicate data
-correctly without the metadata).  The frame takes less space than *two* [RFC4122
-UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct
-timestamps) and also the data.  The point becomes even clearer if we add the
+The frame contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct
+timestamps) and also the data.
+Despite the impressive amount of metadata, it takes less space than *two* [RFC4122
+UUIDs][rfc4122].  The point becomes even clearer if we add the
 object UUID to JSON using the RFC4122 notation:
 
     {"_id": "0651a600-2b49-11e6-8000-1696d3000000", "keyA":"valueA",
@@ -300,8 +301,7 @@ compression, records are inevitably of variable length, so random access is not
 possible.  Also, compression depends on iteration, as UUIDs get abbreviated
 relative to preceding UUIDs.
 
-A binary RON frame starts with magic bytes `RON2` and frame length, a big-endian
-uint32, 8 bytes total. 
+A binary RON frame starts with magic bytes `RON2` and a big-endian uint32 frame length field, 8 bytes total.
 
 On the inside, a frame is a sequence of *fields*.  Each field starts with a
 *descriptor* byte.  A descriptor byte spends two most significant bits for a
@@ -316,13 +316,13 @@ follows:
     * `0001` reduced op,
     * `0010` header op,
     * `0011` query header op.
-1. `01` UUID half, full value
+1. `01` UUID half, uncompressed uint64
     * `0100` type (reducer) id,
     * `0101` object id,
     * `0110` event id,
     * `0111` ref/location id
 2. `10` UUID half, prefix-compressed
-    * `0100` value UUID half, compressed (warning: not type)
+    * `0100` value UUID half, compressed (warning: not type id)
     * `0101` object id,
     * `0110` event id,
     * `0111` ref/location id
@@ -342,9 +342,9 @@ UUID coding is as follows:
   bytes (big-endian, also note the 8x8-60=4 extra bits); in the first byte, the
   most significant bit denotes a default flip (same as \` in the Base64 coding),
   next three bits specify the shared prefix length, in bytes (0..7)
-* an uncompressed UUID half is up to 8 bytes, starting with the 0th or 8th byte,
-  depending on which half it is, according to the RON UUID big-endian bit
-  layout; skipped (tailing) bytes are zeroes
+* an uncompressed UUID half is up to 8 bytes, starting with the 0th or 8th byte of the UUID (for the value or origin halves respectively), according to the RON UUID big-endian bit
+  layout; skipped (tailing, l.s.b.,
+  depending on which half it is) bytes are zeroes
 
 For example, `1010 0001  1111 0100` is a prefix-compressed half `10` of an event
 UUID `10`, defaults to the corresponding half of the object UUID of the same op

@@ -340,6 +340,42 @@ func NewStateHeader(t, o, e, r UUID) Frame {
 	return NewOpFrame(t, o, e, r, TERM_HEADER)
 }
 
+func (atoms Atoms) Append (newAtoms ...Atom) (a Atoms) {
+	a = atoms
+	for _, n := range newAtoms {
+		a = append(a, n)
+	}
+	return
+}
+
+func (u UUID) Atom () Atom {
+	return Atom(u)
+}
+
+func (atoms Atoms) AppendUUID (uuids ...UUID) (a Atoms) {
+	a = atoms
+	for _, u := range uuids {
+		a = append(a, Atom(u))
+	}
+	return
+}
+
+func (frame *Frame) AppendOp (term int, atoms Atoms) {
+	frame.AppendSpecValuesTerm(Spec(atoms[:4]), atoms[4:], term)
+}
+
+func (batch Batch) AppendOpFrame (term int, atoms []Atom) Batch {
+	f := NewFrame()
+	f.AppendOp(term, atoms)
+	return append(batch, f)
+}
+
+func NewOp (term int, rdt, obj, event, ref UUID, values Atoms) (Frame) {
+	f := NewFrame()
+	f.AppendSpecValuesTerm(NewSpec(rdt,obj,event,ref), values, term)
+	return f
+}
+
 func (frame *Frame) AppendAmended(spec Spec, values Frame, term int) {
 	tmp := values.Clone()
 	tmp.term = term
@@ -355,6 +391,14 @@ func (frame *Frame) AppendSpecValT(spec Spec, value Atom, term int) {
 	frame.Append(tmp)
 }
 
+func (frame *Frame) AppendSpecValuesTerm(spec Spec, values Atoms, term int) {
+	atoms := make([]Atom, 0, len(values)+4+1)
+	atoms = append(atoms, spec...)
+	atoms = append(atoms, values...)
+	tmp := Frame{atoms: atoms[:], term: term}
+	frame.Append(tmp)
+}
+
 func (frame *Frame) AppendReducedOpInt(spec Spec, value int64) {
 	frame.AppendSpecValT(spec, NewIntegerAtom(value), TERM_REDUCED)
 }
@@ -365,6 +409,11 @@ func (frame *Frame) AppendReducedOpUUID(spec Spec, value UUID) {
 
 func (frame *Frame) AppendStateHeader(spec Spec) {
 	frame.AppendEmpty(spec, TERM_HEADER)
+}
+
+func (frame *Frame) AppendStateHeaderValues(rdt, obj, ev, ref UUID, values Atoms) {
+	spec := NewSpec(rdt, obj, ev, ref)
+	frame.AppendSpecValuesTerm(spec, values, TERM_HEADER)
 }
 
 func (frame *Frame) AppendQueryHeader(spec Spec) {

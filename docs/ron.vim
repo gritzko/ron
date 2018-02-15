@@ -7,7 +7,7 @@ endif
 
 syn match INT_ATOM /=[+-]\{0,1}[0-9]\{1,17}/
 hi INT_ATOM ctermfg=LightGreen
-syn match STRING_ATOM /'\(\\u[0-9a-fA-F]\{4}\|\\[^\n\r]\|[^'\\\n\r]\)*'/
+syn match STRING_ATOM /'\(\\u[0-9a-fA-F]\{4}\|\\[^\n\r]\|[^'"\\\n\r]\)*'/
 hi STRING_ATOM ctermfg=DarkGreen
 syn match UUID_ATOM />[`]\{0,1}\(\([(\[{}\])]\)\{0,1}[0-9A-Za-z_~]\{0,10}\)\{0,1}\([-+$%]\)\{0,1}\(\([(\[{}\])]\)\{0,1}[0-9A-Za-z_~]\{0,10}\)\{0,1}/
 hi UUID_ATOM ctermfg=DarkGreen

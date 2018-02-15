@@ -54,6 +54,8 @@ type Frame struct {
 	// Frame body, raw bytes.
 	Body []byte
 }
+// [ ] type Op { term int  atoms Atoms }
+// [ ] separate Frame/Append() and Cursor/Next()
 
 // Checker performs sanity checks on incoming data. Note that a Checker
 // may accumulate data, e.g. keep a max timestamp seen.
@@ -73,6 +75,8 @@ type Checker interface {
 // [ ] slice-append: remember prevFrame, prevPos
 //
 // [x] header to zero defaults. less smartness!
+//
+// [ ] multilevel-logical clock modeAA
 //
 // [ ] lww json mapper (strings only)
 // [x] vim syn file: string json escaping
