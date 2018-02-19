@@ -123,10 +123,8 @@ func (clock *Clock) Time() UUID {
 func (clock *Clock) See(uuid UUID) bool {
 	if clock.lastSeen.Value() < uuid.Value() {
 		clock.lastSeen = NewEventUUID(uuid.Value(), clock.lastSeen.Origin())
-		return true
-	} else {
-		return false
 	}
+	return true
 }
 
 func (clock Clock) IsSane(uuid UUID) bool {
