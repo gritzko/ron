@@ -311,33 +311,43 @@ func (frame Frame) Verify() int {
 }
 
 // IsEqual checks for single-op equality
-func (frame Frame) IsEqual(other Frame) bool {
+func (frame Frame) IsEqual(other Frame) (eq bool, at int) {
 	if frame.EOF() || other.EOF() {
-		return frame.EOF() && other.EOF()
+		return frame.EOF() && other.EOF(), 0
 	}
-	ret := frame.Term() == other.Term()
-	for i := 0; i < 4 && ret; i++ { // FIXME strings are difficult
-		ret = ret && frame.atoms[i] == other.atoms[i]
+	if frame.Term() != other.Term() {
+        return false, -1
+    }
+	for i := 0; i < 4; i++ { // FIXME strings are difficult
+		if frame.atoms[i] != other.atoms[i] {
+            return false, i
+        }
 	}
-	ret = ret && frame.Count() == other.Count()
-	return ret
+	if frame.Count() != other.Count() {
+        return false, -2
+    }
+	return true, 0
 }
 
-func (frame Frame) Equal(other Frame) bool {
-	ret := true
-	for ret && !frame.EOF() && !other.EOF() {
-		ret = ret && frame.IsEqual(other)
-		// TODO atoms
+func (frame Frame) Equal(other Frame) (eq bool, op, at int) {
+	for !frame.EOF() && !other.EOF() {
+        eq, at = frame.IsEqual(other)
+        if !eq {
+            return
+        }
+        op++
 		frame.Next()
 		other.Next()
 	}
-	ret = ret && frame.EOF()
-	ret = ret && other.EOF()
-	return ret
+	if ! frame.EOF() || ! other.EOF() {
+        eq = false
+        return
+    }
+	return
 }
 
 // Equal checks two batches for op-by-op equality (irrespectively of frame borders)
-func (batch Batch) Equal(other Batch) bool {
+func (batch Batch) Equal(other Batch) (eq bool, op, at int) {
 	bi, oi := 0, 0
 	bf := Frame{}
 	of := Frame{}
@@ -350,13 +360,18 @@ func (batch Batch) Equal(other Batch) bool {
 			of = other[oi]
 			oi++
 		}
-		if !bf.IsEqual(of) {
-			return false
+        eq, at = bf.IsEqual(of)
+		if !eq {
+			return
 		}
+        op++
 		bf.Next()
 		of.Next()
 	}
-	return bi == len(batch) && oi == len(other)
+	if bi != len(batch) || oi != len(other) {
+        eq = false
+    }
+    return
 }
 
 func (batch *Batch) AppendFrame(f Frame) {

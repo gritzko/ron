@@ -351,7 +351,8 @@ func TestParseComment(t *testing.T) {
 		for frame.Parser.State() != RON_FULL_STOP {
 			frame.Next()
 		}
-		if !frame.Equal(correct) {
+        eq, _, _ := frame.Equal(correct)
+        if ! eq {
 			t.Fail()
 			t.Logf("%d need \n'%s'\n got \n'%s'\n", k, correct.OpString(), frame.OpString())
 		}
@@ -363,7 +364,8 @@ func TestFormatComment(t *testing.T) {
 	frame := ParseFrameString(frameStr)
 	clone := frame.Reformat(0)
 	for !frame.EOF() && !clone.EOF() {
-		if !frame.Equal(clone) {
+        eq, _, _ := frame.Equal(clone)
+        if ! eq {
 			t.Fail()
 			t.Logf("%s != %s", frame.OpString(), clone.OpString())
 			break
