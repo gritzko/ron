@@ -120,7 +120,11 @@ func (clock *Clock) Time() UUID {
 	return ret
 }
 
+// ...
 func (clock *Clock) See(uuid UUID) bool {
+	if ! clock.IsSane(uuid) {
+		return false
+	}
 	if clock.lastSeen.Value() < uuid.Value() {
 		clock.lastSeen = NewEventUUID(uuid.Value(), clock.lastSeen.Origin())
 	}
