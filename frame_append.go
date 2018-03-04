@@ -66,6 +66,10 @@ func Int60Prefix(a, b uint64) int {
 }
 
 func FormatUUID(buf []byte, uuid UUID) []byte {
+	variety := uuid.Variety()
+	if variety!=0 {
+		buf = append(buf, BASE_PUNCT[variety], '/')
+	}
 	buf = FormatInt(buf, uuid.Value())
 	if uuid.Origin() != UUID_NAME_UPPER_BITS {
 		buf = append(buf, uuid.Sign())
@@ -75,6 +79,10 @@ func FormatUUID(buf []byte, uuid UUID) []byte {
 }
 
 func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
+	if uuid.Variety() != context.Variety() {
+		// don't want to optimize this; a rare case anyway
+		return FormatUUID(buf, uuid)
+	}
 	start := len(buf)
 	buf = FormatZipInt(buf, uuid.Value(), context.Value())
 	if uuid.IsTranscendentName() {

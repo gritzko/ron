@@ -19,6 +19,10 @@ func TestUUID_Parse(t *testing.T) {
 			t.Logf("got %s expected %s", parsed.String(), uuid.String())
 			break
 		}
+		if parsed.String()!=uuidStr {
+			t.Fail()
+			t.Logf("serialized as %s expected %s", parsed.String(), uuidStr)
+		}
 	}
 
 }

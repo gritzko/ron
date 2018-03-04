@@ -63,6 +63,10 @@ func (a UUID) Scheme() uint64 {
 	return a[1] >> 60
 }
 
+func (a UUID) Variety () uint {
+	return uint(a[0]>>60)
+}
+
 func (a UUID) Sign() byte {
 	return UUID_PUNCT[uint(a.Scheme())]
 }
