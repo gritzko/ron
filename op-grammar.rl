@@ -136,7 +136,7 @@
 
     action op_start {
         hlf = 0;
-        if (p>frame.Parser.offset) {
+        if (p>frame.Parser.offset && frame.Position!=-1) {
             // one op is done, so stop parsing for now
             // make sure the parser restarts with the next op
             p--;
@@ -159,6 +159,7 @@
 
     action frame_end {
         fnext *RON_FULL_STOP;
+        fbreak;
     }
 
     # one of op spec UUIDs: type, object, event id or a reference 
