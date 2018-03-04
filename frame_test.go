@@ -76,13 +76,13 @@ func TestFrame_SplitMultiframe(t *testing.T) {
 func TestBatch_Equal(t *testing.T) {
 	b1 := ParseStringBatch([]string{"*one", "*two"})
 	b2 := ParseStringBatch([]string{"*one*two"})
-    eq, _, _ := b1.Equal(b2) 
-    if ! eq {
+	eq := b1.Equal(b2)
+	if !eq {
 		t.Fail()
 	}
 	b2 = append(b2, ParseFrameString("*three"))
-	eq, _, _ = b1.Equal(b2) 
-    if eq {
+	eq = b1.Equal(b2)
+	if eq {
 		t.Fail()
 	}
 }
@@ -104,8 +104,8 @@ func TestFrame_Copy(t *testing.T) {
 func TestFrame_Split2(t *testing.T) {
 	frame := ParseFrameString("*rga#test@4!@1'A'@2'B'*#@4:rm!:3,")
 	split := frame.Split()
-    eq, _, _ := split.Equal(Batch{frame}) 
-    if ! eq {
+	eq := split.Equal(Batch{frame})
+	if !eq {
 		t.Fail()
 		t.Logf("split fail, \n%s\nbecame\n%s", frame.String(), split.String())
 	}

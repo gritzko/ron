@@ -37,6 +37,11 @@
     action end_origin {
     }
 
+    action variety {
+        atoms[atm][hlf] <<= 6;
+        dgt--;
+    }
+
     action uuid_sep {
         hlf = 1;
         atoms[atm][1] &= INT60_FULL;
@@ -48,7 +53,8 @@
     }
 
     # Base64 value
-    BASE = ( [0-9a-zA-Z~_] @int60_dgt )+;
+    DGT = [0-9a-zA-Z~_] @int60_dgt;
+    BASE = DGT+;
     # prefix compression 
     PREFIX =  [([\{\}\])]  @int60_prefix;
     # UUID type: name, hash, event or derived event 
@@ -56,7 +62,7 @@
     # prefix-compressed int (half of UUID) 
     PBASE = PREFIX BASE?;
     # full int 
-    FBASE = BASE >start_full_int;
+    FBASE = (DGT ([\/] @variety)? DGT*) >start_full_int;
     # int, either compressed or not 
     INT = PBASE | FBASE;
 

@@ -21,7 +21,7 @@ var CLOCK_LAMPORT = NewName("Logical")
 var MAX_BIT_GRAB uint64 = 1 << 20
 
 func NewClock(replica uint64, mode UUID, minLen int) Clock {
-	origin := (replica & INT60_FULL) | UUID_UPPER_BITS[UUID_EVENT]
+	origin := (replica & INT60_FULL) | (uint64(UUID_EVENT) << 60)
 	return Clock{lastSeen: NewEventUUID(0, origin), Mode: mode, MinLength: minLen}
 }
 
@@ -122,7 +122,7 @@ func (clock *Clock) Time() UUID {
 
 // ...
 func (clock *Clock) See(uuid UUID) bool {
-	if ! clock.IsSane(uuid) {
+	if !clock.IsSane(uuid) {
 		return false
 	}
 	if clock.lastSeen.Value() < uuid.Value() {

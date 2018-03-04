@@ -340,7 +340,7 @@ func NewStateHeader(t, o, e, r UUID) Frame {
 	return NewOpFrame(t, o, e, r, TERM_HEADER)
 }
 
-func (atoms Atoms) Append (newAtoms ...Atom) (a Atoms) {
+func (atoms Atoms) Append(newAtoms ...Atom) (a Atoms) {
 	a = atoms
 	for _, n := range newAtoms {
 		a = append(a, n)
@@ -348,11 +348,11 @@ func (atoms Atoms) Append (newAtoms ...Atom) (a Atoms) {
 	return
 }
 
-func (u UUID) Atom () Atom {
+func (u UUID) Atom() Atom {
 	return Atom(u)
 }
 
-func (atoms Atoms) AppendUUID (uuids ...UUID) (a Atoms) {
+func (atoms Atoms) AppendUUID(uuids ...UUID) (a Atoms) {
 	a = atoms
 	for _, u := range uuids {
 		a = append(a, Atom(u))
@@ -360,19 +360,19 @@ func (atoms Atoms) AppendUUID (uuids ...UUID) (a Atoms) {
 	return
 }
 
-func (frame *Frame) AppendOp (term int, atoms Atoms) {
+func (frame *Frame) AppendOp(term int, atoms Atoms) {
 	frame.AppendSpecValuesTerm(Spec(atoms[:4]), atoms[4:], term)
 }
 
-func (batch Batch) AppendOpFrame (term int, atoms []Atom) Batch {
+func (batch Batch) AppendOpFrame(term int, atoms []Atom) Batch {
 	f := NewFrame()
 	f.AppendOp(term, atoms)
 	return append(batch, f)
 }
 
-func NewOp (term int, rdt, obj, event, ref UUID, values Atoms) (Frame) {
+func NewOp(term int, rdt, obj, event, ref UUID, values Atoms) Frame {
 	f := NewFrame()
-	f.AppendSpecValuesTerm(NewSpec(rdt,obj,event,ref), values, term)
+	f.AppendSpecValuesTerm(NewSpec(rdt, obj, event, ref), values, term)
 	return f
 }
 

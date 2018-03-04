@@ -54,6 +54,7 @@ type Frame struct {
 	// Frame body, raw bytes.
 	Body []byte
 }
+
 // [ ] type Op { term int  atoms Atoms }
 // [ ] separate Frame/Append() and Cursor/Next()
 

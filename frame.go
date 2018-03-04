@@ -311,43 +311,43 @@ func (frame Frame) Verify() int {
 }
 
 // IsEqual checks for single-op equality
-func (frame Frame) IsEqual(other Frame) (eq bool, at int) {
+func (frame Frame) Compare(other Frame) (eq bool, at int) {
 	if frame.EOF() || other.EOF() {
 		return frame.EOF() && other.EOF(), 0
 	}
 	if frame.Term() != other.Term() {
-        return false, -1
-    }
+		return false, -1
+	}
 	for i := 0; i < 4; i++ { // FIXME strings are difficult
 		if frame.atoms[i] != other.atoms[i] {
-            return false, i
-        }
+			return false, i
+		}
 	}
 	if frame.Count() != other.Count() {
-        return false, -2
-    }
+		return false, -2
+	}
 	return true, 0
 }
 
-func (frame Frame) Equal(other Frame) (eq bool, op, at int) {
+func (frame Frame) CompareAll(other Frame) (eq bool, op, at int) {
 	for !frame.EOF() && !other.EOF() {
-        eq, at = frame.IsEqual(other)
-        if !eq {
-            return
-        }
-        op++
+		eq, at = frame.Compare(other)
+		if !eq {
+			return
+		}
+		op++
 		frame.Next()
 		other.Next()
 	}
-	if ! frame.EOF() || ! other.EOF() {
-        eq = false
-        return
-    }
+	if !frame.EOF() || !other.EOF() {
+		eq = false
+		return
+	}
 	return
 }
 
 // Equal checks two batches for op-by-op equality (irrespectively of frame borders)
-func (batch Batch) Equal(other Batch) (eq bool, op, at int) {
+func (batch Batch) Compare(other Batch) (eq bool, op, at int) {
 	bi, oi := 0, 0
 	bf := Frame{}
 	of := Frame{}
@@ -360,18 +360,28 @@ func (batch Batch) Equal(other Batch) (eq bool, op, at int) {
 			of = other[oi]
 			oi++
 		}
-        eq, at = bf.IsEqual(of)
+		eq, at = bf.Compare(of)
 		if !eq {
 			return
 		}
-        op++
+		op++
 		bf.Next()
 		of.Next()
 	}
 	if bi != len(batch) || oi != len(other) {
-        eq = false
-    }
-    return
+		eq = false
+	}
+	return
+}
+
+func (frame Frame) Equal(other Frame) bool {
+	eq, _, _ := frame.CompareAll(other)
+	return eq
+}
+
+func (batch Batch) Equal(other Batch) bool {
+	eq, _, _ := batch.Compare(other)
+	return eq
 }
 
 func (batch *Batch) AppendFrame(f Frame) {

@@ -29,8 +29,8 @@ while (<> =~ /^(\w+)\s+([^\s]+)\s+(.*)$/) {
     my $i = 0;
     for my $kind (@vals) {
         my $ch = substr($seps,$i,1);
-        @ABC[ord($ch)] = $i;
-        @CBA[ord($ch)] = $k;
+        @ABC[ord($ch)] = $i if @ABC[ord($ch)]==-1;
+        @CBA[ord($ch)] = $k if @CBA[ord($ch)]==-1;
         $i++;
         if ($ch eq "'" || $ch eq "\\") {
             $ch = "\\$ch"

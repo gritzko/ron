@@ -91,10 +91,12 @@ func (uuid UUID) Derived() UUID {
 	}
 }
 
-var UUID_UPPER_BITS = [4]uint64{0, 1 << 60, 2 << 60, 3 << 60}
+func NewRonUUID(scheme, variety uint, value, origin uint64) UUID {
+	return UUID{value | uint64(variety&15)<<60, origin | uint64(scheme&15)<<60}
+}
 
-func NewUUID(scheme uint, time, origin uint64) UUID {
-	return UUID{time, (origin & INT60_FULL) | UUID_UPPER_BITS[scheme]}
+func NewUUID(scheme uint, value, origin uint64) UUID {
+	return NewRonUUID(scheme, 0, value, origin)
 }
 
 func NewEventUUID(time, origin uint64) UUID {
