@@ -32,6 +32,14 @@ func NewOmniReducer() (ret OmniReducer) {
 	return
 }
 
+func (omni OmniReducer) Features () int {
+	return 0 // should it be a reducer?
+}
+
+func (omni EmptyReducer) Features () int {
+	return 0
+}
+
 func (omni OmniReducer) AddType(id UUID, r Reducer) {
 	omni.Types[id] = r
 }

@@ -18,6 +18,10 @@ func MakeVVReducer() ron.Reducer {
 	}
 }
 
+func (vv VV) Features() int {
+	return ACID_FULL
+}
+
 func (vv VV) Reduce(batch ron.Batch) ron.Frame {
 	spec := ron.NewSpec(
 		VV_UUID,

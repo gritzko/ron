@@ -199,6 +199,10 @@ func (batch Batch) IsEmpty() bool {
 	return len(batch) > 0
 }
 
+func (state ParserState) IsFail() bool {
+	return state.position > 0 && state.state == RON_error
+}
+
 func (batch Batch) HasFullState() bool {
 	for _, f := range batch {
 		if f.IsFullState() {

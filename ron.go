@@ -56,7 +56,7 @@ type Frame struct {
 }
 
 // [ ] type Op { term int  atoms Atoms }
-// [ ] separate Frame/Append() and Cursor/Next()
+// [ ] the big divorce: separate Frame/Append() and Cursor/Next()
 
 // Checker performs sanity checks on incoming data. Note that a Checker
 // may accumulate data, e.g. keep a max timestamp seen.
@@ -85,7 +85,7 @@ type Checker interface {
 // [x] non-idiomatic Frame behavior (copy->shared atoms array)
 //     fix:  parser uses cur *Atom, _atoms [6]Atom atoms []Atom
 //
-// [ ] make rewinds *very* explicit, test (query/header differs?)
+// [x] make rewinds *very* explicit, test (query/header differs?)
 //
 // [ ] fuzzer go-fuzz (need samples)
 // [ ] defensive atom parsing
@@ -96,6 +96,11 @@ type Checker interface {
 //
 // [ ] ron.go --> cmd_reduce.go
 // [ ] strings: either escaped byte buffer or an unescaped string!!!!!!
+//
+// [ ] explicit monoframe lengths for trusted sources
+//		*~ :blen =12345!  *~ :flen =1234!
+// [ ] iheap strip comments
+//
 
 // Reducer is essentially a replicated data type.
 // A reduction of the object's full op log produces its RON state.
@@ -106,6 +111,7 @@ type Checker interface {
 // (could be made to reduce 1mln single-op frames)
 // Associative, commutative*, idempotent.
 type Reducer interface {
+	Features() int // see ACID
 	Reduce(batch Batch) Frame
 }
 
@@ -120,7 +126,7 @@ type StringMapper interface {
 	Map(batch Batch) string
 }
 
-type ReducerMaker func() Reducer
+type ReducerMaker func() Reducer // FIXME params map[UUID]Atom - no free-form strings
 
 var RDTYPES map[UUID]ReducerMaker
 
