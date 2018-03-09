@@ -15,7 +15,7 @@ func MakeLogReducer() ron.Reducer {
 }
 
 func (log Log) Features() int {
-	return ACID_FULL
+	return ron.ACID_FULL
 }
 
 func (log Log) Reduce(batch ron.Batch) ron.Frame {

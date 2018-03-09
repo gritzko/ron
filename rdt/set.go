@@ -19,7 +19,7 @@ func MakeSetReducer() ron.Reducer {
 }
 
 func (set Set) Features() int {
-	return ACID_FULL
+	return ron.ACID_FULL
 }
 
 func (set Set) Reduce(batch ron.Batch) ron.Frame {

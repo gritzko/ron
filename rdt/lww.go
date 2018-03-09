@@ -21,7 +21,7 @@ var LWW_UUID = ron.NewName("lww")
 var DELTA_UUID = ron.NewName("d")
 
 func (lww LWW) Features() int {
-	return ACID_FULL
+	return ron.ACID_FULL
 }
 
 func (lww LWW) Reduce(inputs ron.Batch) (res ron.Frame) {

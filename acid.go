@@ -1,4 +1,4 @@
-package rdt
+package ron
 
 // An RDT may have a combination of the following features:
 //
@@ -27,3 +27,4 @@ const (
 	ACID_ACD = ACID_C|ACID_AD
 	ACID_FULL = ACID_A|ACID_CID
 )
+

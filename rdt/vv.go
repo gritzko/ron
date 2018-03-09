@@ -19,7 +19,7 @@ func MakeVVReducer() ron.Reducer {
 }
 
 func (vv VV) Features() int {
-	return ACID_FULL
+	return ron.ACID_FULL
 }
 
 func (vv VV) Reduce(batch ron.Batch) ron.Frame {

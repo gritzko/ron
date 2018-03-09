@@ -16,7 +16,7 @@ type CausalSet struct {
 var CAUSAL_SET_UUID = ron.NewName("cas")
 
 func (cs CausalSet) Features() int {
-	return ACID_AID
+	return ron.ACID_AID
 }
 
 func SetComparator(af, bf *ron.Frame) int64 {
