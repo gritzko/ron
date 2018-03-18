@@ -61,7 +61,7 @@ type Frame struct {
 // Checker performs sanity checks on incoming data. Note that a Checker
 // may accumulate data, e.g. keep a max timestamp seen.
 type Checker interface {
-	Check(frame Frame) error
+	Check(frame Frame) (err UUID)
 }
 
 // [ ] parser: proper UTF-8 CHAR pattern
