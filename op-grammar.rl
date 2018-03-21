@@ -165,7 +165,7 @@
     # one of op spec UUIDs: type, object, event id or a reference 
     REDEF = "`" @redef_uuid;
     QUANT = [*#@:] @spec_uuid_start ;
-    SPEC_UUID = QUANT space* REDEF? UUID? %spec_uuid_end space*;
+    SPEC_UUID = QUANT space* REDEF? (UUID space*)? %spec_uuid_end ;
 
     # 64-bit signed integer 
     INT_ATOM = ([\-+]? @int_sign ( digit @int_digit )+ ) %int_atom_end >int_atom_start;
