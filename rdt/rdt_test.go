@@ -42,7 +42,6 @@ func RunRONTest(t *testing.T, reducer ron.Reducer, scriptFile string) {
 
 		output := reducer.Reduce(inputs)
 		outputs := output.Split()
-		//t.Log("split", output.String(), outputs.String())
 
 		if len(script) == 0 || !script[0].IsHeader() {
 			t.Log("no output specified")
@@ -59,10 +58,12 @@ func RunRONTest(t *testing.T, reducer ron.Reducer, scriptFile string) {
 		correct := script[:l]
 		script = script[l:]
 
-		if !correct.Equal(outputs) {
+                ok, op, at := correct.Compare(outputs)
+		if !ok {
 			t.Fail()
 			t.Logf("FAILS to produce %s:\n%s\nshould be\n%s\n", a.GetString(0), outputs.String(), correct.String())
-			t.Logf("exact input, output:\n%s\n%s\n\n", inputs.String(), output.String())
+			t.Logf("exact input, output:\n%s\n---\n%s\n\n", inputs.String(), output.String())
+                        t.Logf("mismatch at %d %d\n", op, at);
 		} else {
 			t.Log("produces", a.GetString(0), "!\n")
 		}

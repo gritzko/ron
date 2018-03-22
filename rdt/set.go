@@ -39,7 +39,7 @@ func (set Set) Reduce(batch ron.Batch) ron.Frame {
 		ret.AppendReduced(*set.heap.Current())
 		set.heap.NextPrim()
 	}
-	return ret
+	return ret.Rewind()
 }
 
 func init() {
