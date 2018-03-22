@@ -372,7 +372,7 @@ func (batch Batch) Compare(other Batch) (eq bool, op, at int) {
 		bf.Next()
 		of.Next()
 	}
-	if bi != len(batch) || oi != len(other) {
+	if bi != len(batch) || oi != len(other) || !bf.EOF() || !of.EOF() {
 		eq = false
 	}
 	return
