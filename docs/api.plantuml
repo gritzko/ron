@@ -1,6 +1,13 @@
-@startuml
+@startuml API
 
 Uint128 <|-- Atom
+
+enum OpType {
+  HEADER
+  QUERY
+  RAW
+  REDUCED
+}
 
 Atom <|-- UUID
 
@@ -8,12 +15,13 @@ UUID <|-- Spec : [4]
 
 Atom <|-- Op : []
 
-Op <|-- Cursor
-Op : -term : Int
+Op o-- Cursor
+
+Op : -term : OpType
+OpType <.. Op : term
 
 Cursor : +parser : ParserState
 Cursor : +position : Int
-
 
 Frame : -binary : Bool
 Frame : +body : Byte[]
