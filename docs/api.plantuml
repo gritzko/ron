@@ -1,0 +1,32 @@
+@startuml
+
+Uint128 <|-- Atom
+
+Atom <|-- UUID
+
+Atom <|-- Spec : [4]
+
+Atom <|-- Op : []
+
+Frame : -_atoms : Atom[]
+Frame : -atoms : Atom[]
+Frame : -binary : Bool
+Frame : -term : Int
+Frame : +body : Byte[]
+Frame : +parser : ParserState
+Frame : +position : Int
+Frame : +serializer : SerializerState
+
+Atom *-- Frame : _atoms, atoms
+
+class Batch << type alias >>
+Batch : Frame[]
+Batch : map() : Mapper
+Batch : reduce() : Reducer
+Frame <|-- Batch : []
+Batch --> Frame : Reducer
+
+interface "?" as UserObject << user object >>
+Batch --> UserObject : Mapper
+
+@enduml
