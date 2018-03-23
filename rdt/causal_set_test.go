@@ -39,6 +39,13 @@ func TestCausalSet_Reduce(t *testing.T) {
 			"*cas#1VBC8+A@~:one;",
 			"*cas#1VBC8+A@~!@two,",
 		},
+        {
+            "*cas#repeat!",
+            "*cas#repeat@1=1;",
+            "*cas#repeat:1;",
+            "*cas#repeat@1=2;",
+            "*cas#repeat@1!@=2",
+        },
 	}
 	cs := MakeCausalSetReducer()
 	for i, test := range tests {

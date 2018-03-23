@@ -32,7 +32,7 @@ func SetComparator(af, bf *ron.Frame) int64 {
 
 func MakeCausalSetReducer() ron.Reducer {
 	ret := CausalSet{
-		heap: ron.MakeFrameHeap(SetComparator, ron.RefComparatorDesc, 16),
+		heap: ron.MakeFrameHeap(SetComparator, nil, 16),
 	}
 	return ret
 }
