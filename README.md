@@ -299,58 +299,169 @@ not human-readable.
 Like the Base64, the binary format is only optimized for iteration.  Because of
 compression, records are inevitably of variable length, so random access is not
 possible.  Also, compression depends on iteration, as UUIDs get abbreviated
-relative to preceding UUIDs.
+relative to similar preceding UUIDs.
 
-A binary RON frame starts with magic bytes `RON2` and a big-endian uint32 frame length field, 8 bytes total.
+A binary RON frame starts with magic bytes `RON` and a frame *descriptor*
+specifying the version of the protocol and the length of the frame.  The rest
+of a frame is a sequence of *fields*.  Each field starts with a *descriptor*
+specifying the type of the field and its length.
 
-On the inside, a frame is a sequence of *fields*.  Each field starts with a
-*descriptor* byte.  A descriptor byte spends two most significant bits for a
-field type, next two bits for a sub-type and four bits for field byte length
-(excluding the descriptor byte, so starts with 0).  Length of 13, 14 or 15 means
-the descriptor byte is followed by the actual length as a big-endian uint8,
-uint16 or uint32, respectively.  Descriptor byte types and sub-types are as
-follows:
+### Descriptors
+
+A descriptor's first byte spends four most significant bits to describe the
+type of the field, other four bits describe its length.
+
+```
+   7    6    5    4    3    2    1    0
++----+----+----+----+----+----+----+----+
+| major   | minor   |len |field length/ |
+|    type |    type |flag| length length|
++----+----+----+----+----+----+----+----+
+  128  64   32   16    8    4    2    1
+```
+
+Frame descriptor type bits encode major/minor versions of the protocol (two
+m.s. bits for the major, other two for the minor, e.g. `10 00` for 2.0). 
+
+Field descriptor major/minor type bits are set as follows:
 
 0. `00` Op  (the byte length is either 0 or the length of all the op's fields)
     * `0000` raw op subtype,
     * `0001` reduced op,
     * `0010` header op,
     * `0011` query header op.
-1. `01` UUID half, uncompressed uint64
+1. `01` UUID, uncompressed
     * `0100` type (reducer) id,
     * `0101` object id,
     * `0110` event id,
     * `0111` ref/location id
-2. `10` UUID half, prefix-compressed
-    * `0100` value UUID half, compressed (warning: not type id)
+2. `10` UUID, compressed (zipped)
+    * `0100` value UUID, zipped (note: not type id)
     * `0101` object id,
     * `0110` event id,
     * `0111` ref/location id
 3. `11` Atom
-    * `1100` value UUID half, uncompressed
+    * `1100` value UUID, uncompressed
     * `1101` integer (big-endian int64)
     * `1110` string (...)
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
+ 
+A descriptor's four least significant bits encode the length of the frame,
+field or op in question.  The length value given by a descriptor does not
+include the length of the descriptor itself.  Hence, the *cited* length is less
+that the actual byte length by at least 1 byte.  Field lengths are "nested"
+into op lengths, op lengths are "nested" into frame lengths, but they don't add
+up exactly. 
 
-UUID coding is as follows:
+If a field or a frame is 0 to 7 bytes long then it has its length coded
+directly in those four bits (m.s. bit being set to 0). If the m.s. bit is set
+to 1, then the other three bits code the byte length of the following
+big-endian number coding the actual field length (1 to 7 bytes).
 
-* value and origin are encoded as separate halves,
-* a skipped field means "same as the default",
-* in the value part, UUID halves can't be skipped,
-* field length is 0..8 bytes (0 is same as a skipped field)
-* a compressed UUID half (value/origin) has 60 numeric bits encoded by 1..8
-  bytes (big-endian, also note the 8x8-60=4 extra bits); in the first byte, the
-  most significant bit denotes a default flip (same as \` in the Base64 coding),
-  next three bits specify the shared prefix length, in bytes (0..7)
-* an uncompressed UUID half is up to 8 bytes, starting with the 0th or 8th byte of the UUID (for the value or origin halves respectively), according to the RON UUID big-endian bit
-  layout; skipped (tailing, l.s.b.,
-  depending on which half it is) bytes are zeroes
+Consider a time value request frame: `*now?.`
 
-For example, `1010 0001  1111 0100` is a prefix-compressed half `10` of an event
-UUID `10`, defaults to the corresponding half of the object UUID of the same op
-`1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining
-60-7x8=4 bits are `0100`.  As with the Base64 coding, we optimize for
-compression of close UUIDs (ideally, sequential UUIDs).
+* 3 bytes are magic bytes (RON, `0101 0010  0100 1111  0100 1110`)
+* frame descriptor: 1 byte (cited length 5, `1000 0101`)
+* op descriptor: 1 byte (cited length 4, `0011 0100`)
+* uncompressed UUID descriptor: 1 byte (cited length 3, `0100 0011`)
+* `now` RON UUID: 3 bytes (`0000 1100  1011 0011  1110 1100`)
+
+As UUID length is up to 16 bytes, UUID fields never use a separate length
+number. UUID descriptors are always 1 byte long. The length flag is treated
+like the other three bits. 
+
+Length bits `0000` is a special value:
+
+* for integer/float atoms, length 0 stands for zero value (`=0`, `^0.0` resp),
+* for strings, that stands for an empty string,
+* for frames, length 0 stands for an empty frame (e.g. a keepalive),
+* for zipped UUIDs, 0 stands for a zero value (RFC4122 null UUID, all zeros),
+* for uncompressed UUIDs, 0 stands for length 16 (full-length UUID),
+* for ops, length 0 stands for a no-fields op (e.g. if using the `?!`
+  construct, the second op has all UUIDs skipped).
+
+Length bits `1000` is another special value:
+
+* for UUID fields that means simply length 8 (not special),
+* for ops, that means "unspecified" (specifying full op length is optional),
+* likewise for frames, that means "unspecified" (e.g. when using a framed
+  transport like WebSocket we don't need explicit frame lengths),
+* for other cases, the value is reserved.
+
+### Uncompressed UUIDs
+
+Uncompressed UUIDs are not compressed relative to preceding UUIDs (not *zipped*).
+Still, zero bytes are skipped to optimize for some often-used cases.
+The skip pattern is determined based on the cited field length.
+
+Namely, UUIDs 1..8 bytes long have the *origin* part set to zeros (all 8 bytes)
+and the least significant bytes of the value also set to zeroes.
+These are often-used "transcendent" name UUIDs (`lww`, `rga`, `db`, `now`, etc).
+
+UUIDs 9 to 15 bytes long have their l.s. value bytes set to zero. 
+
+UUIDs 16 bytes long are full 128-bit RON UUIDs.
+
+### Compressed UUIDs
+
+Zipped UUIDs are serialized as deltas to similar past UUIDs.  That provides
+significant savings when UUIDs come from the same source (same origin bytes) or
+have close timestamp values.  Repeat UUIDs are simply skipped, same as in the
+Base64 notation.
+
+The origin value is either reused in full or rewritten in full. That is decided
+by the field length (<9 reuse, >=9 rewrite). Implicitly, origin ids are
+considered uncompressible.
+
+There are two zip modes: *short* and *long*.  In the short mode, an UUID is
+compressed relative to the same kind of UUID in the previous op (e.g. event id
+relative to the previous event id).  In the long mode, an UUID is compressed
+relative to a past uncompressed UUID.  A decoder must remember 16 last
+uncompressed timestamp-based UUIDs (no names, no hashes), to perform
+uncompression.
+
+A zipped UUID starts with a *zip byte* referencing the compression details.
+
+Short zip byte:
+
+```
+   7    6    5    4    3    2    1    0
++----+----+----+----+----+----+----+----+
+|  0 | zero tail len|                   |
+|    | (half-bytes) |  m.s. half-byte   |
++----+----+----+----+----+----+----+----+
+  128  64   32   16    8    4    2    1
+```
+
+In this mode, the zip byte specifies how many l.s. half-bytes of the value are
+zeroes. Based on the field length, we decide how many "middle" half-bytes need
+to be changed, relative to the past UUID. M.s. half-bytes stay the same as in
+the past UUID.
+
+Long zip byte:
+
+```
+   7    6    5    4    3    2    1    0
++----+----+----+----+----+----+----+----+
+|  1 |zero tail len | past uncompressed |
+|    |  (half-bytes)|   UUID index      |
++----+----+----+----+----+----+----+----+
+  128  64   32   16    8    4    2    1
+```
+
+In this mode, the zip byte specifies the past uncompressed UUID we use as a
+reference. Similarly to the short mode, we set a number of l.s. half-bytes to
+zeroes, replace middle half-bytes with new values and keep the m.s. half-bytes
+the same.
+
+### Atoms
+
+Strings are serialized as UTF-8.
+
+Integers are serialized using the zig-zag coding (the l.s. bit conveys the sign).
+
+Floats are serialized as ISO floats (4-byte and 8-byte support is required,
+other lengths are optional).
 
 ## The math
 
@@ -379,6 +490,10 @@ applications as well.
 
 Use Swarm RON!
 
+## Acknowledgements
+
+* Russell Sullivan
+* Yury
 
 ## History
 
