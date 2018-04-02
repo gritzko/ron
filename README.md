@@ -110,17 +110,28 @@ four UUID types:
       (global), `MyVariable$gritzko` (scoped),
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
 2. An op is an immutable atomic unit of data change.  An op is a tuple of four
-[UUIDs](uid.md) and zero or more *atoms*:
-    * data type UUID, e.g. `lww` a last-write-wins object,
-    * object UUID `1TUAQ+gritzko`,
-    * event UUID `1TUAQ+gritzko` and
-    * location/reference UUID, e.g. `bar`.
-    * atoms are strings, integers, floats or references (UUIDs).
-3. a frame is an ordered collection of ops, a transactional unit of data
+"key" [UUIDs](uuid.md) and zero or more "value" *atoms*. An op goes under one
+of four *terms*.
+    * Key UUIDs:
+        1. data type UUID, e.g. `lww` a last-write-wins object,
+        2. object UUID `1TUAQ+gritzko`,
+        3. event UUID `1TUAQ+gritzko` and
+        4. location/reference UUID, e.g. `bar`.
+    * Atom types:
+        1. strings, 
+        2. integers, 
+        3. floats or 
+        4. references (UUIDs).
+    * Op terms:
+        1. raw ops (a single op, before being processed by a reducer),
+        2. reduced ops (an op in a frame, processed by a reducer),
+        3. frame headers (planted by a reducer),
+        4. queries (part of connection/subscription state machines).
+3. A frame is an ordered collection of ops, a transactional unit of data
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
-4. a reducer is a RON term for a "data type"; reducers define how object state
+4. A reducer is a RON term for a "data type"; reducers define how object state
 is changed by new ops
     * a reducer is a pure function: `f(state_frame, change_frame) ->
       new_state_frame`, where frames are either empty frames or single ops or
@@ -303,13 +314,13 @@ relative to similar preceding UUIDs.
 
 A binary RON frame starts with magic bytes `RON` and a frame *descriptor*
 specifying the version of the protocol and the length of the frame.  The rest
-of a frame is a sequence of *fields*.  Each field starts with a *descriptor*
+of the frame is a sequence of *fields*.  Each field starts with a *descriptor*
 specifying the type of the field and its length.
 
 ### Descriptors
 
-A descriptor's first byte spends four most significant bits to describe the
-type of the field, other four bits describe its length.
+A descriptor's first byte spends four most significant (m.s.) bits to describe
+the type of the field, other four bits describe its length.
 
 ```
    7    6    5    4    3    2    1    0
@@ -325,8 +336,8 @@ m.s. bits for the major, other two for the minor, e.g. `10 00` for 2.0).
 
 Field descriptor major/minor type bits are set as follows:
 
-0. `00` Op  (the byte length is either 0 or the length of all the op's fields)
-    * `0000` raw op subtype,
+0. `00` RON op,
+    * `0000` raw op,
     * `0001` reduced op,
     * `0010` header op,
     * `0011` query header op.
@@ -358,35 +369,37 @@ directly in those four bits (m.s. bit being set to 0). If the m.s. bit is set
 to 1, then the other three bits code the byte length of the following
 big-endian number coding the actual field length (1 to 7 bytes).
 
-Consider a time value request frame: `*now?.`
+Consider a time value query frame: `*now?.`
 
 * 3 bytes are magic bytes (RON, `0101 0010  0100 1111  0100 1110`)
 * frame descriptor: 1 byte (cited length 5, `1000 0101`)
 * op descriptor: 1 byte (cited length 4, `0011 0100`)
 * uncompressed UUID descriptor: 1 byte (cited length 3, `0100 0011`)
-* `now` RON UUID: 3 bytes (`0000 1100  1011 0011  1110 1100`)
+* `now` RON UUID: 3 bytes (`0000 1100  1011 0011  1110 1100`,
+  the "uncompressed" coding still trims a lot of zeroes, see below).
 
 As UUID length is up to 16 bytes, UUID fields never use a separate length
-number. UUID descriptors are always 1 byte long. The length flag is treated
-like the other three bits. 
+number. UUID descriptors are always 1 byte long. The length flag bit joins the
+other three length bits to code 16 length values (1 to 16, 0 stands for 16). 
 
-Length bits `0000` is a special value:
+Length bits `0000` mean a default value for the field:
 
 * for integer/float atoms, length 0 stands for zero value (`=0`, `^0.0` resp),
 * for strings, that stands for an empty string,
 * for frames, length 0 stands for an empty frame (e.g. a keepalive),
 * for zipped UUIDs, 0 stands for a zero value (RFC4122 null UUID, all zeros),
-* for uncompressed UUIDs, 0 stands for length 16 (full-length UUID),
 * for ops, length 0 stands for a no-fields op (e.g. if using the `?!`
-  construct, the second op has all UUIDs skipped).
+  construct, the second op has all UUIDs skipped),
+* but for uncompressed UUIDs, 0 stands for length 16 (full-length 128 bit
+  UUID).
 
-Length bits `1000` is another special value:
+Length bits `1000` is a special value:
 
-* for UUID fields that means simply length 8 (not special),
+* for UUID fields that means simply length 8 (thus not special),
 * for ops, that means "unspecified" (specifying full op length is optional),
 * likewise for frames, that means "unspecified" (e.g. when using a framed
   transport like WebSocket we don't need explicit frame lengths),
-* for other cases, the value is reserved.
+* for atoms, the value is reserved.
 
 ### Uncompressed UUIDs
 
@@ -397,8 +410,12 @@ The skip pattern is determined based on the cited field length.
 Namely, UUIDs 1..8 bytes long have the *origin* part set to zeros (all 8 bytes)
 and the least significant bytes of the value also set to zeroes.
 These are often-used "transcendent" name UUIDs (`lww`, `rga`, `db`, `now`, etc).
+For example, `lww` is the data type UUID for last-write-wins objects.
+In the unabbreviated RON Base64 form, `lww` is `0lww0000000 00000000000`
+(see the [UUID spec](uuid.md) for the details).
 
 UUIDs 9 to 15 bytes long have their l.s. value bytes set to zero. 
+This case is optimized for arbitrary-precision timestamps.
 
 UUIDs 16 bytes long are full 128-bit RON UUIDs.
 
@@ -406,19 +423,19 @@ UUIDs 16 bytes long are full 128-bit RON UUIDs.
 
 Zipped UUIDs are serialized as deltas to similar past UUIDs.  That provides
 significant savings when UUIDs come from the same source (same origin bytes) or
-have close timestamp values.  Repeat UUIDs are simply skipped, same as in the
+have close timestamp values.  Repeated UUIDs are simply skipped, same as in the
 Base64 notation.
 
-The origin value is either reused in full or rewritten in full. That is decided
+The origin part is either reused in full or rewritten in full. That is decided
 by the field length (<9 reuse, >=9 rewrite). Implicitly, origin ids are
 considered uncompressible.
 
 There are two zip modes: *short* and *long*.  In the short mode, an UUID is
 compressed relative to the same kind of UUID in the previous op (e.g. event id
 relative to the previous event id).  In the long mode, an UUID is compressed
-relative to a past uncompressed UUID.  A decoder must remember 16 last
+relative to a past uncompressed UUID. A decoder must remember 16 last
 uncompressed timestamp-based UUIDs (no names, no hashes), to perform
-uncompression.
+uncompression. For encoders, that is optional.
 
 A zipped UUID starts with a *zip byte* referencing the compression details.
 
@@ -450,7 +467,9 @@ Long zip byte:
 ```
 
 In this mode, the zip byte specifies the past uncompressed UUID we use as a
-reference. Similarly to the short mode, we set a number of l.s. half-bytes to
+reference. Index 0 points at the recentmost uncompressed UUID, 1 to the
+previous one, etc.
+Similarly to the short mode, we set a number of l.s. half-bytes to
 zeroes, replace middle half-bytes with new values and keep the m.s. half-bytes
 the same.
 
@@ -460,7 +479,7 @@ Strings are serialized as UTF-8.
 
 Integers are serialized using the zig-zag coding (the l.s. bit conveys the sign).
 
-Floats are serialized as ISO floats (4-byte and 8-byte support is required,
+Floats are serialized as IEEE 754 floats (4-byte and 8-byte support is required,
 other lengths are optional).
 
 ## The math
@@ -493,7 +512,7 @@ Use Swarm RON!
 ## Acknowledgements
 
 * Russell Sullivan
-* Yury
+* Yuriy Syrovetskiy
 
 ## History
 
