@@ -353,20 +353,20 @@ Field descriptor major/minor type bits are set as follows:
     * `0111` ref/location id
 3. `11` Atom
     * `1100` value UUID, uncompressed
-    * `1101` integer (big-endian int64)
-    * `1110` string (...)
+    * `1101` integer (big-endian, [zigzag-coded][zigzag])
+    * `1110` string (UTF-8)
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
  
 A descriptor's four least significant bits encode the length of the frame,
 field or op in question.  The length value given by a descriptor does not
 include the length of the descriptor itself.  Hence, the *cited* length is less
-that the actual byte length by at least 1 byte.  Field lengths are "nested"
+than the actual byte length by at least 1 byte.  Field lengths are "nested"
 into op lengths, op lengths are "nested" into frame lengths, but they don't add
 up exactly. 
 
 If a field or a frame is 0 to 7 bytes long then it has its length coded
-directly in those four bits (m.s. bit being set to 0). If the m.s. bit is set
-to 1, then the other three bits code the byte length of the following
+directly in those four bits (flag bit being set to 0). If the flag bit is set
+to 1, then the other three bits encode the byte length of the following
 big-endian number coding the actual field length (1 to 7 bytes).
 
 Consider a time value query frame: `*now?.`
@@ -559,3 +559,4 @@ Use Swarm RON!
 [lamport]: http://lamport.azurewebsites.net/pubs/time-clocks.pdf
 [2problems]: https://martinfowler.com/bliki/TwoHardThings.html
 [lsmt]: https://en.wikipedia.org/wiki/Log-structured_merge-tree
+[zigzag]: https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
