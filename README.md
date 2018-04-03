@@ -347,10 +347,10 @@ Field descriptor major/minor type bits are set as follows:
     * `0110` event id,
     * `0111` ref/location id
 2. `10` UUID, compressed (zipped)
-    * `0100` value UUID, zipped (note: not type id)
-    * `0101` object id,
-    * `0110` event id,
-    * `0111` ref/location id
+    * `1000` value UUID, zipped (note: not type id)
+    * `1001` object id,
+    * `1010` event id,
+    * `1011` ref/location id
 3. `11` Atom
     * `1100` value UUID, uncompressed
     * `1101` integer (big-endian, [zigzag-coded][zigzag])
