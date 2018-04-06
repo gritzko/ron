@@ -32,11 +32,11 @@ func NewOmniReducer() (ret OmniReducer) {
 	return
 }
 
-func (omni OmniReducer) Features () int {
+func (omni OmniReducer) Features() int {
 	return 0 // should it be a reducer?
 }
 
-func (omni EmptyReducer) Features () int {
+func (omni EmptyReducer) Features() int {
 	return 0
 }
 

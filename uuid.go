@@ -60,11 +60,11 @@ func (a UUID) EarlierThan(b UUID) bool {
 }
 
 func (a UUID) Scheme() uint64 {
-	return a[1] >> 60
+	return (a[1] >> 60) & 3
 }
 
-func (a UUID) Variety () uint {
-	return uint(a[0]>>60)
+func (a UUID) Variety() uint {
+	return uint(a[0] >> 60)
 }
 
 func (a UUID) Sign() byte {

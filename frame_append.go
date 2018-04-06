@@ -67,7 +67,7 @@ func Int60Prefix(a, b uint64) int {
 
 func FormatUUID(buf []byte, uuid UUID) []byte {
 	variety := uuid.Variety()
-	if variety!=0 {
+	if variety != 0 {
 		buf = append(buf, BASE_PUNCT[variety], '/')
 	}
 	buf = FormatInt(buf, uuid.Value())
@@ -93,14 +93,19 @@ func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 	buf = FormatZipInt(buf, uuid.Origin(), context.Origin())
 	// sometimes, we may skip UUID separator (+-%$)
 	if uuid.Scheme() == context.Scheme() && at > start+1 {
-		if len(buf) > at && ABC_KIND[buf[at]] != BASE_KIND {
+		if len(buf) > at && !IsBase64(buf[at]) {
 			copy(buf[at-1:], buf[at:])
 			buf = buf[:len(buf)-1]
-		} else if len(buf) == at && ABC_KIND[buf[start]] != BASE_KIND {
+		} else if len(buf) == at && !IsBase64(buf[start]) {
 			buf = buf[:len(buf)-1]
 		}
 	}
 	return buf
+}
+
+func IsBase64(b byte) bool {
+	bi := uint(b)
+	return ((IS_BASE[bi>>6] >> (bi & 63)) & 1) != 0
 }
 
 func sharedPrefix(uuid, context UUID) (ret int) {

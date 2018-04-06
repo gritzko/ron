@@ -117,11 +117,11 @@ func TestFrame_Empties(t *testing.T) {
 	head := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
 	next := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
 	next.Next()
-	if head.Type()!=next.Type() || head.Object()!=next.Object() || head.Event()!=next.Event() || head.Ref()!=next.Ref() {
+	if head.Type() != next.Type() || head.Object() != next.Object() || head.Event() != next.Event() || head.Ref() != next.Ref() {
 		t.Fail()
 		t.Logf("failed default")
 	}
-	if next.Term()!=TERM_HEADER {
+	if next.Term() != TERM_HEADER {
 		t.Fail()
 		t.Log("incorrect term")
 	}
