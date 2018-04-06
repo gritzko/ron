@@ -1,0 +1,29 @@
+@startuml
+
+Uint128 <|-- Atom
+
+Atom <|-- UUID
+
+UUID <|-- Spec : [4]
+
+Atom <|-- Op : []
+
+Op <|-- Cursor
+Op : -term : Int
+
+Cursor : +parser : ParserState
+Cursor : +position : Int
+
+
+Frame : -binary : Bool
+Frame : +body : Byte[]
+Frame : +serializer : SerializerState
+
+Cursor <|-- Batch : []
+
+Batch --> Frame : Reducer
+
+interface "?" as UserObject << user object >>
+Batch --> UserObject : Mapper
+
+@enduml
