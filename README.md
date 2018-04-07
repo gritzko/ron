@@ -311,7 +311,7 @@ the descriptor byte is followed by the actual length as a big-endian uint8,
 uint16 or uint32, respectively.  Descriptor byte types and sub-types are as
 follows:
 
-0. `00` Op  (the byte length is either 0 or the length of all the op's fields)
+0. `00` Op term  (cited length is 0)
     * `0000` raw op subtype,
     * `0001` reduced op,
     * `0010` header op,
