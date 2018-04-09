@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gritzko/ron"
+	"bufio"
+	"os"
 )
 
 func convert (args []string) {
@@ -69,8 +71,12 @@ func convert_int4 (args []string) {
 	}
 }
 
-func read_stdin () []string {
-	return []string{}
+func read_stdin () (ret []string) {
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		ret = append(ret, scanner.Text())
+	}
+	return
 }
 
 func convert_uuid (args []string) {
@@ -91,7 +97,7 @@ func convert_uuid (args []string) {
 	for _, a := range uuids {
 		uuid, err := ron.ParseUUIDString(a)
 		if err != nil {
-			Misunderstood(err.Error())
+			Misunderstood(err.Error()+" with "+a)
 			return
 		}
 		switch to {
