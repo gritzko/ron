@@ -309,7 +309,7 @@ func (frame *Frame) Append(other Frame) {
 		frame.atoms = frame.atoms[:len(other.atoms)]
 	}
 	frame.term = other.term
-	frame.Position++
+	frame.position++
 
 }
 

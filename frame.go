@@ -118,7 +118,7 @@ func NewStringFrame(data string) (i Frame) {
 }
 
 func (frame Frame) IsLast() bool {
-	return frame.Parser.position >= len(frame.Body)
+	return frame.Parser.pos >= len(frame.Body)
 }
 
 func (frame *Frame) Next() bool {
@@ -152,12 +152,12 @@ func (frame *Frame) SkipHeader() {
 }
 
 func (frame Frame) Offset() int {
-	return frame.Parser.position
+	return frame.Parser.pos
 }
 
 // Whether op parsing is complete (not always the case for the streaming mode)
 func (frame Frame) IsComplete() bool {
-	return (frame.Parser.state == RON_start && frame.Position >= 0) || frame.Parser.state == RON_FULL_STOP
+	return (frame.Parser.state == RON_start && frame.position >= 0) || frame.Parser.state == RON_FULL_STOP
 }
 
 func (ps ParserState) State() int {
@@ -200,7 +200,7 @@ func (batch Batch) IsEmpty() bool {
 }
 
 func (state ParserState) IsFail() bool {
-	return state.position > 0 && state.state == RON_error
+	return state.pos > 0 && state.state == RON_error
 }
 
 func (batch Batch) HasFullState() bool {
@@ -233,22 +233,22 @@ func NewFormattedFrame(format uint) (ret Frame) {
 }
 
 func (frame Frame) Rest() []byte {
-	return frame.Body[frame.Parser.position:]
+	return frame.Body[frame.Parser.pos:]
 }
 
-// Split returns two frames: one from the start to the current position (exclusive),
+// Split returns two frames: one from the start to the current pos (exclusive),
 // another from the current pos (incl) to the end. The right one is "stripped".
 func (frame Frame) Split2() (left, right Frame) {
 	// TODO text vs binary
-	left = ParseFrame(frame.Body[0:frame.Parser.offset])
-	right = NewBufferFrame(make([]byte, 0, 128+frame.Len()-frame.Parser.position))
+	left = ParseFrame(frame.Body[0:frame.Parser.off])
+	right = NewBufferFrame(make([]byte, 0, 128+frame.Len()-frame.Parser.pos))
 	right.Append(frame)
 	right.AppendBytes(frame.Rest())
 	return
 }
 
 func (frame Frame) SplitInclusive() Frame {
-	at := frame.Parser.position
+	at := frame.Parser.pos
 	if at > 0 && frame.Body[at-1] == FRAME_TERM_SEP {
 		at-- // strip the frame terminator
 	}
@@ -301,7 +301,7 @@ func (spec Spec) SetRef(uuid UUID) {
 	spec[SPEC_REF] = Atom(uuid)
 }
 
-// Verify the syntax, return the offset where error was found. -1 means OK.
+// Verify the syntax, return the off where error was found. -1 means OK.
 func (frame Frame) Verify() int {
 	ve := frame.Rewind()
 	for !ve.EOF() {

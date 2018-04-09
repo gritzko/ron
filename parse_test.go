@@ -176,7 +176,7 @@ func TestParseFrame(t *testing.T) {
 	for k := 0; k < ops; k++ {
 		if iter.EOF() {
 			t.Fail()
-			t.Logf("Premature end: %d not %d, failed at %d\n", k, ops, iter.Parser.position)
+			t.Logf("Premature end: %d not %d, failed at %d\n", k, ops, iter.Parser.pos)
 			break
 		}
 		at = k << 2
@@ -210,7 +210,7 @@ func TestFrame_Next(t *testing.T) {
 		}
 		if frame.Offset() != l {
 			t.Fail()
-			t.Logf("bad offset: %d not %d '%s'", frame.Offset(), l, frameStr)
+			t.Logf("bad off: %d not %d '%s'", frame.Offset(), l, frameStr)
 		} else {
 			//t.Logf("OK %d %s", i, frame.Type().String())
 		}
@@ -234,10 +234,10 @@ func TestFrame_EOF2(t *testing.T) {
 		if frame.Next() {
 			if states[o] != frame.Parser.state {
 				t.Fail()
-				t.Logf("state %d at pos %d op %d, expected %d", frame.Parser.state, frame.Parser.position, o, states[o])
+				t.Logf("state %d at pos %d op %d, expected %d", frame.Parser.state, frame.Parser.pos, o, states[o])
 				break
 			} else {
-				//t.Logf("OK state %d at pos %d op %d", frame.Parser.state, frame.Parser.position, o)
+				//t.Logf("OK state %d at pos %d op %d", frame.Parser.state, frame.Parser.pos, o)
 			}
 			if frame.Parser.state == RON_FULL_STOP {
 				frame = MakeStream(1024)
@@ -272,15 +272,15 @@ func TestFrame_EOF(t *testing.T) {
 		for i := 0; i < len(stream); i++ {
 			frame.AppendBytes([]byte(stream[i : i+1]))
 			frame.Next()
-			//t.Log(k, i, stream[i:i+1], frame.Position, frame.Parser.State(), frame.IsComplete())
+			//t.Log(k, i, stream[i:i+1], frame.pos, frame.Parser.State(), frame.IsComplete())
 			if frame.IsComplete() {
 				if s > len(states[k]) {
 					t.Fail()
-					t.Logf("stream %d offset %d got %d need nothing", k, i, frame.Parser.State())
+					t.Logf("stream %d off %d got %d need nothing", k, i, frame.Parser.State())
 					break
 				}
 				if frame.Parser.State() != states[k][s] {
-					t.Logf("stream %d offset %d got %d need %d", k, i, frame.Parser.State(), states[k][s])
+					t.Logf("stream %d off %d got %d need %d", k, i, frame.Parser.State(), states[k][s])
 					t.Fail()
 					break
 				}

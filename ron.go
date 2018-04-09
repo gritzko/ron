@@ -13,14 +13,14 @@ type Atoms []Atom
 type Spec []Atom
 
 type ParserState struct {
-	// position in the atom array, in the atom, in the half-atom
+	// pos in the atom array, in the atom, in the half-atom
 	atm, hlf, dgt int
 	// ragel parser state
 	state int
-	// byte offset of the current op
-	offset int
-	// parsing byte offset
-	position int
+	// byte off of the current op
+	off int
+	// parsing byte off
+	pos int
 	// parser mode: streaming (might get more bytes) / block (complete frame)
 	streaming bool
 	// which spec uuids are omitted/defaults in the current op
@@ -43,8 +43,8 @@ type Frame struct {
 	Serializer SerializerState
 	// RON coding: binary/text
 	binary bool
-	// The current position in the frame (op idx).
-	Position int
+	// The current pos in the frame (op idx).
+	position int
 	// ints hosts the current op: 4 pairs for spec uuid entries, the rest is values (also pairs).
 	// General convention: hte first int is hte value, the second is flags and other stuff.
 	_atoms [DEFAULT_ATOMS_ALLOC]Atom

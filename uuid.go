@@ -1,7 +1,7 @@
 package ron
 
 func (uuid UUID) Value() uint64 {
-	return uuid[0]&INT60_FULL
+	return uuid[0] & INT60_FULL
 }
 
 func (uuid UUID) Origin() uint64 {
