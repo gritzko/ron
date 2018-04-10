@@ -261,28 +261,28 @@ var UUID_EVENT_EPOCH_RECORD_SEP = BASE_PUNCT[2]
 
 /// end
 
-var ABC [128]int8
+var ABC [128]uint8
 var IS_BASE [4]uint64
 
 func init() {
 	for i := 0; i < 128; i++ {
-		ABC[i] = -1
+		ABC[i] = 255
 	}
 	for i, l := range BASE_PUNCT {
 		li := uint(l)
-		ABC[li] = int8(i)
+		ABC[li] = uint8(i)
 		IS_BASE[li>>6] |= uint64(1) << (li & 63)
 	}
 	for i, l := range PREFIX_PUNCT {
-		ABC[l] = int8(i)
+		ABC[l] = uint8(i)
 	}
 	for i, l := range TERM_PUNCT {
-		ABC[l] = int8(i)
+		ABC[l] = uint8(i)
 	}
 	for i, l := range UUID_PUNCT {
-		ABC[l] = int8(i)
+		ABC[l] = uint8(i)
 	}
 	for i, l := range SPEC_PUNCT {
-		ABC[l] = int8(i)
+		ABC[l] = uint8(i)
 	}
 }

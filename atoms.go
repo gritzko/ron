@@ -122,3 +122,41 @@ func (frame Frame) RawString(idx int) string {
 func (frame Frame) EscString(idx int) []byte {
 	return frame.atoms[idx+4].EscString(frame.Body)
 }
+
+func (a *Atom) init64(half Half, flags uint8) {
+	a[half] = uint64(flags) << 60
+}
+
+func (a *Atom) set2(half Half, idx uint, value uint64) {
+	a[half] |= value << (idx << 1)
+}
+
+func (a *Atom) set4(half Half, idx uint, value uint64) {
+	a[half] |= value << (idx << 2)
+}
+
+func (a *Atom) reset4(half Half, idx uint, value uint8) {
+	a[half] &^= 15 << (idx << 2)
+	a[half] |= uint64(value) << (idx << 2)
+}
+
+func (a *Atom) set6(half Half, dgt int, value uint8) {
+	a[half] |= uint64(value) << DIGIT_OFFSETS[dgt] // FIXME reverse numbering
+}
+
+func (a Atom) get6(half Half, dgt int) uint8 {
+	return uint8((a[half] >> DIGIT_OFFSETS[dgt]) & 63)
+}
+
+func (a *Atom) trim6(half Half, dgt int) {
+	a[half] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+}
+
+func (a *Atom) set64(half Half, value uint64) {
+	a[half] = value
+}
+
+func (a *Atom) arab64(idx Half, value byte) {
+	a[idx] *= 10
+	a[idx] += uint64(value)
+}

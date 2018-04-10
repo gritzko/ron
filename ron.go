@@ -6,6 +6,14 @@ const MAX_ATOMS_PER_OP = 1 << 20
 // An atom is a constant of a RON type: int, float, string or UUID
 type Atom [2]uint64
 
+// half of an atom
+type Half uint8
+
+const (
+	VALUE  Half = 0
+	ORIGIN Half = 1
+)
+
 type UUID Atom
 
 type Atoms []Atom
@@ -14,7 +22,8 @@ type Spec []Atom
 
 type ParserState struct {
 	// pos in the atom array, in the atom, in the half-atom
-	atm, hlf, dgt int
+	atm, dgt int
+	hlf      Half
 	// ragel parser state
 	state int
 	// byte off of the current op
