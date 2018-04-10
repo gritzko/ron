@@ -136,11 +136,12 @@ func (frame *Frame) appendFloat(a Atom) {
 		return
 	}
 	intStr := fmt.Sprintf("%d", a[0])
-	e := int(a[1] & INT32_FULL)
-	if a[1]&BIT32 != 0 {
+	e := a.pow()
+	if a[ORIGIN]&BIT60 != 0 {
 		frame.Body = append(frame.Body, '-')
 	}
-	if a[1]&BIT33 != 0 { // neg e
+	if e < 0 { // neg e
+		e = -e
 		ip := len(intStr) - e
 		if ip > 0 { // integer part
 			frame.Body = append(frame.Body, intStr[:ip]...)
