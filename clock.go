@@ -131,6 +131,8 @@ func (clock Clock) IsSane(uuid UUID) bool {
 	switch clock.Mode {
 	case CLOCK_LAMPORT:
 		return clock.lastSeen.Value()+MAX_BIT_GRAB > uuid.Value()
+	case CLOCK_CALENDAR:
+		return DecodeCalendar(uuid.Value()).Before(time.Now().UTC())
 	default:
 		return true
 	}

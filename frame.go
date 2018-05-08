@@ -47,6 +47,11 @@ func (frame Frame) Spec() Spec {
 	return ret[:]
 }
 
+// Position returns index of current operation
+func (frame Frame) Position() int {
+	return frame.position
+}
+
 func (frame *Frame) Read(reader io.Reader) (length int, err error) {
 	len, cap := frame.Len(), frame.Cap()
 	length, err = reader.Read(frame.Body[len:cap])
