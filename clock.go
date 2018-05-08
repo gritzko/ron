@@ -14,10 +14,6 @@ type Clock struct {
 	MinLength int
 }
 
-var CLOCK_CALENDAR = NewName("Calendar")
-var CLOCK_EPOCH = NewName("Epoch") // TODO implement behavior
-var CLOCK_LAMPORT = NewName("Logical")
-
 var MAX_BIT_GRAB uint64 = 1 << 20
 
 func NewClock(replica uint64, mode UUID, minLen int) Clock {
@@ -169,3 +165,4 @@ func DecodeCalendar(v uint64) time.Time {
 	t := time.Date(year+2010, time.Month(month+1), days+1, hours, mins, secs, ns100*100, time.UTC)
 	return t
 }
+
