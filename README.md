@@ -338,9 +338,6 @@ the type of the field, other four bits describe its length.
    80  40   20   10    8    4    2    1
 ```
 
-Frame descriptor type bits encode major/minor versions of the protocol (two
-m.s. bits for the major, other two for the minor, e.g. `10 00` for 2.0). 
-
 Field descriptor major/minor type bits are set as follows:
 
 0. `00` RON op term,
