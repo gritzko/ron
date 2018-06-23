@@ -1,6 +1,6 @@
 # RON UUID bit layout - compatibility
 
-The bit layout is semi-compatible with RFC4122.  The RFC reserves m.s.bits of
+The bit layout is semi-compatible with RFC4122.  The RFC reserves m.s. bits of
 the 8th byte for the "variant". RON hijacks the 0 variant (NCS backward
 compatibility) assuming no original Apollo UUIDs are still in circulation.
 
