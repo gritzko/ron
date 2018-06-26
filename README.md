@@ -41,13 +41,13 @@ metadata away.
 
 These are the key features of RON:
 
-* RON's atomic unit is an immutable *op*. Every change to the data is an
+* RON's basic unit is an immutable *op*. Every change to the data is an
   *event*; every event produces an op. An op may flow from a replica to a
   replica, from a database to a database, while fully intact and maintaining its
   original identity.
 * Each RON op is context-independent. Nothing is implied by the context,
-  everything is specified explicitly and unambiguously. An op has four globally
-  unique UUIDs for its data type, object, event and location.
+  everything is specified explicitly and unambiguously in the op itself. An op
+  has four globally unique UUIDs for its data type, object, event and location.
 * An object can be referenced by its UUID (e.g. `> 1TUAQ+gritzko`), thus RON can
   express object graph structures beyond simple nesting.  Overall, RON relates
   pieces of data by their UUIDs.  Thanks to that, RON data can be cached
@@ -109,24 +109,23 @@ four UUID types:
     * a name, either global or scoped to a replica, e.g. `foo`, `lww`, `bar`
       (global), `MyVariable$gritzko` (scoped),
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
-2. An op is an immutable atomic unit of data change.  An op is a tuple of four
-"key" [UUIDs](uuid.md) and zero or more "value" *atoms*. An op goes under one
-of four *terms*.
-    * Key UUIDs:
-        1. data type UUID, e.g. `lww` a last-write-wins object,
-        2. object UUID `1TUAQ+gritzko`,
-        3. event UUID `1TUAQ+gritzko` and
-        4. location/reference UUID, e.g. `bar`.
-    * Atom types:
-        1. strings, 
-        2. integers, 
-        3. floats or 
-        4. references (UUIDs).
-    * Op terms:
-        1. raw ops (a single op, before being processed by a reducer),
-        2. reduced ops (an op in a frame, processed by a reducer),
-        3. frame headers (planted by a reducer),
-        4. queries (part of connection/subscription state machines).
+2. An op is an immutable atomic unit of data change. An op is a tuple of four
+or more *atoms*. First four atoms of an op are UUIDs forming the op's key.
+These UUIDs are:
+    1. data type UUID, e.g. `lww` a last-write-wins object,
+    2. object UUID `1TUAQ+gritzko`,
+    3. event UUID `1TUAQ+gritzko` and
+    4. location/reference UUID, e.g. `bar`.
+Other atoms (any number, any type) form the op's value. Op atoms types are:
+    1. UUID,
+    2. integer, 
+    3. string, or 
+    4. float.
+Importantly, an op goes under one of four *terms*:
+    1. raw ops (a single op, before being processed by a reducer),
+    2. reduced ops (an op in a frame, processed by a reducer),
+    3. frame headers (first op of a frame, planted by a reducer),
+    4. queries (part of connection/subscription state machines).
 3. A frame is an ordered collection of ops, a transactional unit of data
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
@@ -199,7 +198,7 @@ The syntax outline:
     * `>` starts an UUID
     * `!` ends a frame header op (a reduced frame has one header op)
     * `?` ends a query header op (a subscription frame has a header)
-    * `.` ends a frame (optional)
+    * `.` ends a frame (required for streaming transports, e.g. TCP)
 4. frame format employs cross-columnar compression
     * repeated UUIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UUIDs using prefix compression, e.g.
