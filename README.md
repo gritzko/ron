@@ -116,11 +116,13 @@ These UUIDs are:
     2. object UUID `1TUAQ+gritzko`,
     3. event UUID `1TUAQ+gritzko` and
     4. location/reference UUID, e.g. `bar`.
+
 Other atoms (any number, any type) form the op's value. Op atoms types are:
     1. UUID,
     2. integer, 
     3. string, or 
     4. float.
+
 Importantly, an op goes under one of four *terms*:
     1. raw ops (a single op, before being processed by a reducer),
     2. reduced ops (an op in a frame, processed by a reducer),
