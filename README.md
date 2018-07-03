@@ -1,3 +1,19 @@
+Table of Contents
+=================
+
+   * [Swarm Replicated Object Notation 2.0.1](#swarm-replicated-object-notation-201)
+      * [Formal model](#formal-model)
+      * [Wire format (Base64)](#wire-format-base64)
+      * [Wire format (binary)](#wire-format-binary)
+         * [Descriptors](#descriptors)
+         * [Op terms](#op-terms)
+         * [Uncompressed UUIDs](#uncompressed-uuids)
+         * [Compressed UUIDs](#compressed-uuids)
+         * [Atoms](#atoms)
+      * [The math](#the-math)
+      * [Acknowledgements](#acknowledgements)
+      * [History](#history)
+
 # Swarm Replicated Object Notation 2.0.1 #
 
 Swarm Replicated Object Notation is a format for *distributed live data*.  RON's
