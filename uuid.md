@@ -28,6 +28,7 @@ The codes for schemes and their varieties:
         1101. short DNS name (D/google$com)
         1110. E.164 intl phone num (E/7999$5631415)
         1111. ISO 3166 country code (F/RU, F/FRA...)
+
     01. number
         00. ?decimal index (up to 9999999999%, also 2D indices 4%5)
         01. cryptographic hash
@@ -39,15 +40,18 @@ The codes for schemes and their varieties:
                  0111. ...SHA-3 based
         10. random number (A/k3R9w_2F8w%Le~6dDScsw)
         11. crypto id, public key fingerprint ???
+
     10. event (Lamport timestamp, value and origin)
         00. Base64 calendar (MMDHmS...)
-            origin is an app-scoped handle
-            0000. trie-forked
-            0001. crypto-forked
-            0010. record-forked
-            0011. external-forked
         01. Logical (4/00001, 70000000002...)
         10. Epoch (RFC 4122 epoch, 100ns since 1582)
+
+        origin is a replica id, where variant specifies the replica id distribution rule:
+        0000. trie-forked
+        0001. crypto-forked
+        0010. record-forked
+        0011. application-specific
+
     11. derived event (timestamp, same as event)
 
 Event/derived RON UUIDs are very much like RFC 4122 v1 time-based UUIDs.  The
