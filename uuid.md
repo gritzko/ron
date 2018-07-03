@@ -1,6 +1,6 @@
 # RON UUID bit layout - compatibility
 
-The bit layout is semi-compatible with RFC4122.  The RFC reserves m.s. bits of
+The bit layout is semi-compatible with RFC 4122.  The RFC reserves m.s. bits of
 the 8th byte for the "variant". RON hijacks the 0 variant (NCS backward
 compatibility) assuming no original Apollo UUIDs are still in circulation.
 
@@ -10,7 +10,7 @@ compatibility) assuming no original Apollo UUIDs are still in circulation.
     .... ....  .... ....  .... ....  .... ....
 
 `ss` bits stand for the "scheme" of the RON UUID.  `vvvv` stand for "variety"
-within the scheme.  For example, scheme: event timestamp `10`, variety: RFC4122
+within the scheme.  For example, scheme: event timestamp `10`, variety: RFC 4122
 epoch `0010`.
 
 The codes for schemes and their varieties:
@@ -47,10 +47,10 @@ The codes for schemes and their varieties:
             0010. record-forked
             0011. external-forked
         01. Logical (4/00001, 70000000002...)
-        10. Epoch (RFC4122 epoch, 100ns since 1582)
+        10. Epoch (RFC 4122 epoch, 100ns since 1582)
     11. derived event (timestamp, same as event)
 
-Event/derived RON UUIDs are very much like RFC4122 v1 time-based UUIDs.  The
+Event/derived RON UUIDs are very much like RFC 4122 v1 time-based UUIDs.  The
 difference is subtle but very important: RON event UUIDs are logical clocks.
 They are *monotonous* and causally consistent. Practically speaking, RON UUIDs
 assume an internet connection is/was available to somewhat synchronize the
@@ -61,12 +61,12 @@ must reject any data with UUIDs "from the future".
 
     00. RON UUID,
     01. internal: RON atom (int, float, string),
-    10. RC4122 UUID,
+    10. RFC 4122 UUID,
     11. Microsoft something.
 
 ## Base64 rendering
 
-Any UUID, including RFC4122 UUIDs, could be Base64-serialized as 22 chars
+Any UUID, including RFC 4122 UUIDs, could be Base64-serialized as 22 chars
 
     A0123456789 8abcdefghij
 
