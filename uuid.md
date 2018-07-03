@@ -47,10 +47,10 @@ The codes for schemes and their varieties:
         10. Epoch (RFC 4122 epoch, 100ns since 1582)
 
         origin is a replica id, where variant specifies the replica id assignment rule:
-        0000. trie-forked
-        0001. crypto-forked
-        0010. record-forked
-        0011. application-specific
+        __00. trie-forked
+        __01. crypto-forked
+        __10. record-forked
+        __11. application-specific
 
     11. derived event (timestamp, same as event)
 
