@@ -46,7 +46,7 @@ The codes for schemes and their varieties:
         01. Logical (4/00001, 70000000002...)
         10. Epoch (RFC 4122 epoch, 100ns since 1582)
 
-        origin is a replica id, where variant specifies the replica id distribution rule:
+        origin is a replica id, where variant specifies the replica id assignment rule:
         0000. trie-forked
         0001. crypto-forked
         0010. record-forked
