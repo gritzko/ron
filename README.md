@@ -125,51 +125,67 @@ four UUID types:
     * a name, either global or scoped to a replica, e.g. `foo`, `lww`, `bar`
       (global), `MyVariable$gritzko` (scoped),
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
-2. An op is an immutable atomic unit of data change. An op is a tuple of four
-or more *atoms*. First four atoms of an op are UUIDs forming the op's key.
-These UUIDs are:
+    
+2.  An op is an immutable atomic unit of data change. An op is a tuple of four
+    or more *atoms*. First four atoms of an op are UUIDs forming the op's key.
+
+    These UUIDs are:
+
     1. data type UUID, e.g. `lww` a last-write-wins object,
     2. object UUID `1TUAQ+gritzko`,
     3. event UUID `1TUAQ+gritzko` and
     4. location/reference UUID, e.g. `bar`.
 
-Other atoms (any number, any type) form the op's value. Op atoms types are:
+    Other atoms (any number, any type) form the op's value. Op atoms types are:
+
     1. UUID,
     2. integer, 
     3. string, or 
     4. float.
 
-Importantly, an op goes under one of four *terms*:
+    Importantly, an op goes under one of four *terms*:
+
     1. raw ops (a single op, before being processed by a reducer),
     2. reduced ops (an op in a frame, processed by a reducer),
     3. frame headers (first op of a frame, planted by a reducer),
     4. queries (part of connection/subscription state machines).
+
 3. A frame is an ordered collection of ops, a transactional unit of data
+
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
-4. A reducer is a RON term for a "data type"; reducers define how object state
-is changed by new ops
-    * a reducer is a pure function: `f(state_frame, change_frame) ->
-      new_state_frame`, where frames are either empty frames or single ops or
-      products of past reductions by the same reducer,
-    * reducers are:
-        1. associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )`
-        where `patch == f(op1,op2)`
-        2. commutative for concurrent ops (can tolerate causally consistent
-        partial orders), e.g. `f(f(state,a),b) == f(f(state,b),a)`, assuming `a`
-        and `b` originated concurrently at different replicas,
-        3. idempotent, e.g. `f(state, op1) == f(f(state, op1), op1) == f(state,
-        f(op1, op1))`, etc.
-    * optionally, reducers may have stronger guarantees, e.g. full commutativity
-      (tolerates causality violations),
-    * a frame could be an op, a patch or a complete state. Hence, a baseline
-      reducer can "switch gears" from pure op-based CRDT mode to state-based
-      CRDT to delta-based, e.g.
+
+4.  A reducer is a RON term for a "data type"; reducers define how object state 
+    is changed by new ops
+
+    *   a reducer is a pure function: `f(state_frame, change_frame) ->
+        new_state_frame`, where frames are either empty frames or single ops or
+        products of past reductions by the same reducer,
+    
+    *   reducers are:
+    
+        1.  associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )`
+            where `patch == f(op1,op2)`
+        2.  commutative for concurrent ops (can tolerate causally consistent
+            partial orders), e.g. `f(f(state,a),b) == f(f(state,b),a)`, assuming `a`
+            and `b` originated concurrently at different replicas,
+        3.  idempotent, e.g. `f(state, op1) == f(f(state, op1), op1) == f(state,
+            f(op1, op1))`, etc.
+
+    *   optionally, reducers may have stronger guarantees, e.g. full commutativity
+        (tolerates causality violations),
+
+    *   a frame could be an op, a patch or a complete state. Hence, a baseline
+        reducer can "switch gears" from pure op-based CRDT mode to state-based
+        CRDT to delta-based, e.g.
+        
         1. `f(state, op)` is op-based
         2. `f(state1, state2)` is state-based
         3. `f(state, patch)` is delta-based
+        
 4. a mapper translates a replicated object's state frame into other formats
+
     * mappers turn RON objects into JSON or XML documents, C++, JavaScript or
       other objects
     * mappers are one-way: RON metadata may be lost in conversion
