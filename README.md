@@ -390,7 +390,7 @@ Field descriptor major/minor type bits are set as follows:
     * `1011` ref/location id
 3. `11` Atom
     * `1100` value UUID, uncompressed (lengths 1..16)
-    * `1101` integer (big-endian, [zigzag-coded][zigzag], lengths 1..8)
+    * `1101` integer (big-endian, [zigzag-coded][zigzag], lengths 1, 2, 4, 8)
     * `1110` string (UTF-8, length 0..2^31-1)
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
  
