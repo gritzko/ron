@@ -3,7 +3,7 @@ Table of Contents
 
    * [Swarm Replicated Object Notation 2.0.1](#swarm-replicated-object-notation-201)
       * [Formal model](#formal-model)
-      * [Wire format (Base64)](#wire-format-base64)
+      * [Wire format (text)](#wire-format-text)
       * [Wire format (binary)](#wire-format-binary)
          * [Descriptors](#descriptors)
          * [Op terms](#op-terms)
@@ -198,7 +198,7 @@ consistency by default.  Although, nothing prevents it from running in a
 linearized [ACIDic][peterb] or gossip environment.  That only relaxes (or
 restricts) the choice of reducers.
 
-## Wire format (Base64)
+## Wire format (text)
 
 Design goals for the RON wire format is to be reasonably readable and reasonably
 compact.  No less human-readable than regular expressions.  No less compact than
@@ -340,7 +340,7 @@ The binary format is more efficient because of higher bit density; it is also
 simpler and safer to parse because of explicit field lengths.  Obviously, it is
 not human-readable.
 
-Like the Base64, the binary format is only optimized for iteration.  Because of
+Like the text format, the binary one is only optimized for iteration.  Because of
 compression, records are inevitably of variable length, so random access is not
 possible.  Also, compression depends on iteration, as UUIDs get abbreviated
 relative to similar preceding UUIDs.
