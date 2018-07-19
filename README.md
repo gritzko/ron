@@ -241,7 +241,7 @@ The syntax outline:
     * key UUIDs are compressed against the same UUID in the previous op
       (e.g. event id against the previous event id)
     * body UUIDs are compressed against previous UUID of the same op
-    * backtick \` means repetition of the previous UUID of the same op
+    * backtick \` changes the default UUID to the previous UUID of the same op
       (e.g. event id against same op's object id)
 
 Consider a simple JSON object: 
