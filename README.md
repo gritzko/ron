@@ -238,10 +238,12 @@ The syntax outline:
     * RON abbreviates similar UUIDs using prefix compression, e.g.
       `1D4ICCE+XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC+XU5eRJ`
       (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
-    * by default, an UUID is compressed against the same UUID in the previous op
+    * by default, a key UUID is compressed against the same UUID in the previous op
       (e.g. event id against the previous event id)
     * backtick \` changes the default UUID to the previous UUID of the same op
       (e.g. event id against same op's object id)
+    * the first value UUID is compressed against the object UUID of the op,
+      each other is compressed against the previous one.
 
 Consider a simple JSON object: 
 
