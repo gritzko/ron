@@ -125,7 +125,7 @@ four UUID types:
     * a name, either global or scoped to a replica, e.g. `foo`, `lww`, `bar`
       (global), `MyVariable$gritzko` (scoped),
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
-    
+
 2.  An op is an immutable atomic unit of data change. An op is a tuple of four
     or more *atoms*. First four atoms of an op are UUIDs forming the op's key.
 
@@ -139,8 +139,8 @@ four UUID types:
     Other atoms (any number, any type) form the op's value. Op atoms types are:
 
     1. UUID,
-    2. integer, 
-    3. string, or 
+    2. integer,
+    3. string, or
     4. float.
 
     Importantly, an op goes under one of four *terms*:
@@ -156,15 +156,15 @@ four UUID types:
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
 
-4.  A reducer is a RON term for a "data type"; reducers define how object state 
+4.  A reducer is a RON term for a "data type"; reducers define how object state
     is changed by new ops
 
     *   a reducer is a pure function: `f(state_frame, change_frame) ->
         new_state_frame`, where frames are either empty frames or single ops or
         products of past reductions by the same reducer,
-    
+
     *   reducers are:
-    
+
         1.  associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )`
             where `patch == f(op1,op2)`
         2.  commutative for concurrent ops (can tolerate causally consistent
@@ -179,11 +179,11 @@ four UUID types:
     *   a frame could be an op, a patch or a complete state. Hence, a baseline
         reducer can "switch gears" from pure op-based CRDT mode to state-based
         CRDT to delta-based, e.g.
-        
+
         1. `f(state, op)` is op-based
         2. `f(state1, state2)` is state-based
         3. `f(state, patch)` is delta-based
-        
+
 4. a mapper translates a replicated object's state frame into other formats
 
     * mappers turn RON objects into JSON or XML documents, C++, JavaScript or
@@ -234,16 +234,19 @@ The syntax outline:
     * `?` ends a query header op (a subscription frame has a header)
     * `.` ends a frame (required for streaming transports, e.g. TCP)
 4. frame format employs cross-columnar compression
-    * repeated UUIDs can be skipped altogether ("same as in the last op")
+    * repeated key UUIDs can be skipped altogether ("same as in the last op");
+      in the first op a skipped UUID means `0`;
     * RON abbreviates similar UUIDs using prefix compression, e.g.
       `1D4ICCE+XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC+XU5eRJ`
       (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
-    * by default, an UUID is compressed against the same UUID in the previous op
-      (e.g. event id against the previous event id)
+    * by default, a key UUID is compressed against the same UUID in the previous
+      op (e.g. event id against the previous event id);
     * backtick \` changes the default UUID to the previous UUID of the same op
       (e.g. event id against same op's object id)
+    * the first value UUID is compressed against the object UUID of the op,
+      each other is compressed against the previous one.
 
-Consider a simple JSON object: 
+Consider a simple JSON object:
 
     {"keyA":"valueA", "keyB":"valueB"}
 
@@ -393,7 +396,7 @@ Field descriptor major/minor type bits are set as follows:
     * `1101` integer (big-endian, [zigzag-coded][zigzag], lengths 1, 2, 4, 8)
     * `1110` string (UTF-8, length 0..2^31-1)
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
- 
+
 A descriptor's four least significant bits encode the length of the field in
 question.  The length value given by a descriptor does not include the length
 of the descriptor itself.
@@ -418,7 +421,7 @@ Consider a time value query frame: `*now?.`
   the "uncompressed" coding still trims a lot of zeroes, see below).
 
 As UUID length is up to 16 bytes, UUID fields never use a separate length
-number. UUID descriptors are always 1 byte long. The length of 0 stands for 16. 
+number. UUID descriptors are always 1 byte long. The length of 0 stands for 16.
 
 Length bits `0000` stand for:
 
@@ -451,7 +454,7 @@ For example, `lww` is the data type UUID for last-write-wins objects.
 In the unabbreviated RON Base64 form, `lww` is `0/lww0000000 00000000000`
 (see the [UUID spec](uuid.md) for the details).
 
-UUIDs 9 to 15 bytes long have their l.s. value bytes set to zero. 
+UUIDs 9 to 15 bytes long have their l.s. value bytes set to zero.
 This case is optimized for arbitrary-precision timestamps.
 
 UUIDs 16 bytes long are full 128-bit RON UUIDs.
