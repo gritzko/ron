@@ -156,7 +156,9 @@ four UUID types:
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
       or chunks
-    * frame may contain any number of reduced chunks and raw ops in any order
+    * frame may contain any number of reduced chunks and raw ops in any order;
+      a chunk consists of a header or a query header op followed by reduced ops
+      belonging to the chunk; raw ops form their own one-op chunk.
 
 4.  A reducer is a RON term for a "data type"; reducers define how object state
     is changed by new ops
