@@ -155,6 +155,8 @@ four UUID types:
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
+      or chunks
+    * frame may contain any number of reduced chunks and raw ops in any order
 
 4.  A reducer is a RON term for a "data type"; reducers define how object state
     is changed by new ops
@@ -221,7 +223,7 @@ The syntax outline:
       variant is
       `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~`
 3. serialized ops use some punctuation, e.g. `*lww #1D4ICC-XU5eRJ
-@1D4ICC2-XU5eRJ :keyA 'valueA'`
+   @1D4ICC2-XU5eRJ :keyA 'valueA'`
     * `*` starts a data type UUID
     * `#` starts an object UUID
     * `@` starts an op's own event UUID
@@ -230,8 +232,10 @@ The syntax outline:
     * `'` starts and ends a string
     * `^` starts a float (e-notation)
     * `>` starts an UUID
-    * `!` ends a frame header op (a reduced frame has one header op)
+    * `!` ends a frame header op (a reduced chunk has one header op)
     * `?` ends a query header op (a subscription frame has a header)
+    * `,` ends a reduced op (optional)
+    * `;` ends a raw op
     * `.` ends a frame (required for streaming transports, e.g. TCP)
 4. frame format employs cross-columnar compression
     * repeated key UUIDs can be skipped altogether ("same as in the last op");
