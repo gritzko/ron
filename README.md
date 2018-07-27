@@ -215,6 +215,9 @@ The syntax outline:
     * integers: `1`
     * e-notation floats: `3.1415`, `1.0e+6`
     * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`
+      * if single quotes are used to wrap string (which is DEPRECATED),
+        additional escaping of single quotes inside string is needed:
+        `'` → `\u0027`
     * RON UUIDs `1D4ICC-XU5eRJ`, `1TUAQ+gritzko`
 2. UUIDs use a compact custom serialization
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122]
@@ -231,7 +234,8 @@ The syntax outline:
     * `@` starts an op's own event UUID
     * `:` starts a location UUID
     * `=` starts an integer
-    * `'` starts and ends a string
+    * `'` starts and ends a string (DEPRECATED)
+    * `"` starts and ends a string
     * `^` starts a float (e-notation)
     * `>` starts an UUID
     * `!` ends a frame header op (a reduced chunk has one header op)
