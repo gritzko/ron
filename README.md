@@ -40,8 +40,8 @@ Consider JSON. It expresses relations by element positioning:
 
 RON may express that state as:
 
-    *lww #1TUAQ+gritzko @`   :bar = 1
-         #(R            @`   :foo > (Q
+    *lww #1TUAQ+gritzko @`   :bar = 1;
+         #(R            @`   :foo > (Q;
 
 Those are two RON *ops*:
 
@@ -96,8 +96,8 @@ These are the key features of RON:
 
 Consider the above frame uncompressed:
 
-    *lww #1TUAQ+gritzko @1TUAQ+gritzko :bar = 1
-    *lww #1TUAR+gritzko @1TUAR+gritzko :foo > 1TUAQ+gritzko
+    *lww #1TUAQ+gritzko @1TUAQ+gritzko :bar = 1;
+    *lww #1TUAR+gritzko @1TUAR+gritzko :foo > 1TUAQ+gritzko;
 
 
 One may say, what metadata solves is [naming things and cache
@@ -290,7 +290,7 @@ Consider "Hello world!" collaboratively written by two users, `bart` and `lisa`
 on 27 Nov 2017 around 9am GMT.  A compressed RGA (Replicated Growable Array)
 frame would look like:
 
-    *rga#1UQ8p+bart@1UQ8yk+lisa!
+    *rga#1UQ8p+bart@1UQ8yk+lisa:0!
         @(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'
         @(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
 
@@ -300,7 +300,7 @@ The `txt` mapper may convert the RGA frame into text:
 
 If nicely indented, the compressed frame is easier to read:
 
-    *rga #1UQ8p+bart @1UQ8yk+lisa     !
+    *rga #1UQ8p+bart @1UQ8yk+lisa :0  !
                      @(s+bart        'H'
                      @[r             'e'
                      @(t             'l'
