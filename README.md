@@ -214,7 +214,8 @@ The syntax outline:
 1. atoms follow very predictable conventions:
     * integers: `1`
     * e-notation floats: `3.1415`, `1.0e+6`
-    * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`
+    * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`,
+      except that `'` (U+0027 APOSTROPHE) must be encoded as `\u0027`
     * RON UUIDs `1D4ICC-XU5eRJ`, `1TUAQ+gritzko`
 2. UUIDs use a compact custom serialization
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122]
