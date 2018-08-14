@@ -242,7 +242,7 @@ The syntax outline:
     * `.` ends a frame (required for streaming transports, e.g. TCP)
 4. frame format employs cross-columnar compression
     * repeated key UUIDs can be skipped altogether ("same as in the last op");
-      in the first op a skipped UUID means `0`;
+      in the first op all key UUIDs are mandatory;
     * RON abbreviates similar UUIDs using prefix compression, e.g.
       `1D4ICCE+XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC+XU5eRJ`
       (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
