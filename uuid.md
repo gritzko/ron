@@ -9,11 +9,11 @@ compatibility) assuming no original Apollo UUIDs are still in circulation.
     00ss ....  .... ....  .... ....  .... ....
     .... ....  .... ....  .... ....  .... ....
 
-`ss` bits stand for the "scheme" of the RON UUID.  `vvvv` stand for "variety"
-within the scheme.  For example, scheme: event timestamp `10`, variety: RFC 4122
+`ss` bits stand for the "version" of the RON UUID.  `vvvv` stand for "variety"
+within the version.  For example, version: event timestamp `10`, variety: RFC 4122
 epoch `0010`.
 
-The codes for schemes and their varieties:
+The codes for versions and their varieties:
 
     00. human readable name
         0000. transcendental/hardcoded name (lww, rga)
@@ -77,10 +77,10 @@ Any UUID, including RFC 4122 UUIDs, could be Base64-serialized as 22 chars
 where the leading char is `0` to `F` in each half.  The half-separating space is
 optional.  The Base64 serialization reproduces the bit layout, verbatim. 
 
-For scheme `00` or variety `0000`, the leading char might be skipped.
+For version `00` or variety `0000`, the leading char might be skipped.
 (The separating whitespace becomes non-optional then.)
 
-In case of RON UUIDs, the leading char denoting the scheme might be replaced by
+In case of RON UUIDs, the leading char denoting the version might be replaced by
 one of four special characters (`$` for `00`, `%` for `01`, `+` for `10`, `-` for
 `11`).
 
