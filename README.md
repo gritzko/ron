@@ -530,6 +530,20 @@ Integers are serialized using the zig-zag coding (the l.s. bit conveys the sign)
 Floats are serialized as IEEE 754 floats (4-byte and 8-byte support is required,
 other lengths are optional).
 
+## Implementations
+
+* **C++**
+  * [swarmcpp](https://github.com/gritzko/swarmcpp)
+* **Go**
+  * [ron](https://github.com/gritzko/ron)
+* **Haskell**
+  * [ron](https://github.com/ff-notes/swarm/tree/master/ron),
+    modules `RON.Text`, `RON.Binary` and others
+* **Java**
+  * ?
+* **JavaScript**
+  * [swarm](https://github.com/gritzko/swarm)
+
 ## The math
 
 RON is [log-structured][log]: it stores data as a stream of changes first,
