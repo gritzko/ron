@@ -25,7 +25,7 @@ func TestParseOp(t *testing.T) {
 	t.Log(iter.OpString())
 	i := iter.Integer(0)
 	if i != 1 {
-		t.Logf("int parse fails: %d", iter)
+		t.Logf("int parse fails: %s", iter.String())
 		t.Fail()
 	}
 }
