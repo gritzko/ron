@@ -18,7 +18,11 @@ func MakeSetReducer() ron.Reducer {
 	return ret
 }
 
-func (cs Set) Reduce(batch ron.Batch) ron.Frame {
+func (set Set) Features() int {
+	return ron.ACID_FULL
+}
+
+func (set Set) Reduce(batch ron.Batch) ron.Frame {
 	ret := ron.MakeFrame(batch.Len())
 	ref := DELTA_UUID
 	if batch.HasFullState() {
@@ -30,12 +34,12 @@ func (cs Set) Reduce(batch ron.Batch) ron.Frame {
 		batch[len(batch)-1].Event(),
 		ref,
 	))
-	cs.heap.PutAll(batch)
-	for !cs.heap.EOF() {
-		ret.AppendReduced(*cs.heap.Current())
-		cs.heap.NextPrim()
+	set.heap.PutAll(batch)
+	for !set.heap.EOF() {
+		ret.AppendReduced(*set.heap.Current())
+		set.heap.NextPrim()
 	}
-	return ret
+	return ret.Rewind()
 }
 
 func init() {

@@ -1,19 +1,3 @@
-Table of Contents
-=================
-
-   * [Swarm Replicated Object Notation 2.0.1](#swarm-replicated-object-notation-201)
-      * [Formal model](#formal-model)
-      * [Wire format (text)](#wire-format-text)
-      * [Wire format (binary)](#wire-format-binary)
-         * [Descriptors](#descriptors)
-         * [Op terms](#op-terms)
-         * [Uncompressed UUIDs](#uncompressed-uuids)
-         * [Compressed UUIDs](#compressed-uuids)
-         * [Atoms](#atoms)
-      * [The math](#the-math)
-      * [Acknowledgements](#acknowledgements)
-      * [History](#history)
-
 # Swarm Replicated Object Notation 2.0.1 #
 
 Swarm Replicated Object Notation is a format for *distributed live data*.  RON's
@@ -40,8 +24,8 @@ Consider JSON. It expresses relations by element positioning:
 
 RON may express that state as:
 
-    *lww #1TUAQ+gritzko @`   :bar = 1;
-         #(R            @`   :foo > (Q;
+    *lww #1TUAQ+gritzko @`   :bar = 1
+         #(R            @`   :foo > (Q
 
 Those are two RON *ops*:
 
@@ -57,13 +41,13 @@ metadata away.
 
 These are the key features of RON:
 
-* RON's basic unit is an immutable *op*. Every change to the data is an
+* RON's atomic unit is an immutable *op*. Every change to the data is an
   *event*; every event produces an op. An op may flow from a replica to a
   replica, from a database to a database, while fully intact and maintaining its
   original identity.
 * Each RON op is context-independent. Nothing is implied by the context,
-  everything is specified explicitly and unambiguously in the op itself. An op
-  has four globally unique UUIDs for its data type, object, event and location.
+  everything is specified explicitly and unambiguously. An op has four globally
+  unique UUIDs for its data type, object, event and location.
 * An object can be referenced by its UUID (e.g. `> 1TUAQ+gritzko`), thus RON can
   express object graph structures beyond simple nesting.  Overall, RON relates
   pieces of data by their UUIDs.  Thanks to that, RON data can be cached
@@ -96,8 +80,8 @@ These are the key features of RON:
 
 Consider the above frame uncompressed:
 
-    *lww #1TUAQ+gritzko @1TUAQ+gritzko :bar = 1;
-    *lww #1TUAR+gritzko @1TUAR+gritzko :foo > 1TUAQ+gritzko;
+    *lww #1TUAQ+gritzko @1TUAQ+gritzko :bar = 1
+    *lww #1TUAR+gritzko @1TUAR+gritzko :foo > 1TUAQ+gritzko
 
 
 One may say, what metadata solves is [naming things and cache
@@ -125,71 +109,39 @@ four UUID types:
     * a name, either global or scoped to a replica, e.g. `foo`, `lww`, `bar`
       (global), `MyVariable$gritzko` (scoped),
     * a hash (e.g. `4Js8lam4LB%kj529sMEsl`, both parts are hash sum bits).
-
-2.  An op is an immutable atomic unit of data change. An op is a tuple of four
-    or more *atoms*. First four atoms of an op are UUIDs forming the op's key.
-
-    These UUIDs are:
-
-    1. data type UUID, e.g. `lww` a last-write-wins object,
-    2. object UUID `1TUAQ+gritzko`,
-    3. event UUID `1TUAQ+gritzko` and
-    4. location/reference UUID, e.g. `bar`.
-
-    Other atoms (any number, any type) form the op's value. Op atoms types are:
-
-    1. UUID,
-    2. integer,
-    3. string, or
-    4. float.
-
-    Importantly, an op goes under one of four *terms*:
-
-    1. raw ops (a single op, before being processed by a reducer),
-    2. reduced ops (an op in a frame, processed by a reducer),
-    3. frame headers (first op of a frame, planted by a reducer),
-    4. queries (part of connection/subscription state machines).
-
-3. A frame is an ordered collection of ops, a transactional unit of data
-
+2. An op is an immutable atomic unit of data change.  An op is a tuple of four
+[UUIDs](uid.md) and zero or more *atoms*:
+    * data type UUID, e.g. `lww` a last-write-wins object,
+    * object UUID `1TUAQ+gritzko`,
+    * event UUID `1TUAQ+gritzko` and
+    * location/reference UUID, e.g. `bar`.
+    * atoms are strings, integers, floats or references (UUIDs).
+3. a frame is an ordered collection of ops, a transactional unit of data
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
     * in general, data is seen as a [partially ordered][po] log of frames
-      or chunks
-    * frame may contain any number of reduced chunks and raw ops in any order;
-      a chunk consists of a header or a query header op followed by reduced ops
-      belonging to the chunk; raw ops form their own one-op chunk.
-
-4.  A reducer is a RON term for a "data type"; reducers define how object state
-    is changed by new ops
-
-    *   a reducer is a pure function: `f(state_frame, change_frame) ->
-        new_state_frame`, where frames are either empty frames or single ops or
-        products of past reductions by the same reducer,
-
-    *   reducers are:
-
-        1.  associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )`
-            where `patch == f(op1,op2)`
-        2.  commutative for concurrent ops (can tolerate causally consistent
-            partial orders), e.g. `f(f(state,a),b) == f(f(state,b),a)`, assuming `a`
-            and `b` originated concurrently at different replicas,
-        3.  idempotent, e.g. `f(state, op1) == f(f(state, op1), op1) == f(state,
-            f(op1, op1))`, etc.
-
-    *   optionally, reducers may have stronger guarantees, e.g. full commutativity
-        (tolerates causality violations),
-
-    *   a frame could be an op, a patch or a complete state. Hence, a baseline
-        reducer can "switch gears" from pure op-based CRDT mode to state-based
-        CRDT to delta-based, e.g.
-
+4. a reducer is a RON term for a "data type"; reducers define how object state
+is changed by new ops
+    * a reducer is a pure function: `f(state_frame, change_frame) ->
+      new_state_frame`, where frames are either empty frames or single ops or
+      products of past reductions by the same reducer,
+    * reducers are:
+        1. associative, e.g. `f( f(state, op1), op2 ) == f( state, patch )`
+        where `patch == f(op1,op2)`
+        2. commutative for concurrent ops (can tolerate causally consistent
+        partial orders), e.g. `f(f(state,a),b) == f(f(state,b),a)`, assuming `a`
+        and `b` originated concurrently at different replicas,
+        3. idempotent, e.g. `f(state, op1) == f(f(state, op1), op1) == f(state,
+        f(op1, op1))`, etc.
+    * optionally, reducers may have stronger guarantees, e.g. full commutativity
+      (tolerates causality violations),
+    * a frame could be an op, a patch or a complete state. Hence, a baseline
+      reducer can "switch gears" from pure op-based CRDT mode to state-based
+      CRDT to delta-based, e.g.
         1. `f(state, op)` is op-based
         2. `f(state1, state2)` is state-based
         3. `f(state, patch)` is delta-based
-
 4. a mapper translates a replicated object's state frame into other formats
-
     * mappers turn RON objects into JSON or XML documents, C++, JavaScript or
       other objects
     * mappers are one-way: RON metadata may be lost in conversion
@@ -202,7 +154,7 @@ consistency by default.  Although, nothing prevents it from running in a
 linearized [ACIDic][peterb] or gossip environment.  That only relaxes (or
 restricts) the choice of reducers.
 
-## Wire format (text)
+## Wire format (Base64)
 
 Design goals for the RON wire format is to be reasonably readable and reasonably
 compact.  No less human-readable than regular expressions.  No less compact than
@@ -214,8 +166,7 @@ The syntax outline:
 1. atoms follow very predictable conventions:
     * integers: `1`
     * e-notation floats: `3.1415`, `1.0e+6`
-    * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`,
-      except that `'` (U+0027 APOSTROPHE) must be encoded as `\u0027` or `\'`
+    * UTF-8 JSON-escaped strings: `строка\n线\t\u7ebf\n라인`
     * RON UUIDs `1D4ICC-XU5eRJ`, `1TUAQ+gritzko`
 2. UUIDs use a compact custom serialization
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122]
@@ -226,35 +177,29 @@ The syntax outline:
       variant is
       `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~`
 3. serialized ops use some punctuation, e.g. `*lww #1D4ICC-XU5eRJ
-   @1D4ICC2-XU5eRJ :keyA 'valueA'`
+@1D4ICC2-XU5eRJ :keyA 'valueA'`
     * `*` starts a data type UUID
     * `#` starts an object UUID
     * `@` starts an op's own event UUID
     * `:` starts a location UUID
     * `=` starts an integer
-    * `'` starts and ends a string;
-          may occur inside a string if prefixed by backslash — `\'`
+    * `'` starts and ends a string
     * `^` starts a float (e-notation)
     * `>` starts an UUID
-    * `!` ends a frame header op (a reduced chunk has one header op)
+    * `!` ends a frame header op (a reduced frame has one header op)
     * `?` ends a query header op (a subscription frame has a header)
-    * `,` ends a reduced op (optional)
-    * `;` ends a raw op
-    * `.` ends a frame (required for streaming transports, e.g. TCP)
+    * `.` ends a frame (optional)
 4. frame format employs cross-columnar compression
-    * repeated key UUIDs can be skipped altogether ("same as in the last op");
-      in the first op all key UUIDs are mandatory;
+    * repeated UUIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UUIDs using prefix compression, e.g.
       `1D4ICCE+XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC+XU5eRJ`
       (symbols `([{}])` corespond to 4,5,..9 symbols of shared prefix)
-    * by default, a key UUID is compressed against the same UUID in the previous
-      op (e.g. event id against the previous event id);
+    * by default, an UUID is compressed against the same UUID in the previous op
+      (e.g. event id against the previous event id)
     * backtick \` changes the default UUID to the previous UUID of the same op
       (e.g. event id against same op's object id)
-    * the first value UUID is compressed against the object UUID of the op,
-      each other is compressed against the previous one.
 
-Consider a simple JSON object:
+Consider a simple JSON object: 
 
     {"keyA":"valueA", "keyB":"valueB"}
 
@@ -292,7 +237,7 @@ Consider "Hello world!" collaboratively written by two users, `bart` and `lisa`
 on 27 Nov 2017 around 9am GMT.  A compressed RGA (Replicated Growable Array)
 frame would look like:
 
-    *rga#1UQ8p+bart@1UQ8yk+lisa:0!
+    *rga#1UQ8p+bart@1UQ8yk+lisa!
         @(s+bart'H'@[r'e'@(t'l'@[T'l'@[i'o'
         @(w+lisa' '@(x'w'@(y'o'@[1'r'@{a'l'@[2'd'@[k'!'
 
@@ -302,7 +247,7 @@ The `txt` mapper may convert the RGA frame into text:
 
 If nicely indented, the compressed frame is easier to read:
 
-    *rga #1UQ8p+bart @1UQ8yk+lisa :0  !
+    *rga #1UQ8p+bart @1UQ8yk+lisa     !
                      @(s+bart        'H'
                      @[r             'e'
                      @(t             'l'
@@ -351,184 +296,61 @@ The binary format is more efficient because of higher bit density; it is also
 simpler and safer to parse because of explicit field lengths.  Obviously, it is
 not human-readable.
 
-Like the text format, the binary one is only optimized for iteration.  Because of
+Like the Base64, the binary format is only optimized for iteration.  Because of
 compression, records are inevitably of variable length, so random access is not
 possible.  Also, compression depends on iteration, as UUIDs get abbreviated
-relative to similar preceding UUIDs.
+relative to preceding UUIDs.
 
-A binary RON frame starts with magic bytes `RON2` and frame length.  The rest
-of the frame is a sequence of *fields*.  Each field starts with a *descriptor*
-specifying the type of the field and its length.
+A binary RON frame starts with magic bytes `RON2` and a big-endian uint32 frame length field, 8 bytes total.
 
-Frame length is serialized as a 32-bit big-endian integer.  The maximum length
-of a frame is 2^31-1 bytes.  If the length value has its most significant bit
-set to 1, then the frame is *chunked*.  A chunked frame is followed by a
-continuation frame.  A continuation frame has no magic bytes, just a 4-byte
-length field.  The last continuation frame must have the m.s.b. of its length
-set to 0.
+On the inside, a frame is a sequence of *fields*.  Each field starts with a
+*descriptor* byte.  A descriptor byte spends two most significant bits for a
+field type, next two bits for a sub-type and four bits for field byte length
+(excluding the descriptor byte, so starts with 0).  Length of 13, 14 or 15 means
+the descriptor byte is followed by the actual length as a big-endian uint8,
+uint16 or uint32, respectively.  Descriptor byte types and sub-types are as
+follows:
 
-### Descriptors
-
-A descriptor's first byte spends four most significant (m.s.) bits to describe
-the type of the field, other four bits describe its length.
-
-```
-   7    6    5    4    3    2    1    0
-+----+----+----+----+----+----+----+----+
-| major   | minor   |     field         |
-|    type |    type |        length     |
-+----+----+----+----+----+----+----+----+
-  128  64   32   16    8    4    2    1
-   80  40   20   10    8    4    2    1
-```
-
-Field descriptor major/minor type bits are set as follows:
-
-0. `00` RON op term,
-    * `0000` raw op,
+0. `00` Op term  (cited length is 0)
+    * `0000` raw op subtype,
     * `0001` reduced op,
     * `0010` header op,
     * `0011` query header op.
-1. `01` UUID, uncompressed
+1. `01` UUID half, uncompressed uint64
     * `0100` type (reducer) id,
     * `0101` object id,
     * `0110` event id,
     * `0111` ref/location id
-2. `10` UUID, compressed (zipped)
-    * `1000` value UUID, zipped (note: not type id)
-    * `1001` object id,
-    * `1010` event id,
-    * `1011` ref/location id
+2. `10` UUID half, prefix-compressed
+    * `0100` value UUID half, compressed (warning: not type id)
+    * `0101` object id,
+    * `0110` event id,
+    * `0111` ref/location id
 3. `11` Atom
-    * `1100` value UUID, uncompressed (lengths 1..16)
-    * `1101` integer (big-endian, [zigzag-coded][zigzag], lengths 1, 2, 4, 8)
-    * `1110` string (UTF-8, length 0..2^31-1)
+    * `1100` value UUID half, uncompressed
+    * `1101` integer (big-endian int64)
+    * `1110` string (...)
     * `1111` float (IEEE 754-2008, binary 16, 32 or 64, lengths 2, 4, 8 resp)
 
-A descriptor's four least significant bits encode the length of the field in
-question.  The length value given by a descriptor does not include the length
-of the descriptor itself.
+UUID coding is as follows:
 
-If a field or a frame is 1 to 16 bytes long then it has its length coded
-directly in the four l.s. bits of the descriptor. Zero stands for the length of
-16 because most field types are limited to that length.  Op terms specify no
-length.  With string atoms, zero denotes the presence of an extended length
-field which is either 1 or 4 bytes long. The maximum allowed string length is
-2Gb (31 bits).  In case the descriptor byte is exactly `1110 0000`, the m.s.
-bit of the next byte denotes the length of the extended length field (`0` for
-one, `1` for four bytes).  The rest of the next byte (and possibly other three)
-is a big-endian integer denoting the byte length of the string.
+* value and origin are encoded as separate halves,
+* a skipped field means "same as the default",
+* in the value part, UUID halves can't be skipped,
+* field length is 0..8 bytes (0 is same as a skipped field)
+* a compressed UUID half (value/origin) has 60 numeric bits encoded by 1..8
+  bytes (big-endian, also note the 8x8-60=4 extra bits); in the first byte, the
+  most significant bit denotes a default flip (same as \` in the Base64 coding),
+  next three bits specify the shared prefix length, in bytes (0..7)
+* an uncompressed UUID half is up to 8 bytes, starting with the 0th or 8th byte of the UUID (for the value or origin halves respectively), according to the RON UUID big-endian bit
+  layout; skipped (tailing, l.s.b.,
+  depending on which half it is) bytes are zeroes
 
-Consider a time value query frame: `*now?.`
-
-* 4 bytes are magic bytes (RON, `0101 0010  0100 1111  0100 1110  0011 0010`)
-* frame length: 4 bytes (length 5, `0000 0000  0000 0000  0000 0000  0000 0101`)
-* op term descriptor: 1 byte (`0011 0000`)
-* uncompressed UUID descriptor: 1 byte (cited length 3, `0100 0011`)
-* `now` RON UUID: 3 bytes (`0000 1100  1011 0011  1110 1100`,
-  the "uncompressed" coding still trims a lot of zeroes, see below).
-
-As UUID length is up to 16 bytes, UUID fields never use a separate length
-number. UUID descriptors are always 1 byte long. The length of 0 stands for 16.
-
-Length bits `0000` stand for:
-
-* zero length for op terms,
-* 16 for integer/float atoms, zipped/unzipped UUIDs,
-* for strings, that signals an extended length record (1 or 4 bytes).
-
-An extended length record is used for strings cause those can be up to 2GB
-long. An extended length record is either 1 or four bytes. Four-byte record is
-a big-endian 32-bit int having its m.s. bit set to 1. Thus, strings of 127
-bytes and shorter may use 1 byte long length record.
-
-### Op terms
-
-Op term fields may have cited length of `0000` or be skipped if they match the
-previous op's term.  Still, sometimes we want to introduce redundancy,
-CRC/checksumming, hashing, etc.  Exactly for this purpose we may use non-empty
-terms.  The checksumming method is specified by the field length (TODO).
-
-### Uncompressed UUIDs
-
-Uncompressed UUIDs are not compressed relative to preceding UUIDs (not *zipped*).
-Still, zero bytes are skipped to optimize for some often-used cases.
-The skip pattern is determined based on the cited field length.
-
-Namely, UUIDs 1..8 bytes long have the *origin* part set to zeros (all 8 bytes)
-and the least significant bytes of the value also set to zeroes.
-These are often-used "transcendent" name UUIDs (`lww`, `rga`, `db`, `now`, etc).
-For example, `lww` is the data type UUID for last-write-wins objects.
-In the unabbreviated RON Base64 form, `lww` is `0/lww0000000 00000000000`
-(see the [UUID spec](uuid.md) for the details).
-
-UUIDs 9 to 15 bytes long have their l.s. value bytes set to zero.
-This case is optimized for arbitrary-precision timestamps.
-
-UUIDs 16 bytes long are full 128-bit RON UUIDs.
-
-### Compressed UUIDs
-
-Zipped UUIDs are serialized as deltas to similar past UUIDs.  That provides
-significant savings when UUIDs come from the same source (same origin bytes) or
-have close timestamp values.  Repeated UUIDs are simply skipped, same as in the
-Base64 notation.
-
-The origin part is either reused in full or rewritten in full. That is decided
-by the field length (<9 reuse, >=9 rewrite). Implicitly, origin ids are
-considered uncompressible.
-
-There are two zip modes: *short* and *long*.  In the short mode, an UUID is
-compressed relative to the same kind of UUID in the previous op (e.g. event id
-relative to the previous event id).  In the long mode, an UUID is compressed
-relative to a past uncompressed UUID. A decoder must remember 16 last
-uncompressed timestamp-based UUIDs (no names, no hashes), to perform
-uncompression. For encoders, that is optional.
-
-A zipped UUID starts with a *zip byte* referencing the compression details.
-
-Short zip byte:
-
-```
-   7    6    5    4    3    2    1    0
-+----+----+----+----+----+----+----+----+
-|  0 | zero tail len|                   |
-|    | (half-bytes) |  m.s. half-byte   |
-+----+----+----+----+----+----+----+----+
-  128  64   32   16    8    4    2    1
-```
-
-In this mode, the zip byte specifies how many l.s. half-bytes of the value are
-zeroes. Based on the field length, we decide how many "middle" half-bytes need
-to be changed, relative to the past UUID. M.s. half-bytes stay the same as in
-the past UUID.
-
-Long zip byte:
-
-```
-   7    6    5    4    3    2    1    0
-+----+----+----+----+----+----+----+----+
-|  1 |zero tail len | past uncompressed |
-|    |  (half-bytes)|   UUID index      |
-+----+----+----+----+----+----+----+----+
-  128  64   32   16    8    4    2    1
-```
-
-In this mode, the zip byte specifies the past uncompressed UUID we use as a
-reference. Index 0 points at the recentmost uncompressed UUID, 1 to the
-previous one, etc.
-Similarly to the short mode, we set a number of l.s. half-bytes to
-zeroes, replace middle half-bytes with new values and keep the m.s. half-bytes
-the same.
-
-### Atoms
-
-Strings are serialized as UTF-8.
-
-Integers are serialized using the zig-zag coding (the l.s. bit conveys the sign).
-
-Floats are serialized as IEEE 754 floats (4-byte and 8-byte support is required,
-other lengths are optional).
+For example, `1010 0001  1111 0100` is a prefix-compressed half `10` of an event
+UUID `10`, defaults to the corresponding half of the object UUID of the same op
+`1` (flip bit), shares 7 bytes of prefix with the default `111`, the remaining
+60-7x8=4 bits are `0100`.  As with the Base64 coding, we optimize for
+compression of close UUIDs (ideally, sequential UUIDs).
 
 ## The math
 
@@ -557,10 +379,6 @@ applications as well.
 
 Use Swarm RON!
 
-## Acknowledgements
-
-* Russell Sullivan
-* Yuriy Syrovetskiy
 
 ## History
 
@@ -607,4 +425,3 @@ Use Swarm RON!
 [lamport]: http://lamport.azurewebsites.net/pubs/time-clocks.pdf
 [2problems]: https://martinfowler.com/bliki/TwoHardThings.html
 [lsmt]: https://en.wikipedia.org/wiki/Log-structured_merge-tree
-[zigzag]: https://developers.google.com/protocol-buffers/docs/encoding#signed-integers

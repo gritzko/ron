@@ -22,8 +22,12 @@ func MakeFrameHeap(primary, secondary Comparator, size int) (ret FrameHeap) {
 
 func (heap FrameHeap) less(i, j int) bool {
 	c := heap.primary(heap.iters[i], heap.iters[j])
-	if c == 0 && heap.secondary != nil {
-		c = heap.secondary(heap.iters[i], heap.iters[j])
+	if c == 0 {
+		if heap.secondary != nil {
+			c = heap.secondary(heap.iters[i], heap.iters[j])
+		} else {
+			c = int64(j) - int64(i)
+		}
 	}
 	//fmt.Printf("CMP %s %s GOT %d\n", heap.iters[i].OpString(), heap.iters[j].OpString(), c)
 	return c < 0
@@ -69,8 +73,12 @@ func (heap *FrameHeap) PutAll(b Batch) {
 }
 
 func (heap *FrameHeap) Put(i *Frame) {
-	if !i.EOF() && i.IsHeader() {
-		i.Next()
+	for {
+		if !i.EOF() && (i.IsHeader() || i.IsQuery()) {
+			i.Next()
+		} else {
+			break
+		}
 	}
 	if !i.EOF() && !i.IsHeader() {
 		at := len(heap.iters)

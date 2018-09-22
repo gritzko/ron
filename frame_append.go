@@ -67,7 +67,7 @@ func Int60Prefix(a, b uint64) int {
 
 func FormatUUID(buf []byte, uuid UUID) []byte {
 	variety := uuid.Variety()
-	if variety!=0 {
+	if variety != 0 {
 		buf = append(buf, BASE_PUNCT[variety], '/')
 	}
 	buf = FormatInt(buf, uuid.Value())
@@ -93,14 +93,19 @@ func FormatZipUUID(buf []byte, uuid, context UUID) []byte {
 	buf = FormatZipInt(buf, uuid.Origin(), context.Origin())
 	// sometimes, we may skip UUID separator (+-%$)
 	if uuid.Scheme() == context.Scheme() && at > start+1 {
-		if len(buf) > at && ABC_KIND[buf[at]] != BASE_KIND {
+		if len(buf) > at && !IsBase64(buf[at]) {
 			copy(buf[at-1:], buf[at:])
 			buf = buf[:len(buf)-1]
-		} else if len(buf) == at && ABC_KIND[buf[start]] != BASE_KIND {
+		} else if len(buf) == at && !IsBase64(buf[start]) {
 			buf = buf[:len(buf)-1]
 		}
 	}
 	return buf
+}
+
+func IsBase64(b byte) bool {
+	bi := uint(b)
+	return ((IS_BASE[bi>>6] >> (bi & 63)) & 1) != 0
 }
 
 func sharedPrefix(uuid, context UUID) (ret int) {
@@ -131,11 +136,12 @@ func (frame *Frame) appendFloat(a Atom) {
 		return
 	}
 	intStr := fmt.Sprintf("%d", a[0])
-	e := int(a[1] & INT32_FULL)
-	if a[1]&BIT32 != 0 {
+	e := a.pow()
+	if a[ORIGIN]&BIT60 != 0 {
 		frame.Body = append(frame.Body, '-')
 	}
-	if a[1]&BIT33 != 0 { // neg e
+	if e < 0 { // neg e
+		e = -e
 		ip := len(intStr) - e
 		if ip > 0 { // integer part
 			frame.Body = append(frame.Body, intStr[:ip]...)
@@ -304,7 +310,7 @@ func (frame *Frame) Append(other Frame) {
 		frame.atoms = frame.atoms[:len(other.atoms)]
 	}
 	frame.term = other.term
-	frame.Position++
+	frame.position++
 
 }
 
