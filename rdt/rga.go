@@ -34,6 +34,10 @@ func MakeRGAReducer() ron.Reducer {
 	return rga
 }
 
+func (rga RGA) Features() int {
+	return ron.ACID_FULL
+}
+
 // [x] multiframe handling: the O(N) multiframe merge
 // [ ] undo/redo
 

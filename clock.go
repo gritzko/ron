@@ -14,10 +14,6 @@ type Clock struct {
 	MinLength int
 }
 
-var CLOCK_CALENDAR = NewName("Calendar")
-var CLOCK_EPOCH = NewName("Epoch") // TODO implement behavior
-var CLOCK_LAMPORT = NewName("Logical")
-
 var MAX_BIT_GRAB uint64 = 1 << 20
 
 func NewClock(replica uint64, mode UUID, minLen int) Clock {
@@ -89,8 +85,7 @@ func CalendarToRFCString(uuid UUID) string {
 
 }
 
-func trim_time(full, last uint64) uint64 {
-	i := 5
+func trimTime(full, last uint64, i int) uint64 {
 	for i < 11 && full&PREFIX_MASKS[i] <= last {
 		i++
 	}
@@ -113,11 +108,15 @@ func (clock *Clock) Time() UUID {
 	if val <= last {
 		val = last + 1
 	} else {
-		val = trim_time(val, last)
+		val = trimTime(val, last, clock.MinLength)
 	}
 	ret := NewEventUUID(val, clock.lastSeen.Origin())
 	clock.See(ret)
 	return ret
+}
+
+func (clock *Clock) Now() time.Time {
+	return time.Now().Add(clock.offset).UTC()
 }
 
 // ...
@@ -135,6 +134,8 @@ func (clock Clock) IsSane(uuid UUID) bool {
 	switch clock.Mode {
 	case CLOCK_LAMPORT:
 		return clock.lastSeen.Value()+MAX_BIT_GRAB > uuid.Value()
+	case CLOCK_CALENDAR:
+		return DecodeCalendar(uuid.Value()).Before(clock.Now())
 	default:
 		return true
 	}

@@ -1,6 +1,8 @@
 package ron
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFrame_Split(t *testing.T) {
 	frame := ParseFrameString("*lww#id1!:val=1*#id2:0!:val=2")
@@ -108,5 +110,19 @@ func TestFrame_Split2(t *testing.T) {
 	if !eq {
 		t.Fail()
 		t.Logf("split fail, \n%s\nbecame\n%s", frame.String(), split.String())
+	}
+}
+
+func TestFrame_Empties(t *testing.T) {
+	head := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
+	next := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
+	next.Next()
+	if head.Type() != next.Type() || head.Object() != next.Object() || head.Event() != next.Event() || head.Ref() != next.Ref() {
+		t.Fail()
+		t.Logf("failed default")
+	}
+	if next.Term() != TERM_HEADER {
+		t.Fail()
+		t.Log("incorrect term")
 	}
 }

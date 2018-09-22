@@ -7,8 +7,8 @@ import (
 
 func TestUUID_String(t *testing.T) {
 	tests := [][]string{
-		{"0$author", "name$author2", "name{2"},
 		{"}DcR-L8w", "}IYI-", "}IYI-0"},
+		{"0$author", "name$author2", "name{2"},
 		{"0", "1", "1"},
 		{"0", "123-0", "123-"},
 		{"0", "0000000001-orig", ")1-orig"},
@@ -35,6 +35,17 @@ func TestUUID_String(t *testing.T) {
 			t.Logf("case %d: %s must be %s (%s, %s)", i, zip, tri[2], uuid.String(), context.String())
 			t.Fail()
 		}
+	}
+}
+
+func Test_IsBase(t *testing.T) {
+	for _, b := range BASE_PUNCT {
+		if !IsBase64(b) {
+			t.Fail()
+		}
+	}
+	if IsBase64('.') {
+		t.Fail()
 	}
 }
 

@@ -14,6 +14,10 @@ func MakeLogReducer() ron.Reducer {
 	}
 }
 
+func (log Log) Features() int {
+	return ron.ACID_FULL
+}
+
 func (log Log) Reduce(batch ron.Batch) ron.Frame {
 	log.heap.PutAll(batch)
 	spec := ron.NewSpec(
