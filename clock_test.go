@@ -44,7 +44,7 @@ func BenchmarkClock_Time(b *testing.B) {
 		next := clock.Time()
 		if next.Value() <= prev.Value() {
 			b.Fail()
-			b.Logf("%s (%d) <= %s (%d) at %d\n", next.String(), next.Value, prev.String(), prev.Value, i)
+			b.Logf("%s (%s) <= %s (%s) at %d\n", next.String(), next.String(), prev.String(), prev.String(), i)
 			break
 		}
 		prev = next
