@@ -2,6 +2,7 @@ package ron
 
 import (
 	"math"
+	"strconv"
 )
 
 const ATOM_INT_62 = uint64(ATOM_INT) << 62
@@ -9,31 +10,16 @@ const ATOM_FLOAT_62 = uint64(ATOM_FLOAT) << 62
 const ATOM_STRING_62 = uint64(ATOM_STRING) << 62
 const ATOM_UUID_62 = uint64(ATOM_UUID) << 62
 
-func NewIntegerAtom(i int64) (a Atom) {
-	a[1] = ATOM_INT_62
+func NewIntegerAtom(i int64) Atom {
+	var a Atom
+	a[ORIGIN] = ATOM_INT_62
 	if i > 0 {
-		a[0] = uint64(i)
+		a[VALUE] = uint64(i)
 	} else {
-		a[0] = uint64(-i)
-		a[1] |= 1
+		a[VALUE] = uint64(-i)
+		a[ORIGIN] |= 1
 	}
-	return
-}
-
-func NewIntAtom(i int) Atom {
-	return NewIntegerAtom(int64(i))
-}
-
-func NewStringRangeAtom(from, till int) Atom {
-	return Atom{uint64((from << 32) | till), ATOM_STRING_62}
-}
-
-func NewFloatAtom(f float64) Atom {
-	return Atom{math.Float64bits(f), ATOM_FLOAT_62}
-}
-
-func NewUUIDAtom(uuid UUID) Atom {
-	return Atom(uuid)
+	return a
 }
 
 func (frame Frame) Count() int {
@@ -41,12 +27,12 @@ func (frame Frame) Count() int {
 }
 
 func (a Atom) Type() uint {
-	return uint(a[1] >> 62)
+	return uint(a[ORIGIN] >> 62)
 }
 
 func (a Atom) Integer() int64 {
-	neg := a[1] & (1 << 60)
-	ret := int64(a[0])
+	neg := a[ORIGIN] & (1 << 60)
+	ret := int64(a[VALUE])
 	if neg == 0 {
 		return ret
 	} else {
@@ -68,26 +54,40 @@ var BIT61 = uint64(1) << 61
 // We can't rely on standard floats cause they MUTATE THE VALUE.
 // If 3.141592 is parsed then serialized, it becomes 3.141591(9)
 // or something, that is entirely platform-dependent.
-// Hence, we work that around by storing a 64-bit integer 3141592 and
-// a 32-bit exponent.
 // Overall, floats are NOT commutative. Any floating arithmetic
 // is highly discouraged inside CRDT type implementations.
 func (a Atom) Float() float64 {
-	pow := a.pow()
-	ret := float64(a[VALUE]) * math.Pow10(pow)
-	if a[ORIGIN]&BIT60 != 0 {
-		ret = -ret
-	}
-	return ret
+	return math.Float64frombits(a[VALUE])
 }
 
-func (a Atom) pow() int {
-	pow := int(a[ORIGIN] & INT16_FULL)
-	if a[ORIGIN]&BIT61 != 0 {
-		pow = -pow
+func (a *Atom) setType(t uint64) {
+	a[ORIGIN] = ((a[ORIGIN] << 4) >> 4) | t
+}
+
+func (a *Atom) setFloatType() {
+	a.setType(ATOM_FLOAT_62)
+}
+
+func (a *Atom) setFrom(from int) {
+	a[ORIGIN] |= uint64(from) << 30
+}
+
+func (a *Atom) setTill(till int) {
+	a[ORIGIN] |= uint64(till)
+}
+
+func (a *Atom) parseValue(b []byte) {
+	if a.Type() == ATOM_FLOAT {
+		from := (a[ORIGIN] >> 30) & INT30_FULL
+		till := a[ORIGIN] & INT30_FULL
+		f, err := strconv.ParseFloat(string(b[from:till]), 64)
+		if err == nil {
+			a[VALUE] = math.Float64bits(f)
+		}
+	} else {
+		// TODO: implement in nominal RON format
+		panic("parsing is not implemented for this type")
 	}
-	pow -= int((a[ORIGIN] >> 16) & INT16_FULL)
-	return pow
 }
 
 // add JSON escapes
@@ -109,6 +109,7 @@ func (a Atom) RawString(body []byte) string {
 }
 
 var INT32_FULL uint64 = (1 << 32) - 1
+var INT30_FULL uint64 = (1 << 30) - 1
 
 func (a Atom) EscString(body []byte) []byte {
 	from := a[0] >> 32

@@ -457,17 +457,19 @@ func TestOp_ParseAtoms(t *testing.T) {
 
 func TestOp_ParseFloat(t *testing.T) {
 	frames := [][2]string{
-		{"*lww#id^3.141592", "*lww#id^3.141592"},
-		{"*lww#id^-0.25", "*lww#id^-0.25"},
-		{"*lww#id^0.000001", "*lww#id^1.0e-6"},
-		{"*lww#id^-0.00000e+02", "*lww#id^0.0"},
-		{"*lww#id^-1.00000e+09", "*lww#id^-1000000000.0"},
-		{"*lww#id^1000000000.0e-1", "*lww#id^100000000.0"},
+		{"*lww#id^3.141592", "*lww#id^3.141592e+00"},
+		{"*lww#id^-0.25", "*lww#id^-2.5e-01"},
+		{"*lww#id^-25e-01", "*lww#id^-2.5e+00"},
+		{"*lww#id^0.000001", "*lww#id^1e-06"},
+		{"*lww#id^-0.00000e+02", "*lww#id^-0e+00"},
+		{"*lww#id^-1.00000e+09", "*lww#id^-1e+09"},
+		{"*lww#id^1000000000.0e-1", "*lww#id^1e+08"},
 		{"*lww#id^12345.6789e+16", "*lww#id^1.23456789e+20"},
 	}
 	vals := []float64{
 		3.141592,
 		-0.25,
+		-2.5,
 		0.000001,
 		0,
 		-1e+9,

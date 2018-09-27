@@ -3,6 +3,7 @@ package ron
 import (
 	"fmt"
 	"math/bits"
+	"strconv"
 )
 
 const (
@@ -131,56 +132,10 @@ func (frame *Frame) appendUUID(uuid UUID, context UUID) {
 var zeros []byte = []byte("0000000000")
 
 func (frame *Frame) appendFloat(a Atom) {
-	if a[0] == 0 {
-		frame.Body = append(frame.Body, "0.0"...)
-		return
-	}
-	intStr := fmt.Sprintf("%d", a[0])
-	e := a.pow()
-	if a[ORIGIN]&BIT60 != 0 {
-		frame.Body = append(frame.Body, '-')
-	}
-	if e < 0 { // neg e
-		e = -e
-		ip := len(intStr) - e
-		if ip > 0 { // integer part
-			frame.Body = append(frame.Body, intStr[:ip]...)
-			frame.Body = append(frame.Body, '.')
-			tail := intStr[ip:]
-			for len(tail) > 1 && tail[len(tail)-1] == '0' {
-				tail = tail[:len(tail)-1]
-			}
-			frame.Body = append(frame.Body, tail...)
-		} else if ip == 0 {
-			frame.Body = append(frame.Body, '0', '.')
-			frame.Body = append(frame.Body, intStr...)
-		} else {
-			de := 1 - ip
-			frame.Body = append(frame.Body, intStr[:1]...)
-			frame.Body = append(frame.Body, '.')
-			if len(intStr) > 1 {
-				frame.Body = append(frame.Body, intStr[1:]...)
-			} else {
-				frame.Body = append(frame.Body, '0')
-			}
-			frame.Body = append(frame.Body, 'e', '-')
-			exp := fmt.Sprintf("%d", de)
-			frame.Body = append(frame.Body, exp...)
-		}
-	} else {
-		if e+len(intStr) <= 10 {
-			frame.Body = append(frame.Body, intStr...)
-			frame.Body = append(frame.Body, zeros[:e]...)
-			frame.Body = append(frame.Body, ".0"...)
-		} else {
-			exp := fmt.Sprintf("%d", e+len(intStr)-1)
-			frame.Body = append(frame.Body, intStr[0])
-			frame.Body = append(frame.Body, '.')
-			frame.Body = append(frame.Body, intStr[1:]...)
-			frame.Body = append(frame.Body, "e+"...)
-			frame.Body = append(frame.Body, exp...)
-		}
-	}
+	frame.Body = append(
+		frame.Body,
+		strconv.FormatFloat(a.Float(), 'e', -1, 64)...,
+	)
 }
 
 func (frame *Frame) appendSpec(other Frame) {
@@ -418,7 +373,7 @@ func (frame *Frame) AppendReducedOpInt(spec Spec, value int64) {
 }
 
 func (frame *Frame) AppendReducedOpUUID(spec Spec, value UUID) {
-	frame.AppendSpecValT(spec, NewUUIDAtom(value), TERM_REDUCED)
+	frame.AppendSpecValT(spec, Atom(value), TERM_REDUCED)
 }
 
 func (frame *Frame) AppendStateHeader(spec Spec) {

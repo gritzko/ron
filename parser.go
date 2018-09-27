@@ -1,22 +1,26 @@
-//line ragel/go-parser.rl:1
+//line dfa.rl:1
 package ron
 
 import "fmt"
 import "errors"
 
-//line ragel/go-parser.rl:7
-//line go/parser.go:12
-const RON_start int = 14
-const RON_first_final int = 14
+//line dfa.rl:7
+
+//line parser.go:12
+const RON_start int = 15
+const RON_first_final int = 15
 const RON_error int = 0
 
-const RON_en_main int = 14
+const RON_en_main int = 15
 
-//line ragel/go-parser.rl:8
+//line dfa.rl:8
 
-//line ragel/go-parser.rl:9
-//line ragel/go-parser.rl:10
-//line ragel/go-parser.rl:11
+//line dfa.rl:9
+
+//line dfa.rl:10
+
+//line dfa.rl:11
+
 // The parser reached end-of-input (in block mode) or
 // the closing dot (in streaming mode) successfully.
 // The rest of the input is frame.Rest()
@@ -34,12 +38,12 @@ func (frame *Frame) Parse() {
 			return
 		}
 
-//line go/parser.go:46
+//line parser.go:46
 		{
 			(ps.state) = RON_start
 		}
 
-//line ragel/go-parser.rl:30
+//line dfa.rl:30
 		frame.position = -1
 		frame.atoms = frame._atoms[:4]
 
@@ -69,11 +73,9 @@ func (frame *Frame) Parse() {
 		eof = -1
 	}
 
-	atm, hlf, dgt := ps.atm, ps.hlf, ps.dgt
-	atoms := frame.atoms
-	p := ps.pos
+	atm, hlf, dgt, p, atoms := ps.atm, ps.hlf, ps.dgt, ps.pos, frame.atoms
 
-//line go/parser.go:86
+//line parser.go:84
 	{
 		if p == pe {
 			goto _test_eof
@@ -82,42 +84,42 @@ func (frame *Frame) Parse() {
 
 	_again:
 		switch ps.state {
-		case 14:
-			goto st14
+		case 15:
+			goto st15
 		case 0:
 			goto st0
 		case 1:
 			goto st1
-		case 15:
-			goto st15
 		case 16:
 			goto st16
 		case 17:
 			goto st17
 		case 18:
 			goto st18
+		case 19:
+			goto st19
 		case 2:
 			goto st2
 		case 3:
 			goto st3
-		case 19:
-			goto st19
 		case 20:
 			goto st20
 		case 21:
 			goto st21
+		case 22:
+			goto st22
 		case 4:
 			goto st4
 		case 5:
 			goto st5
-		case 22:
-			goto st22
-		case 6:
-			goto st6
 		case 23:
 			goto st23
+		case 6:
+			goto st6
 		case 24:
 			goto st24
+		case 25:
+			goto st25
 		case 7:
 			goto st7
 		case 8:
@@ -126,26 +128,26 @@ func (frame *Frame) Parse() {
 			goto st9
 		case 10:
 			goto st10
-		case 25:
-			goto st25
+		case 26:
+			goto st26
 		case 11:
 			goto st11
 		case 12:
 			goto st12
-		case 26:
-			goto st26
 		case 27:
 			goto st27
+		case 13:
+			goto st13
 		case 28:
 			goto st28
 		case 29:
 			goto st29
 		case 30:
 			goto st30
-		case 13:
-			goto st13
 		case 31:
 			goto st31
+		case 14:
+			goto st14
 		case 32:
 			goto st32
 		case 33:
@@ -156,6 +158,8 @@ func (frame *Frame) Parse() {
 			goto st35
 		case 36:
 			goto st36
+		case 37:
+			goto st37
 		}
 
 		if p++; p == pe {
@@ -163,42 +167,42 @@ func (frame *Frame) Parse() {
 		}
 	_resume:
 		switch ps.state {
-		case 14:
-			goto st_case_14
+		case 15:
+			goto st_case_15
 		case 0:
 			goto st_case_0
 		case 1:
 			goto st_case_1
-		case 15:
-			goto st_case_15
 		case 16:
 			goto st_case_16
 		case 17:
 			goto st_case_17
 		case 18:
 			goto st_case_18
+		case 19:
+			goto st_case_19
 		case 2:
 			goto st_case_2
 		case 3:
 			goto st_case_3
-		case 19:
-			goto st_case_19
 		case 20:
 			goto st_case_20
 		case 21:
 			goto st_case_21
+		case 22:
+			goto st_case_22
 		case 4:
 			goto st_case_4
 		case 5:
 			goto st_case_5
-		case 22:
-			goto st_case_22
-		case 6:
-			goto st_case_6
 		case 23:
 			goto st_case_23
+		case 6:
+			goto st_case_6
 		case 24:
 			goto st_case_24
+		case 25:
+			goto st_case_25
 		case 7:
 			goto st_case_7
 		case 8:
@@ -207,26 +211,26 @@ func (frame *Frame) Parse() {
 			goto st_case_9
 		case 10:
 			goto st_case_10
-		case 25:
-			goto st_case_25
+		case 26:
+			goto st_case_26
 		case 11:
 			goto st_case_11
 		case 12:
 			goto st_case_12
-		case 26:
-			goto st_case_26
 		case 27:
 			goto st_case_27
+		case 13:
+			goto st_case_13
 		case 28:
 			goto st_case_28
 		case 29:
 			goto st_case_29
 		case 30:
 			goto st_case_30
-		case 13:
-			goto st_case_13
 		case 31:
 			goto st_case_31
+		case 14:
+			goto st_case_14
 		case 32:
 			goto st_case_32
 		case 33:
@@ -237,13 +241,15 @@ func (frame *Frame) Parse() {
 			goto st_case_35
 		case 36:
 			goto st_case_36
+		case 37:
+			goto st_case_37
 		}
 		goto st_out
-	st14:
+	st15:
 		if p++; p == pe {
-			goto _test_eof14
+			goto _test_eof15
 		}
-	st_case_14:
+	st_case_15:
 		switch (frame.Body)[p] {
 		case 32:
 			goto st1
@@ -258,7 +264,7 @@ func (frame *Frame) Parse() {
 		case 44:
 			goto tr2
 		case 46:
-			goto tr30
+			goto tr31
 		case 58:
 			goto tr3
 		case 59:
@@ -282,13 +288,15 @@ func (frame *Frame) Parse() {
 	st0:
 		(ps.state) = 0
 		goto _out
-	tr159:
-//line ragel/../ragel/base-grammar.rl:32
+	tr160:
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 		frame.position++
 
 		goto st1
@@ -297,7 +305,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof1
 		}
 	st_case_1:
-//line go/parser.go:313
+//line parser.go:315
 		switch (frame.Body)[p] {
 		case 32:
 			goto st1
@@ -331,253 +339,11 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	tr2:
-		(ps.state) = 15
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto _again
-	tr32:
-		(ps.state) = 15
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto _again
-	tr40:
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr55:
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr63:
-//line ragel/../ragel/base-grammar.rl:113
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr71:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr79:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr89:
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr98:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr108:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr119:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/./uuid-grammar.rl:50
-		atoms[atm][1] = UUID_NAME_FLAG
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr129:
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr139:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	tr150:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/./uuid-grammar.rl:50
-		atoms[atm][1] = UUID_NAME_FLAG
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:116
-		frame.term = int(ABC[(frame.Body)[p]])
-
-		goto st15
-	st15:
-		if p++; p == pe {
-			goto _test_eof15
-		}
-	st_case_15:
-//line go/parser.go:603
-		switch (frame.Body)[p] {
-		case 32:
-			goto st15
-		case 33:
-			goto tr32
-		case 35:
-			goto tr33
-		case 39:
-			goto tr34
-		case 42:
-			goto tr33
-		case 44:
-			goto tr32
-		case 46:
-			goto tr35
-		case 58:
-			goto tr33
-		case 59:
-			goto tr32
-		case 61:
-			goto tr36
-		case 62:
-			goto tr37
-		case 63:
-			goto tr32
-		case 64:
-			goto tr33
-		case 94:
-			goto tr38
-		}
-		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st15
-		}
-		goto st0
-	tr3:
 		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -593,36 +359,21 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
 		goto _again
 	tr33:
 		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -638,734 +389,1012 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
 		goto _again
 	tr41:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+//line ./op-grammar.rl:128
 
-		goto _again
+//line ./op-grammar.rl:104
+
+		frame.term = int(ABC[(frame.Body)[p]])
+
+		goto st16
 	tr56:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:40
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr64:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr72:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr80:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr90:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:37
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr99:
-		(ps.state) = 16
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr109:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:34
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr120:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:34
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:104
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
-		}
+		frame.term = int(ABC[(frame.Body)[p]])
 
-//line ragel/../ragel/base-grammar.rl:6
-		ps.omitted = 15
-
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
-
-		goto _again
+		goto st16
 	tr130:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:37
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+//line ./op-grammar.rl:128
 
-		goto _again
+//line ./op-grammar.rl:104
+
+		frame.term = int(ABC[(frame.Body)[p]])
+
+		goto st16
 	tr140:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:34
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+//line ./op-grammar.rl:128
 
-		goto _again
+//line ./op-grammar.rl:104
+
+		frame.term = int(ABC[(frame.Body)[p]])
+
+		goto st16
 	tr151:
-		(ps.state) = 16
-//line ragel/../ragel/./uuid-grammar.rl:34
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:16
-		n = (int)(ABC[(frame.Body)[p]])
-		hlf, dgt = 0, 0
-		if n < atm {
-			// parse #op1#op2#op3 without Ragel state explosion
-			(ps.state) = (RON_start)
-			frame.position++
-			p--
-			{
-				p++
-				goto _out
-			}
-		} else {
-			// next UUID
-			atm = n
-			ps.omitted -= 1 << uint(n)
-		}
+//line ./op-grammar.rl:128
 
-		goto _again
+//line ./op-grammar.rl:104
+
+		frame.term = int(ABC[(frame.Body)[p]])
+
+		goto st16
 	st16:
 		if p++; p == pe {
 			goto _test_eof16
 		}
 	st_case_16:
-//line go/parser.go:1263
+//line parser.go:606
 		switch (frame.Body)[p] {
 		case 32:
 			goto st16
 		case 33:
-			goto tr40
+			goto tr33
 		case 35:
-			goto tr41
+			goto tr34
 		case 39:
-			goto tr43
+			goto tr35
 		case 42:
-			goto tr41
+			goto tr34
 		case 44:
-			goto tr40
+			goto tr33
 		case 46:
-			goto tr45
+			goto tr36
 		case 58:
-			goto tr41
+			goto tr34
 		case 59:
-			goto tr40
+			goto tr33
 		case 61:
-			goto tr47
+			goto tr37
 		case 62:
-			goto tr48
+			goto tr38
 		case 63:
-			goto tr40
+			goto tr33
 		case 64:
-			goto tr41
-		case 91:
-			goto tr44
-		case 93:
-			goto tr44
+			goto tr34
 		case 94:
-			goto tr49
-		case 96:
-			goto tr50
-		case 123:
+			goto tr39
+		}
+		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+			goto st16
+		}
+		goto st0
+	tr3:
+		(ps.state) = 17
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr34:
+		(ps.state) = 17
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr42:
+		(ps.state) = 17
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr57:
+		(ps.state) = 17
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr65:
+		(ps.state) = 17
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr73:
+		(ps.state) = 17
+//line ./op-grammar.rl:60
+
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr81:
+		(ps.state) = 17
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr91:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:37
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr100:
+		(ps.state) = 17
+//line ./op-grammar.rl:69
+
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr110:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:34
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr121:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
+		atoms[atm][1] = UUID_NAME_FLAG
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:6
+
+		ps.omitted = 15
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr131:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:37
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr141:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:34
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	tr152:
+		(ps.state) = 17
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
+		atoms[atm][1] = UUID_NAME_FLAG
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:16
+
+		n = (int)(ABC[(frame.Body)[p]])
+		hlf, dgt = VALUE, 0
+		if n < atm {
+			// parse #op1#op2#op3 without Ragel state explosion
+			(ps.state) = (RON_start)
+			frame.position++
+			p--
+			{
+				p++
+				goto _out
+			}
+		} else {
+			// next UUID
+			atm = n
+			ps.omitted -= 1 << uint(n)
+		}
+
+		goto _again
+	st17:
+		if p++; p == pe {
+			goto _test_eof17
+		}
+	st_case_17:
+//line parser.go:1267
+		switch (frame.Body)[p] {
+		case 32:
+			goto st17
+		case 33:
+			goto tr41
+		case 35:
+			goto tr42
+		case 39:
 			goto tr44
-		case 125:
-			goto tr44
-		case 126:
+		case 42:
+			goto tr42
+		case 44:
+			goto tr41
+		case 46:
 			goto tr46
+		case 58:
+			goto tr42
+		case 59:
+			goto tr41
+		case 61:
+			goto tr48
+		case 62:
+			goto tr49
+		case 63:
+			goto tr41
+		case 64:
+			goto tr42
+		case 91:
+			goto tr45
+		case 93:
+			goto tr45
+		case 94:
+			goto tr50
+		case 96:
+			goto tr51
+		case 123:
+			goto tr45
+		case 125:
+			goto tr45
+		case 126:
+			goto tr47
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto st16
+					goto st17
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr44
+					goto tr45
 				}
 			default:
-				goto tr42
+				goto tr43
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr46
+					goto tr47
 				}
 			case (frame.Body)[p] > 90:
 				if 95 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr46
+					goto tr47
 				}
 			default:
-				goto tr46
+				goto tr47
 			}
 		default:
-			goto tr42
-		}
-		goto st0
-	tr42:
-//line ragel/../ragel/./uuid-grammar.rl:5
-
-//line ragel/../ragel/./uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[(frame.Body)[p]])
-
-		goto st17
-	tr141:
-//line ragel/../ragel/./uuid-grammar.rl:34
-//line ragel/../ragel/./uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[(frame.Body)[p]])
-
-		goto st17
-	st17:
-		if p++; p == pe {
-			goto _test_eof17
-		}
-	st_case_17:
-//line go/parser.go:1362
-		switch (frame.Body)[p] {
-		case 32:
-			goto st18
-		case 33:
-			goto tr40
-		case 35:
-			goto tr41
-		case 39:
 			goto tr43
-		case 42:
-			goto tr41
-		case 44:
-			goto tr40
-		case 46:
-			goto tr45
-		case 58:
-			goto tr41
-		case 59:
-			goto tr40
-		case 61:
-			goto tr47
-		case 62:
-			goto tr48
-		case 63:
-			goto tr40
-		case 64:
-			goto tr41
-		case 91:
-			goto tr52
-		case 93:
-			goto tr52
-		case 94:
-			goto tr49
-		case 95:
-			goto tr53
-		case 123:
-			goto tr52
-		case 125:
-			goto tr52
-		case 126:
-			goto tr53
-		}
-		switch {
-		case (frame.Body)[p] < 48:
-			switch {
-			case (frame.Body)[p] > 13:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr52
-				}
-			case (frame.Body)[p] >= 9:
-				goto st18
-			}
-		case (frame.Body)[p] > 57:
-			switch {
-			case (frame.Body)[p] > 90:
-				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr53
-				}
-			case (frame.Body)[p] >= 65:
-				goto tr53
-			}
-		default:
-			goto tr53
 		}
 		goto st0
-	tr128:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr43:
+//line ././uuid-grammar.rl:5
+
+//line ././uuid-grammar.rl:45
+
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
 		goto st18
-	tr138:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr142:
+//line ././uuid-grammar.rl:34
 
-		goto st18
-	tr149:
-//line ragel/../ragel/./uuid-grammar.rl:34
-//line ragel/../ragel/./uuid-grammar.rl:50
-		atoms[atm][1] = UUID_NAME_FLAG
+//line ././uuid-grammar.rl:45
+
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
 		goto st18
 	st18:
@@ -1373,46 +1402,134 @@ func (frame *Frame) Parse() {
 			goto _test_eof18
 		}
 	st_case_18:
-//line go/parser.go:1452
+//line parser.go:1368
 		switch (frame.Body)[p] {
 		case 32:
-			goto st18
+			goto st19
 		case 33:
-			goto tr40
+			goto tr41
 		case 35:
-			goto tr41
+			goto tr42
 		case 39:
-			goto tr43
+			goto tr44
 		case 42:
-			goto tr41
+			goto tr42
 		case 44:
-			goto tr40
+			goto tr41
 		case 46:
-			goto tr45
+			goto tr46
 		case 58:
-			goto tr41
+			goto tr42
 		case 59:
-			goto tr40
-		case 61:
-			goto tr47
-		case 62:
-			goto tr48
-		case 63:
-			goto tr40
-		case 64:
 			goto tr41
-		case 94:
+		case 61:
+			goto tr48
+		case 62:
 			goto tr49
+		case 63:
+			goto tr41
+		case 64:
+			goto tr42
+		case 91:
+			goto tr53
+		case 93:
+			goto tr53
+		case 94:
+			goto tr50
+		case 95:
+			goto tr54
+		case 123:
+			goto tr53
+		case 125:
+			goto tr53
+		case 126:
+			goto tr54
+		}
+		switch {
+		case (frame.Body)[p] < 48:
+			switch {
+			case (frame.Body)[p] > 13:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr53
+				}
+			case (frame.Body)[p] >= 9:
+				goto st19
+			}
+		case (frame.Body)[p] > 57:
+			switch {
+			case (frame.Body)[p] > 90:
+				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
+					goto tr54
+				}
+			case (frame.Body)[p] >= 65:
+				goto tr54
+			}
+		default:
+			goto tr54
+		}
+		goto st0
+	tr129:
+//line ././uuid-grammar.rl:37
+
+		goto st19
+	tr139:
+//line ././uuid-grammar.rl:34
+
+		goto st19
+	tr150:
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
+		atoms[atm][1] = UUID_NAME_FLAG
+
+		goto st19
+	st19:
+		if p++; p == pe {
+			goto _test_eof19
+		}
+	st_case_19:
+//line parser.go:1458
+		switch (frame.Body)[p] {
+		case 32:
+			goto st19
+		case 33:
+			goto tr41
+		case 35:
+			goto tr42
+		case 39:
+			goto tr44
+		case 42:
+			goto tr42
+		case 44:
+			goto tr41
+		case 46:
+			goto tr46
+		case 58:
+			goto tr42
+		case 59:
+			goto tr41
+		case 61:
+			goto tr48
+		case 62:
+			goto tr49
+		case 63:
+			goto tr41
+		case 64:
+			goto tr42
+		case 94:
+			goto tr50
 		}
 		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st18
+			goto st19
 		}
 		goto st0
 	tr4:
 		(ps.state) = 2
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -1428,24 +1545,28 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr34:
+	tr35:
 		(ps.state) = 2
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -1461,182 +1582,220 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr43:
-//line ragel/../ragel/base-grammar.rl:32
+	tr44:
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr57:
-//line ragel/../ragel/base-grammar.rl:40
+	tr58:
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr65:
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+	tr66:
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr73:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
+	tr74:
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr81:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+	tr82:
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr91:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr92:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr100:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+	tr101:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr111:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr112:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr121:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr122:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr131:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr132:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr142:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr143:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr152:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr153:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st2
@@ -1645,7 +1804,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof2
 		}
 	st_case_2:
-//line go/parser.go:1770
+//line parser.go:1777
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1660,8 +1819,9 @@ func (frame *Frame) Parse() {
 		}
 		goto tr8
 	tr8:
-//line ragel/../ragel/base-grammar.rl:88
-		atoms[atm].set32(VALUE, 1, p)
+//line ./op-grammar.rl:74
+
+		atoms[atm][0] = ((uint64)(p)) << 32
 
 		goto st3
 	st3:
@@ -1669,7 +1829,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof3
 		}
 	st_case_3:
-//line go/parser.go:1795
+//line parser.go:1802
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -1680,124 +1840,25 @@ func (frame *Frame) Parse() {
 		case 39:
 			goto tr12
 		case 92:
-			goto st13
+			goto st14
 		}
 		goto st3
 	tr9:
-//line ragel/../ragel/base-grammar.rl:88
-		atoms[atm].set32(VALUE, 1, p)
+//line ./op-grammar.rl:74
 
-//line ragel/../ragel/base-grammar.rl:91
-		atoms[atm].set32(VALUE, 0, p)
-		atoms[atm].set2(ORIGIN, 31, ATOM_STRING)
+		atoms[atm][0] = ((uint64)(p)) << 32
 
-		goto st19
+//line ./op-grammar.rl:78
+
+		atoms[atm][0] |= uint64(p)
+		atoms[atm][1] = ((uint64)(ATOM_STRING)) << 62
+
+		goto st20
 	tr12:
-//line ragel/../ragel/base-grammar.rl:91
-		atoms[atm].set32(VALUE, 0, p)
-		atoms[atm].set2(ORIGIN, 31, ATOM_STRING)
+//line ./op-grammar.rl:78
 
-		goto st19
-	st19:
-		if p++; p == pe {
-			goto _test_eof19
-		}
-	st_case_19:
-//line go/parser.go:1832
-		switch (frame.Body)[p] {
-		case 32:
-			goto tr54
-		case 33:
-			goto tr55
-		case 35:
-			goto tr56
-		case 39:
-			goto tr57
-		case 42:
-			goto tr56
-		case 44:
-			goto tr55
-		case 46:
-			goto tr58
-		case 58:
-			goto tr56
-		case 59:
-			goto tr55
-		case 61:
-			goto tr59
-		case 62:
-			goto tr60
-		case 63:
-			goto tr55
-		case 64:
-			goto tr56
-		case 94:
-			goto tr61
-		}
-		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto tr54
-		}
-		goto st0
-	tr54:
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr70:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr78:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr88:
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr97:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr107:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-		goto st20
-	tr118:
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/./uuid-grammar.rl:50
-		atoms[atm][1] = UUID_NAME_FLAG
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
+		atoms[atm][0] |= uint64(p)
+		atoms[atm][1] = ((uint64)(ATOM_STRING)) << 62
 
 		goto st20
 	st20:
@@ -1805,357 +1866,490 @@ func (frame *Frame) Parse() {
 			goto _test_eof20
 		}
 	st_case_20:
-//line go/parser.go:1951
+//line parser.go:1839
 		switch (frame.Body)[p] {
 		case 32:
-			goto st20
+			goto tr55
 		case 33:
-			goto tr63
+			goto tr56
 		case 35:
-			goto tr64
+			goto tr57
 		case 39:
-			goto tr65
+			goto tr58
 		case 42:
-			goto tr64
+			goto tr57
 		case 44:
-			goto tr63
+			goto tr56
 		case 46:
-			goto tr66
+			goto tr59
 		case 58:
-			goto tr64
+			goto tr57
 		case 59:
-			goto tr63
+			goto tr56
 		case 61:
-			goto tr67
+			goto tr60
 		case 62:
-			goto tr68
+			goto tr61
 		case 63:
-			goto tr63
+			goto tr56
 		case 64:
-			goto tr64
+			goto tr57
 		case 94:
-			goto tr69
+			goto tr62
 		}
 		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st20
+			goto tr55
 		}
 		goto st0
-	tr30:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+	tr55:
+//line ./op-grammar.rl:41
 
-		goto _again
-	tr35:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr45:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:32
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+		goto st21
+	tr71:
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+//line ./op-grammar.rl:41
 
-		goto _again
-	tr58:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+		goto st21
+	tr79:
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+//line ./op-grammar.rl:41
 
-		goto _again
-	tr66:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:113
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr74:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
-
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+		goto st21
+	tr89:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
-		goto _again
-	tr83:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:41
 
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+		goto st21
+	tr98:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+//line ./op-grammar.rl:41
 
-		goto _again
-	tr92:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+		goto st21
+	tr108:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
-		goto _again
-	tr101:
-		(ps.state) = 21
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+//line ./op-grammar.rl:41
 
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+		goto st21
+	tr119:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
+//line ././uuid-grammar.rl:51
 
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr113:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
-
-//line ragel/../ragel/base-grammar.rl:40
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr122:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/./uuid-grammar.rl:50
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr132:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr144:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
-	tr153:
-		(ps.state) = 21
-//line ragel/../ragel/./uuid-grammar.rl:34
-
-//line ragel/../ragel/./uuid-grammar.rl:50
-		atoms[atm][1] = UUID_NAME_FLAG
-
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:136
-		frame.position++
-
-//line ragel/../ragel/base-grammar.rl:143
-		(ps.state) = (RON_FULL_STOP)
-		{
-			p++
-			goto _out
-		}
-
-		goto _again
+		goto st21
 	st21:
 		if p++; p == pe {
 			goto _test_eof21
 		}
 	st_case_21:
-//line go/parser.go:2285
-		goto st0
-	tr5:
-		(ps.state) = 4
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
-			// one op is done, so stop parsing for now
-			// make sure the parser restarts with the next op
-			p--
-			(ps.state) = (RON_start)
-			{
-				p++
-				goto _out
-			}
-		} else {
-			//op_idx++;
-			if frame.term != TERM_RAW {
-				frame.term = TERM_REDUCED
-			}
+//line parser.go:1959
+		switch (frame.Body)[p] {
+		case 32:
+			goto st21
+		case 33:
+			goto tr64
+		case 35:
+			goto tr65
+		case 39:
+			goto tr66
+		case 42:
+			goto tr65
+		case 44:
+			goto tr64
+		case 46:
+			goto tr67
+		case 58:
+			goto tr65
+		case 59:
+			goto tr64
+		case 61:
+			goto tr68
+		case 62:
+			goto tr69
+		case 63:
+			goto tr64
+		case 64:
+			goto tr65
+		case 94:
+			goto tr70
 		}
+		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+			goto st21
+		}
+		goto st0
+	tr31:
+		(ps.state) = 22
+//line ./op-grammar.rl:131
 
-//line ragel/../ragel/base-grammar.rl:108
-		atm = 4
-		hlf = 0
-		dgt = 0
-
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
-		atoms = append(atoms, Atom{})
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
 
 		goto _again
 	tr36:
-		(ps.state) = 4
-//line ragel/../ragel/base-grammar.rl:136
+		(ps.state) = 22
+//line ./op-grammar.rl:124
+
 		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr46:
+		(ps.state) = 22
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr59:
+		(ps.state) = 22
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr67:
+		(ps.state) = 22
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr75:
+		(ps.state) = 22
+//line ./op-grammar.rl:60
+
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr84:
+		(ps.state) = 22
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr93:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:37
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr102:
+		(ps.state) = 22
+//line ./op-grammar.rl:69
+
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr114:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:34
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr123:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
+		atoms[atm][1] = UUID_NAME_FLAG
+
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr133:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:37
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr145:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:34
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	tr154:
+		(ps.state) = 22
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
+		atoms[atm][1] = UUID_NAME_FLAG
+
+//line ./op-grammar.rl:32
+
+		atm++
+
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:124
+
+		frame.position++
+
+//line ./op-grammar.rl:131
+
+		(ps.state) = (RON_FULL_STOP)
+		{
+			p++
+			goto _out
+		}
+
+		goto _again
+	st22:
+		if p++; p == pe {
+			goto _test_eof22
+		}
+	st_case_22:
+//line parser.go:2294
+		goto st0
+	tr5:
+		(ps.state) = 4
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -2171,182 +2365,257 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr47:
-//line ragel/../ragel/base-grammar.rl:32
-		atm++
+	tr37:
+		(ps.state) = 4
+//line ./op-grammar.rl:124
 
-//line ragel/../ragel/base-grammar.rl:140
+		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
+			// one op is done, so stop parsing for now
+			// make sure the parser restarts with the next op
+			p--
+			(ps.state) = (RON_start)
+			{
+				p++
+				goto _out
+			}
+		} else {
+			//op_idx++;
+			if frame.term != TERM_RAW {
+				frame.term = TERM_REDUCED
+			}
+		}
+
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
-		goto st4
-	tr59:
-//line ragel/../ragel/base-grammar.rl:40
+		goto _again
+	tr48:
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:95
+
+		atm = 4
+		hlf = VALUE
+		dgt = 0
+
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr67:
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
-		atoms = append(atoms, Atom{})
+	tr60:
+//line ./op-grammar.rl:41
 
-		goto st4
-	tr75:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
-
-//line ragel/../ragel/base-grammar.rl:40
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr85:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+	tr68:
+//line ./op-grammar.rl:36
 
-//line ragel/../ragel/base-grammar.rl:40
+		hlf, dgt = VALUE, 0
+		atoms = append(atoms, Atom{})
+
+		goto st4
+	tr76:
+//line ./op-grammar.rl:60
+
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr94:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr86:
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
-//line ragel/../ragel/base-grammar.rl:40
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr102:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+	tr95:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:40
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr115:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr103:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
 
-//line ragel/../ragel/base-grammar.rl:40
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr125:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr116:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ./op-grammar.rl:91
+
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+		atm++
+
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
+		atoms = append(atoms, Atom{})
+
+		goto st4
+	tr126:
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr134:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr135:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr146:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr147:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr156:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr157:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st4
@@ -2355,7 +2624,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof4
 		}
 	st_case_4:
-//line go/parser.go:2570
+//line parser.go:2580
 		switch (frame.Body)[p] {
 		case 32:
 			goto st4
@@ -2374,11 +2643,12 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	tr15:
-//line ragel/../ragel/base-grammar.rl:44
+//line ./op-grammar.rl:45
 
-//line ragel/../ragel/base-grammar.rl:46
+//line ./op-grammar.rl:48
+
 		if (frame.Body)[p] == '-' {
-			atoms[atm].set1(ORIGIN, 60)
+			atoms[atm][1] |= 1
 		}
 
 		goto st5
@@ -2387,60 +2657,64 @@ func (frame *Frame) Parse() {
 			goto _test_eof5
 		}
 	st_case_5:
-//line go/parser.go:2604
+//line parser.go:2614
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto tr17
 		}
 		goto st0
 	tr16:
-//line ragel/../ragel/base-grammar.rl:44
+//line ./op-grammar.rl:45
 
-//line ragel/../ragel/base-grammar.rl:51
-		atoms[atm].arab64(VALUE, (frame.Body)[p]-'0')
+//line ./op-grammar.rl:54
+
+		atoms[atm][0] *= 10
+		atoms[atm][0] += (uint64)((frame.Body)[p] - '0')
 		// TODO max size for int/float/string
 
-		goto st22
+		goto st23
 	tr17:
-//line ragel/../ragel/base-grammar.rl:51
-		atoms[atm].arab64(VALUE, (frame.Body)[p]-'0')
+//line ./op-grammar.rl:54
+
+		atoms[atm][0] *= 10
+		atoms[atm][0] += (uint64)((frame.Body)[p] - '0')
 		// TODO max size for int/float/string
 
-		goto st22
-	st22:
+		goto st23
+	st23:
 		if p++; p == pe {
-			goto _test_eof22
+			goto _test_eof23
 		}
-	st_case_22:
-//line go/parser.go:2631
+	st_case_23:
+//line parser.go:2643
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr70
+			goto tr71
 		case 33:
-			goto tr71
+			goto tr72
 		case 35:
-			goto tr72
-		case 39:
 			goto tr73
-		case 42:
-			goto tr72
-		case 44:
-			goto tr71
-		case 46:
+		case 39:
 			goto tr74
-		case 58:
+		case 42:
+			goto tr73
+		case 44:
 			goto tr72
-		case 59:
-			goto tr71
-		case 61:
+		case 46:
 			goto tr75
-		case 62:
-			goto tr76
-		case 63:
-			goto tr71
-		case 64:
+		case 58:
+			goto tr73
+		case 59:
 			goto tr72
-		case 94:
+		case 61:
+			goto tr76
+		case 62:
 			goto tr77
+		case 63:
+			goto tr72
+		case 64:
+			goto tr73
+		case 94:
+			goto tr78
 		}
 		switch {
 		case (frame.Body)[p] > 13:
@@ -2448,14 +2722,15 @@ func (frame *Frame) Parse() {
 				goto tr17
 			}
 		case (frame.Body)[p] >= 9:
-			goto tr70
+			goto tr71
 		}
 		goto st0
 	tr6:
 		(ps.state) = 6
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -2471,24 +2746,28 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr37:
+	tr38:
 		(ps.state) = 6
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -2504,182 +2783,220 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr48:
-//line ragel/../ragel/base-grammar.rl:32
+	tr49:
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr60:
-//line ragel/../ragel/base-grammar.rl:40
+	tr61:
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr68:
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+	tr69:
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr76:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
+	tr77:
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr86:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+	tr87:
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr95:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr96:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr103:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+	tr104:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr116:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr117:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr126:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr127:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr135:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr136:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr147:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr148:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr157:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr158:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st6
@@ -2688,7 +3005,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof6
 		}
 	st_case_6:
-//line go/parser.go:2954
+//line parser.go:2967
 		switch (frame.Body)[p] {
 		case 32:
 			goto st6
@@ -2737,136 +3054,31 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	tr19:
-//line ragel/../ragel/base-grammar.rl:96
+//line ./op-grammar.rl:83
+
 		if atm == 4 {
 			atoms[atm] = atoms[SPEC_OBJECT]
 		} else if atoms[atm-1].Type() == ATOM_UUID {
 			atoms[atm] = atoms[atm-1]
 		}
 
-//line ragel/../ragel/./uuid-grammar.rl:5
+//line ././uuid-grammar.rl:5
 
-//line ragel/../ragel/./uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[(frame.Body)[p]])
+//line ././uuid-grammar.rl:45
 
-		goto st23
-	tr110:
-//line ragel/../ragel/./uuid-grammar.rl:34
-//line ragel/../ragel/./uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[(frame.Body)[p]])
-
-		goto st23
-	st23:
-		if p++; p == pe {
-			goto _test_eof23
-		}
-	st_case_23:
-//line go/parser.go:3035
-		switch (frame.Body)[p] {
-		case 32:
-			goto tr78
-		case 33:
-			goto tr79
-		case 35:
-			goto tr80
-		case 39:
-			goto tr81
-		case 42:
-			goto tr80
-		case 44:
-			goto tr79
-		case 46:
-			goto tr83
-		case 58:
-			goto tr80
-		case 59:
-			goto tr79
-		case 61:
-			goto tr85
-		case 62:
-			goto tr86
-		case 63:
-			goto tr79
-		case 64:
-			goto tr80
-		case 91:
-			goto tr82
-		case 93:
-			goto tr82
-		case 94:
-			goto tr87
-		case 95:
-			goto tr84
-		case 123:
-			goto tr82
-		case 125:
-			goto tr82
-		case 126:
-			goto tr84
-		}
-		switch {
-		case (frame.Body)[p] < 48:
-			switch {
-			case (frame.Body)[p] > 13:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr82
-				}
-			case (frame.Body)[p] >= 9:
-				goto tr78
-			}
-		case (frame.Body)[p] > 57:
-			switch {
-			case (frame.Body)[p] > 90:
-				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr84
-				}
-			case (frame.Body)[p] >= 65:
-				goto tr84
-			}
-		default:
-			goto tr84
-		}
-		goto st0
-	tr82:
-//line ragel/../ragel/./uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
-
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
 		goto st24
-	tr93:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
-		dgt++
-		if dgt > 10 {
-			{
-				p++
-				(ps.state) = 24
-				goto _out
-			}
-		}
+	tr111:
+//line ././uuid-grammar.rl:34
 
-		goto st24
-	tr106:
-//line ragel/../ragel/./uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
-		dgt--
+//line ././uuid-grammar.rl:45
 
-		goto st24
-	tr112:
-//line ragel/../ragel/./uuid-grammar.rl:34
-//line ragel/../ragel/./uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
-
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
 		goto st24
 	st24:
@@ -2874,64 +3086,183 @@ func (frame *Frame) Parse() {
 			goto _test_eof24
 		}
 	st_case_24:
-//line go/parser.go:3150
+//line parser.go:3050
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr88
+			goto tr79
 		case 33:
-			goto tr89
+			goto tr80
 		case 35:
-			goto tr90
+			goto tr81
 		case 39:
-			goto tr91
+			goto tr82
 		case 42:
-			goto tr90
+			goto tr81
 		case 44:
-			goto tr89
+			goto tr80
 		case 46:
-			goto tr92
+			goto tr84
 		case 58:
-			goto tr90
+			goto tr81
 		case 59:
-			goto tr89
+			goto tr80
 		case 61:
-			goto tr94
+			goto tr86
 		case 62:
-			goto tr95
+			goto tr87
 		case 63:
-			goto tr89
+			goto tr80
 		case 64:
-			goto tr90
+			goto tr81
+		case 91:
+			goto tr83
+		case 93:
+			goto tr83
 		case 94:
-			goto tr96
+			goto tr88
 		case 95:
-			goto tr93
+			goto tr85
+		case 123:
+			goto tr83
+		case 125:
+			goto tr83
 		case 126:
-			goto tr93
+			goto tr85
 		}
 		switch {
 		case (frame.Body)[p] < 48:
-			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr88
+			switch {
+			case (frame.Body)[p] > 13:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr83
+				}
+			case (frame.Body)[p] >= 9:
+				goto tr79
 			}
 		case (frame.Body)[p] > 57:
 			switch {
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr93
+					goto tr85
 				}
 			case (frame.Body)[p] >= 65:
-				goto tr93
+				goto tr85
 			}
 		default:
+			goto tr85
+		}
+		goto st0
+	tr83:
+//line ././uuid-grammar.rl:29
+
+		dgt = 0
+		hlf = 1
+
+//line ././uuid-grammar.rl:9
+
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st25
+	tr94:
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
+			{
+				p++
+				(ps.state) = 25
+				goto _out
+			}
+		}
+
+		goto st25
+	tr107:
+//line ././uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
+		dgt--
+
+		goto st25
+	tr113:
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:29
+
+		dgt = 0
+		hlf = 1
+
+//line ././uuid-grammar.rl:9
+
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st25
+	st25:
+		if p++; p == pe {
+			goto _test_eof25
+		}
+	st_case_25:
+//line parser.go:3165
+		switch (frame.Body)[p] {
+		case 32:
+			goto tr89
+		case 33:
+			goto tr90
+		case 35:
+			goto tr91
+		case 39:
+			goto tr92
+		case 42:
+			goto tr91
+		case 44:
+			goto tr90
+		case 46:
 			goto tr93
+		case 58:
+			goto tr91
+		case 59:
+			goto tr90
+		case 61:
+			goto tr95
+		case 62:
+			goto tr96
+		case 63:
+			goto tr90
+		case 64:
+			goto tr91
+		case 94:
+			goto tr97
+		case 95:
+			goto tr94
+		case 126:
+			goto tr94
+		}
+		switch {
+		case (frame.Body)[p] < 48:
+			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+				goto tr89
+			}
+		case (frame.Body)[p] > 57:
+			switch {
+			case (frame.Body)[p] > 90:
+				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
+					goto tr94
+				}
+			case (frame.Body)[p] >= 65:
+				goto tr94
+			}
+		default:
+			goto tr94
 		}
 		goto st0
 	tr7:
 		(ps.state) = 7
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -2947,24 +3278,28 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr38:
+	tr39:
 		(ps.state) = 7
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 		frame.position++
 
-//line ragel/../ragel/base-grammar.rl:120
-		hlf = 0
-		if p > ps.off && frame.position != -1 {
+//line ./op-grammar.rl:108
+
+		hlf = VALUE
+		if p > frame.Parser.off && frame.position != -1 {
 			// one op is done, so stop parsing for now
 			// make sure the parser restarts with the next op
 			p--
@@ -2980,182 +3315,220 @@ func (frame *Frame) Parse() {
 			}
 		}
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto _again
-	tr49:
-//line ragel/../ragel/base-grammar.rl:32
+	tr50:
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr61:
-//line ragel/../ragel/base-grammar.rl:40
+	tr62:
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr69:
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+	tr70:
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr77:
-//line ragel/../ragel/base-grammar.rl:55
-		atoms[atm].set2(ORIGIN, 31, ATOM_INT)
+	tr78:
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr87:
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+	tr88:
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr96:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr97:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr105:
-//line ragel/../ragel/base-grammar.rl:84
-		atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
+	tr106:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm].setTill(p)
+		atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr117:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr118:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr127:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr128:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-		atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr136:
-//line ragel/../ragel/./uuid-grammar.rl:37
+	tr137:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr148:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr149:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr158:
-//line ragel/../ragel/./uuid-grammar.rl:34
+	tr159:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 		atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 		atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:108
+//line ./op-grammar.rl:95
+
 		atm = 4
-		hlf = 0
+		hlf = VALUE
 		dgt = 0
 
-//line ragel/../ragel/base-grammar.rl:36
-		hlf, dgt = 0, 0
+//line ./op-grammar.rl:36
+
+		hlf, dgt = VALUE, 0
 		atoms = append(atoms, Atom{})
 
 		goto st7
@@ -3164,7 +3537,7 @@ func (frame *Frame) Parse() {
 			goto _test_eof7
 		}
 	st_case_7:
-//line go/parser.go:3486
+//line parser.go:3502
 		switch (frame.Body)[p] {
 		case 32:
 			goto st7
@@ -3183,12 +3556,10 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	tr23:
-//line ragel/../ragel/base-grammar.rl:59
+//line ./op-grammar.rl:64
 
-//line ragel/../ragel/base-grammar.rl:65
-		if (frame.Body)[p] == '-' {
-			atoms[atm].set1(ORIGIN, 60)
-		}
+		atoms[atm].setFloatType()
+		atoms[atm].setFrom(p)
 
 		goto st8
 	st8:
@@ -3196,23 +3567,16 @@ func (frame *Frame) Parse() {
 			goto _test_eof8
 		}
 	st_case_8:
-//line go/parser.go:3520
+//line parser.go:3532
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto tr25
+			goto st9
 		}
 		goto st0
 	tr24:
-//line ragel/../ragel/base-grammar.rl:59
+//line ./op-grammar.rl:64
 
-//line ragel/../ragel/base-grammar.rl:61
-		atoms[atm].arab64(VALUE, (frame.Body)[p]-'0')
-		// TODO max size for int/float/string
-
-		goto st9
-	tr25:
-//line ragel/../ragel/base-grammar.rl:61
-		atoms[atm].arab64(VALUE, (frame.Body)[p]-'0')
-		// TODO max size for int/float/string
+		atoms[atm].setFloatType()
+		atoms[atm].setFrom(p)
 
 		goto st9
 	st9:
@@ -3220,12 +3584,17 @@ func (frame *Frame) Parse() {
 			goto _test_eof9
 		}
 	st_case_9:
-//line go/parser.go:3547
-		if (frame.Body)[p] == 46 {
+//line parser.go:3549
+		switch (frame.Body)[p] {
+		case 46:
 			goto st10
+		case 69:
+			goto st13
+		case 101:
+			goto st13
 		}
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto tr25
+			goto st9
 		}
 		goto st0
 	st10:
@@ -3234,63 +3603,55 @@ func (frame *Frame) Parse() {
 		}
 	st_case_10:
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto tr27
+			goto st26
 		}
 		goto st0
-	tr27:
-//line ragel/../ragel/base-grammar.rl:70
-		atoms[atm].arab64(VALUE, (frame.Body)[p]-'0')
-		atoms[atm].inc16(ORIGIN, 1)
-		// TODO max size for int/float/string
-
-		goto st25
-	st25:
+	st26:
 		if p++; p == pe {
-			goto _test_eof25
+			goto _test_eof26
 		}
-	st_case_25:
-//line go/parser.go:3577
+	st_case_26:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr97
+			goto tr98
 		case 33:
-			goto tr98
+			goto tr99
 		case 35:
-			goto tr99
-		case 39:
 			goto tr100
-		case 42:
-			goto tr99
-		case 44:
-			goto tr98
-		case 46:
+		case 39:
 			goto tr101
-		case 58:
+		case 42:
+			goto tr100
+		case 44:
 			goto tr99
-		case 59:
-			goto tr98
-		case 61:
+		case 46:
 			goto tr102
-		case 62:
-			goto tr103
-		case 63:
-			goto tr98
-		case 64:
+		case 58:
+			goto tr100
+		case 59:
 			goto tr99
+		case 61:
+			goto tr103
+		case 62:
+			goto tr104
+		case 63:
+			goto tr99
+		case 64:
+			goto tr100
 		case 69:
 			goto st11
 		case 94:
-			goto tr105
+			goto tr106
 		case 101:
 			goto st11
 		}
 		switch {
 		case (frame.Body)[p] > 13:
 			if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-				goto tr27
+				goto st26
 			}
 		case (frame.Body)[p] >= 9:
-			goto tr97
+			goto tr98
 		}
 		goto st0
 	st11:
@@ -3300,182 +3661,95 @@ func (frame *Frame) Parse() {
 	st_case_11:
 		switch (frame.Body)[p] {
 		case 43:
-			goto tr28
+			goto st12
 		case 45:
-			goto tr28
+			goto st12
 		}
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto tr29
+			goto st27
 		}
 		goto st0
-	tr28:
-//line ragel/../ragel/base-grammar.rl:75
-		if (frame.Body)[p] == '-' {
-			atoms[atm].set1(ORIGIN, 61)
-		}
-
-		goto st12
 	st12:
 		if p++; p == pe {
 			goto _test_eof12
 		}
 	st_case_12:
-//line go/parser.go:3649
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto tr29
+			goto st27
 		}
 		goto st0
-	tr29:
-//line ragel/../ragel/base-grammar.rl:80
-		atoms[atm].arab16(ORIGIN, (frame.Body)[p]-'0')
-		// TODO max size for int/float/string
-
-		goto st26
-	st26:
-		if p++; p == pe {
-			goto _test_eof26
-		}
-	st_case_26:
-//line go/parser.go:3666
-		switch (frame.Body)[p] {
-		case 32:
-			goto tr97
-		case 33:
-			goto tr98
-		case 35:
-			goto tr99
-		case 39:
-			goto tr100
-		case 42:
-			goto tr99
-		case 44:
-			goto tr98
-		case 46:
-			goto tr101
-		case 58:
-			goto tr99
-		case 59:
-			goto tr98
-		case 61:
-			goto tr102
-		case 62:
-			goto tr103
-		case 63:
-			goto tr98
-		case 64:
-			goto tr99
-		case 94:
-			goto tr105
-		}
-		switch {
-		case (frame.Body)[p] > 13:
-			if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-				goto tr29
-			}
-		case (frame.Body)[p] >= 9:
-			goto tr97
-		}
-		goto st0
-	tr84:
-//line ragel/../ragel/./uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
-
-//line ragel/../ragel/./uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
-
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
-		dgt++
-		if dgt > 10 {
-			{
-				p++
-				(ps.state) = 27
-				goto _out
-			}
-		}
-
-		goto st27
 	st27:
 		if p++; p == pe {
 			goto _test_eof27
 		}
 	st_case_27:
-//line go/parser.go:3730
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr88
+			goto tr98
 		case 33:
-			goto tr89
+			goto tr99
 		case 35:
-			goto tr90
+			goto tr100
 		case 39:
-			goto tr91
+			goto tr101
 		case 42:
-			goto tr90
+			goto tr100
 		case 44:
-			goto tr89
+			goto tr99
 		case 46:
-			goto tr92
-		case 47:
-			goto tr106
+			goto tr102
 		case 58:
-			goto tr90
+			goto tr100
 		case 59:
-			goto tr89
+			goto tr99
 		case 61:
-			goto tr94
+			goto tr103
 		case 62:
-			goto tr95
+			goto tr104
 		case 63:
-			goto tr89
+			goto tr99
 		case 64:
-			goto tr90
+			goto tr100
 		case 94:
-			goto tr96
-		case 95:
-			goto tr93
-		case 126:
-			goto tr93
+			goto tr106
 		}
 		switch {
-		case (frame.Body)[p] < 48:
-			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr88
+		case (frame.Body)[p] > 13:
+			if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+				goto st27
 			}
-		case (frame.Body)[p] > 57:
-			switch {
-			case (frame.Body)[p] > 90:
-				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr93
-				}
-			case (frame.Body)[p] >= 65:
-				goto tr93
-			}
-		default:
-			goto tr93
+		case (frame.Body)[p] >= 9:
+			goto tr98
 		}
 		goto st0
-	tr20:
-//line ragel/../ragel/base-grammar.rl:96
-		if atm == 4 {
-			atoms[atm] = atoms[SPEC_OBJECT]
-		} else if atoms[atm-1].Type() == ATOM_UUID {
-			atoms[atm] = atoms[atm-1]
+	st13:
+		if p++; p == pe {
+			goto _test_eof13
 		}
+	st_case_13:
+		switch (frame.Body)[p] {
+		case 43:
+			goto st10
+		case 45:
+			goto st10
+		}
+		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+			goto st26
+		}
+		goto st0
+	tr85:
+//line ././uuid-grammar.rl:29
 
-//line ragel/../ragel/./uuid-grammar.rl:5
+		dgt = 0
+		hlf = 1
 
-//line ragel/../ragel/./uuid-grammar.rl:26
+//line ././uuid-grammar.rl:22
 
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		atoms[atm][hlf] &= INT60_FLAGS
 
-		goto st28
-	tr114:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3491,97 +3765,84 @@ func (frame *Frame) Parse() {
 			goto _test_eof28
 		}
 	st_case_28:
-//line go/parser.go:3821
+//line parser.go:3726
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr107
+			goto tr89
 		case 33:
-			goto tr108
+			goto tr90
 		case 35:
-			goto tr109
+			goto tr91
 		case 39:
-			goto tr111
+			goto tr92
 		case 42:
-			goto tr109
+			goto tr91
 		case 44:
-			goto tr108
+			goto tr90
 		case 46:
-			goto tr113
+			goto tr93
+		case 47:
+			goto tr107
 		case 58:
-			goto tr109
+			goto tr91
 		case 59:
-			goto tr108
+			goto tr90
 		case 61:
-			goto tr115
+			goto tr95
 		case 62:
-			goto tr116
+			goto tr96
 		case 63:
-			goto tr108
+			goto tr90
 		case 64:
-			goto tr109
-		case 91:
-			goto tr112
-		case 93:
-			goto tr112
+			goto tr91
 		case 94:
-			goto tr117
+			goto tr97
 		case 95:
-			goto tr114
-		case 123:
-			goto tr112
-		case 125:
-			goto tr112
+			goto tr94
 		case 126:
-			goto tr114
+			goto tr94
 		}
 		switch {
-		case (frame.Body)[p] < 43:
-			switch {
-			case (frame.Body)[p] < 36:
-				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr107
-				}
-			case (frame.Body)[p] > 37:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr112
-				}
-			default:
-				goto tr110
+		case (frame.Body)[p] < 48:
+			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+				goto tr89
 			}
-		case (frame.Body)[p] > 45:
+		case (frame.Body)[p] > 57:
 			switch {
-			case (frame.Body)[p] < 65:
-				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr114
-				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr114
+					goto tr94
 				}
-			default:
-				goto tr114
+			case (frame.Body)[p] >= 65:
+				goto tr94
 			}
 		default:
-			goto tr110
+			goto tr94
 		}
 		goto st0
-	tr21:
-//line ragel/../ragel/base-grammar.rl:96
+	tr20:
+//line ./op-grammar.rl:83
+
 		if atm == 4 {
 			atoms[atm] = atoms[SPEC_OBJECT]
 		} else if atoms[atm-1].Type() == ATOM_UUID {
 			atoms[atm] = atoms[atm-1]
 		}
 
-//line ragel/../ragel/./uuid-grammar.rl:5
+//line ././uuid-grammar.rl:5
 
-//line ragel/../ragel/./uuid-grammar.rl:26
+//line ././uuid-grammar.rl:26
 
-//line ragel/../ragel/./uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
+//line ././uuid-grammar.rl:9
 
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st29
+	tr115:
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3597,85 +3858,100 @@ func (frame *Frame) Parse() {
 			goto _test_eof29
 		}
 	st_case_29:
-//line go/parser.go:3928
+//line parser.go:3817
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr118
+			goto tr108
 		case 33:
-			goto tr119
+			goto tr109
 		case 35:
-			goto tr120
+			goto tr110
 		case 39:
-			goto tr121
+			goto tr112
 		case 42:
-			goto tr120
+			goto tr110
 		case 44:
-			goto tr119
+			goto tr109
 		case 46:
-			goto tr122
-		case 47:
-			goto tr123
+			goto tr114
 		case 58:
-			goto tr120
+			goto tr110
 		case 59:
-			goto tr119
+			goto tr109
 		case 61:
-			goto tr125
+			goto tr116
 		case 62:
-			goto tr126
+			goto tr117
 		case 63:
-			goto tr119
+			goto tr109
 		case 64:
-			goto tr120
+			goto tr110
 		case 91:
-			goto tr112
+			goto tr113
 		case 93:
-			goto tr112
+			goto tr113
 		case 94:
-			goto tr127
+			goto tr118
 		case 95:
-			goto tr124
+			goto tr115
 		case 123:
-			goto tr112
+			goto tr113
 		case 125:
-			goto tr112
+			goto tr113
 		case 126:
-			goto tr124
+			goto tr115
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr118
+					goto tr108
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr112
+					goto tr113
 				}
 			default:
-				goto tr110
+				goto tr111
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr124
+					goto tr115
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr124
+					goto tr115
 				}
 			default:
-				goto tr124
+				goto tr115
 			}
 		default:
-			goto tr110
+			goto tr111
 		}
 		goto st0
-	tr124:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+	tr21:
+//line ./op-grammar.rl:83
+
+		if atm == 4 {
+			atoms[atm] = atoms[SPEC_OBJECT]
+		} else if atoms[atm-1].Type() == ATOM_UUID {
+			atoms[atm] = atoms[atm-1]
+		}
+
+//line ././uuid-grammar.rl:5
+
+//line ././uuid-grammar.rl:26
+
+//line ././uuid-grammar.rl:22
+
+		atoms[atm][hlf] &= INT60_FLAGS
+
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3686,122 +3962,91 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st30
-	tr123:
-//line ragel/../ragel/./uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
-		dgt--
-
-		goto st30
 	st30:
 		if p++; p == pe {
 			goto _test_eof30
 		}
 	st_case_30:
-//line go/parser.go:4026
+//line parser.go:3924
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr118
+			goto tr119
 		case 33:
-			goto tr119
+			goto tr120
 		case 35:
-			goto tr120
-		case 39:
 			goto tr121
-		case 42:
-			goto tr120
-		case 44:
-			goto tr119
-		case 46:
+		case 39:
 			goto tr122
+		case 42:
+			goto tr121
+		case 44:
+			goto tr120
+		case 46:
+			goto tr123
+		case 47:
+			goto tr124
 		case 58:
-			goto tr120
+			goto tr121
 		case 59:
-			goto tr119
-		case 61:
-			goto tr125
-		case 62:
-			goto tr126
-		case 63:
-			goto tr119
-		case 64:
 			goto tr120
-		case 91:
-			goto tr112
-		case 93:
-			goto tr112
-		case 94:
+		case 61:
+			goto tr126
+		case 62:
 			goto tr127
+		case 63:
+			goto tr120
+		case 64:
+			goto tr121
+		case 91:
+			goto tr113
+		case 93:
+			goto tr113
+		case 94:
+			goto tr128
 		case 95:
-			goto tr124
+			goto tr125
 		case 123:
-			goto tr112
+			goto tr113
 		case 125:
-			goto tr112
+			goto tr113
 		case 126:
-			goto tr124
+			goto tr125
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr118
+					goto tr119
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr112
+					goto tr113
 				}
 			default:
-				goto tr110
+				goto tr111
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr124
+					goto tr125
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr124
+					goto tr125
 				}
 			default:
-				goto tr124
+				goto tr125
 			}
 		default:
-			goto tr110
+			goto tr111
 		}
 		goto st0
-	tr10:
-//line ragel/../ragel/base-grammar.rl:88
-		atoms[atm].set32(VALUE, 1, p)
+	tr125:
+//line ././uuid-grammar.rl:14
 
-		goto st13
-	st13:
-		if p++; p == pe {
-			goto _test_eof13
-		}
-	st_case_13:
-//line go/parser.go:4111
-		switch (frame.Body)[p] {
-		case 10:
-			goto st0
-		case 13:
-			goto st0
-		}
-		goto st3
-	tr52:
-//line ragel/../ragel/./uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
-
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
-
-		goto st31
-	tr133:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3812,21 +4057,11 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st31
-	tr137:
-//line ragel/../ragel/./uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
+	tr124:
+//line ././uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
 		dgt--
-
-		goto st31
-	tr143:
-//line ragel/../ragel/./uuid-grammar.rl:34
-//line ragel/../ragel/./uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
-
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
 
 		goto st31
 	st31:
@@ -3834,69 +4069,115 @@ func (frame *Frame) Parse() {
 			goto _test_eof31
 		}
 	st_case_31:
-//line go/parser.go:4168
+//line parser.go:4022
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr128
+			goto tr119
 		case 33:
-			goto tr129
+			goto tr120
 		case 35:
-			goto tr130
+			goto tr121
 		case 39:
-			goto tr131
+			goto tr122
 		case 42:
-			goto tr130
+			goto tr121
 		case 44:
-			goto tr129
+			goto tr120
 		case 46:
-			goto tr132
+			goto tr123
 		case 58:
-			goto tr130
+			goto tr121
 		case 59:
-			goto tr129
+			goto tr120
 		case 61:
-			goto tr134
+			goto tr126
 		case 62:
-			goto tr135
+			goto tr127
 		case 63:
-			goto tr129
+			goto tr120
 		case 64:
-			goto tr130
+			goto tr121
+		case 91:
+			goto tr113
+		case 93:
+			goto tr113
 		case 94:
-			goto tr136
+			goto tr128
 		case 95:
-			goto tr133
+			goto tr125
+		case 123:
+			goto tr113
+		case 125:
+			goto tr113
 		case 126:
-			goto tr133
+			goto tr125
 		}
 		switch {
-		case (frame.Body)[p] < 48:
-			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr128
-			}
-		case (frame.Body)[p] > 57:
+		case (frame.Body)[p] < 43:
 			switch {
+			case (frame.Body)[p] < 36:
+				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+					goto tr119
+				}
+			case (frame.Body)[p] > 37:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr113
+				}
+			default:
+				goto tr111
+			}
+		case (frame.Body)[p] > 45:
+			switch {
+			case (frame.Body)[p] < 65:
+				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+					goto tr125
+				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr133
+					goto tr125
 				}
-			case (frame.Body)[p] >= 65:
-				goto tr133
+			default:
+				goto tr125
 			}
 		default:
-			goto tr133
+			goto tr111
 		}
 		goto st0
+	tr10:
+//line ./op-grammar.rl:74
+
+		atoms[atm][0] = ((uint64)(p)) << 32
+
+		goto st14
+	st14:
+		if p++; p == pe {
+			goto _test_eof14
+		}
+	st_case_14:
+//line parser.go:4107
+		switch (frame.Body)[p] {
+		case 10:
+			goto st0
+		case 13:
+			goto st0
+		}
+		goto st3
 	tr53:
-//line ragel/../ragel/./uuid-grammar.rl:29
+//line ././uuid-grammar.rl:29
+
 		dgt = 0
-		hlf = ORIGIN
+		hlf = 1
 
-//line ragel/../ragel/./uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
+//line ././uuid-grammar.rl:9
 
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st32
+	tr134:
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3907,79 +4188,98 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st32
+	tr138:
+//line ././uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
+		dgt--
+
+		goto st32
+	tr144:
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:29
+
+		dgt = 0
+		hlf = 1
+
+//line ././uuid-grammar.rl:9
+
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st32
 	st32:
 		if p++; p == pe {
 			goto _test_eof32
 		}
 	st_case_32:
-//line go/parser.go:4245
+//line parser.go:4164
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr128
+			goto tr129
 		case 33:
-			goto tr129
+			goto tr130
 		case 35:
-			goto tr130
-		case 39:
 			goto tr131
-		case 42:
-			goto tr130
-		case 44:
-			goto tr129
-		case 46:
+		case 39:
 			goto tr132
-		case 47:
-			goto tr137
+		case 42:
+			goto tr131
+		case 44:
+			goto tr130
+		case 46:
+			goto tr133
 		case 58:
-			goto tr130
+			goto tr131
 		case 59:
-			goto tr129
-		case 61:
-			goto tr134
-		case 62:
-			goto tr135
-		case 63:
-			goto tr129
-		case 64:
 			goto tr130
-		case 94:
+		case 61:
+			goto tr135
+		case 62:
 			goto tr136
+		case 63:
+			goto tr130
+		case 64:
+			goto tr131
+		case 94:
+			goto tr137
 		case 95:
-			goto tr133
+			goto tr134
 		case 126:
-			goto tr133
+			goto tr134
 		}
 		switch {
 		case (frame.Body)[p] < 48:
 			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr128
+				goto tr129
 			}
 		case (frame.Body)[p] > 57:
 			switch {
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr133
+					goto tr134
 				}
 			case (frame.Body)[p] >= 65:
-				goto tr133
+				goto tr134
 			}
 		default:
-			goto tr133
+			goto tr134
 		}
 		goto st0
-	tr44:
-//line ragel/../ragel/./uuid-grammar.rl:5
+	tr54:
+//line ././uuid-grammar.rl:29
 
-//line ragel/../ragel/./uuid-grammar.rl:26
+		dgt = 0
+		hlf = 1
 
-//line ragel/../ragel/./uuid-grammar.rl:9
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+//line ././uuid-grammar.rl:22
 
-		goto st33
-	tr145:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+		atoms[atm][hlf] &= INT60_FLAGS
+
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -3995,90 +4295,76 @@ func (frame *Frame) Parse() {
 			goto _test_eof33
 		}
 	st_case_33:
-//line go/parser.go:4328
+//line parser.go:4241
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr138
+			goto tr129
 		case 33:
-			goto tr139
+			goto tr130
 		case 35:
-			goto tr140
+			goto tr131
 		case 39:
-			goto tr142
+			goto tr132
 		case 42:
-			goto tr140
+			goto tr131
 		case 44:
-			goto tr139
+			goto tr130
 		case 46:
-			goto tr144
+			goto tr133
+		case 47:
+			goto tr138
 		case 58:
-			goto tr140
+			goto tr131
 		case 59:
-			goto tr139
+			goto tr130
 		case 61:
-			goto tr146
+			goto tr135
 		case 62:
-			goto tr147
+			goto tr136
 		case 63:
-			goto tr139
+			goto tr130
 		case 64:
-			goto tr140
-		case 91:
-			goto tr143
-		case 93:
-			goto tr143
+			goto tr131
 		case 94:
-			goto tr148
+			goto tr137
 		case 95:
-			goto tr145
-		case 123:
-			goto tr143
-		case 125:
-			goto tr143
+			goto tr134
 		case 126:
-			goto tr145
+			goto tr134
 		}
 		switch {
-		case (frame.Body)[p] < 43:
-			switch {
-			case (frame.Body)[p] < 36:
-				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr138
-				}
-			case (frame.Body)[p] > 37:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr143
-				}
-			default:
-				goto tr141
+		case (frame.Body)[p] < 48:
+			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+				goto tr129
 			}
-		case (frame.Body)[p] > 45:
+		case (frame.Body)[p] > 57:
 			switch {
-			case (frame.Body)[p] < 65:
-				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr145
-				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr145
+					goto tr134
 				}
-			default:
-				goto tr145
+			case (frame.Body)[p] >= 65:
+				goto tr134
 			}
 		default:
-			goto tr141
+			goto tr134
 		}
 		goto st0
-	tr46:
-//line ragel/../ragel/./uuid-grammar.rl:5
+	tr45:
+//line ././uuid-grammar.rl:5
 
-//line ragel/../ragel/./uuid-grammar.rl:26
+//line ././uuid-grammar.rl:26
 
-//line ragel/../ragel/./uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
+//line ././uuid-grammar.rl:9
 
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st34
+	tr146:
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -4094,85 +4380,92 @@ func (frame *Frame) Parse() {
 			goto _test_eof34
 		}
 	st_case_34:
-//line go/parser.go:4427
+//line parser.go:4324
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr149
+			goto tr139
 		case 33:
-			goto tr150
+			goto tr140
 		case 35:
-			goto tr151
+			goto tr141
 		case 39:
-			goto tr152
+			goto tr143
 		case 42:
-			goto tr151
+			goto tr141
 		case 44:
-			goto tr150
+			goto tr140
 		case 46:
-			goto tr153
-		case 47:
-			goto tr154
+			goto tr145
 		case 58:
-			goto tr151
+			goto tr141
 		case 59:
-			goto tr150
+			goto tr140
 		case 61:
-			goto tr156
+			goto tr147
 		case 62:
-			goto tr157
+			goto tr148
 		case 63:
-			goto tr150
+			goto tr140
 		case 64:
-			goto tr151
+			goto tr141
 		case 91:
-			goto tr143
+			goto tr144
 		case 93:
-			goto tr143
+			goto tr144
 		case 94:
-			goto tr158
+			goto tr149
 		case 95:
-			goto tr155
+			goto tr146
 		case 123:
-			goto tr143
+			goto tr144
 		case 125:
-			goto tr143
+			goto tr144
 		case 126:
-			goto tr155
+			goto tr146
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr149
+					goto tr139
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr143
+					goto tr144
 				}
 			default:
-				goto tr141
+				goto tr142
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr155
+					goto tr146
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr155
+					goto tr146
 				}
 			default:
-				goto tr155
+				goto tr146
 			}
 		default:
-			goto tr141
+			goto tr142
 		}
 		goto st0
-	tr155:
-//line ragel/../ragel/./uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[(frame.Body)[p]])
+	tr47:
+//line ././uuid-grammar.rl:5
+
+//line ././uuid-grammar.rl:26
+
+//line ././uuid-grammar.rl:22
+
+		atoms[atm][hlf] &= INT60_FLAGS
+
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -4183,96 +4476,106 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st35
-	tr154:
-//line ragel/../ragel/./uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
-		dgt--
-
-		goto st35
 	st35:
 		if p++; p == pe {
 			goto _test_eof35
 		}
 	st_case_35:
-//line go/parser.go:4525
+//line parser.go:4423
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr149
+			goto tr150
 		case 33:
-			goto tr150
+			goto tr151
 		case 35:
-			goto tr151
-		case 39:
 			goto tr152
-		case 42:
-			goto tr151
-		case 44:
-			goto tr150
-		case 46:
+		case 39:
 			goto tr153
+		case 42:
+			goto tr152
+		case 44:
+			goto tr151
+		case 46:
+			goto tr154
+		case 47:
+			goto tr155
 		case 58:
-			goto tr151
+			goto tr152
 		case 59:
-			goto tr150
-		case 61:
-			goto tr156
-		case 62:
-			goto tr157
-		case 63:
-			goto tr150
-		case 64:
 			goto tr151
-		case 91:
-			goto tr143
-		case 93:
-			goto tr143
-		case 94:
+		case 61:
+			goto tr157
+		case 62:
 			goto tr158
+		case 63:
+			goto tr151
+		case 64:
+			goto tr152
+		case 91:
+			goto tr144
+		case 93:
+			goto tr144
+		case 94:
+			goto tr159
 		case 95:
-			goto tr155
+			goto tr156
 		case 123:
-			goto tr143
+			goto tr144
 		case 125:
-			goto tr143
+			goto tr144
 		case 126:
-			goto tr155
+			goto tr156
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr149
+					goto tr150
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr143
+					goto tr144
 				}
 			default:
-				goto tr141
+				goto tr142
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr155
+					goto tr156
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr155
+					goto tr156
 				}
 			default:
-				goto tr155
+				goto tr156
 			}
 		default:
-			goto tr141
+			goto tr142
 		}
 		goto st0
-	tr50:
-//line ragel/../ragel/base-grammar.rl:10
-		if atm > 0 {
-			atoms[atm] = atoms[atm-1]
+	tr156:
+//line ././uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
+			{
+				p++
+				(ps.state) = 36
+				goto _out
+			}
 		}
+
+		goto st36
+	tr155:
+//line ././uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
+		dgt--
 
 		goto st36
 	st36:
@@ -4280,89 +4583,173 @@ func (frame *Frame) Parse() {
 			goto _test_eof36
 		}
 	st_case_36:
-//line go/parser.go:4612
+//line parser.go:4521
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr159
+			goto tr150
 		case 33:
-			goto tr40
+			goto tr151
 		case 35:
-			goto tr41
+			goto tr152
 		case 39:
-			goto tr43
+			goto tr153
 		case 42:
-			goto tr41
+			goto tr152
 		case 44:
-			goto tr40
+			goto tr151
 		case 46:
-			goto tr45
+			goto tr154
 		case 58:
-			goto tr41
+			goto tr152
 		case 59:
-			goto tr40
+			goto tr151
 		case 61:
-			goto tr47
+			goto tr157
 		case 62:
-			goto tr48
+			goto tr158
 		case 63:
-			goto tr40
+			goto tr151
 		case 64:
-			goto tr41
+			goto tr152
 		case 91:
-			goto tr44
+			goto tr144
 		case 93:
-			goto tr44
+			goto tr144
 		case 94:
-			goto tr49
+			goto tr159
 		case 95:
-			goto tr46
+			goto tr156
 		case 123:
-			goto tr44
+			goto tr144
 		case 125:
-			goto tr44
+			goto tr144
 		case 126:
-			goto tr46
+			goto tr156
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr159
+					goto tr150
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr44
+					goto tr144
 				}
 			default:
-				goto tr42
+				goto tr142
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr46
+					goto tr156
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr46
+					goto tr156
 				}
 			default:
-				goto tr46
+				goto tr156
 			}
 		default:
+			goto tr142
+		}
+		goto st0
+	tr51:
+//line ./op-grammar.rl:10
+
+		if atm > 0 {
+			atoms[atm] = atoms[atm-1]
+		}
+
+		goto st37
+	st37:
+		if p++; p == pe {
+			goto _test_eof37
+		}
+	st_case_37:
+//line parser.go:4608
+		switch (frame.Body)[p] {
+		case 32:
+			goto tr160
+		case 33:
+			goto tr41
+		case 35:
 			goto tr42
+		case 39:
+			goto tr44
+		case 42:
+			goto tr42
+		case 44:
+			goto tr41
+		case 46:
+			goto tr46
+		case 58:
+			goto tr42
+		case 59:
+			goto tr41
+		case 61:
+			goto tr48
+		case 62:
+			goto tr49
+		case 63:
+			goto tr41
+		case 64:
+			goto tr42
+		case 91:
+			goto tr45
+		case 93:
+			goto tr45
+		case 94:
+			goto tr50
+		case 95:
+			goto tr47
+		case 123:
+			goto tr45
+		case 125:
+			goto tr45
+		case 126:
+			goto tr47
+		}
+		switch {
+		case (frame.Body)[p] < 43:
+			switch {
+			case (frame.Body)[p] < 36:
+				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+					goto tr160
+				}
+			case (frame.Body)[p] > 37:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr45
+				}
+			default:
+				goto tr43
+			}
+		case (frame.Body)[p] > 45:
+			switch {
+			case (frame.Body)[p] < 65:
+				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+					goto tr47
+				}
+			case (frame.Body)[p] > 90:
+				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
+					goto tr47
+				}
+			default:
+				goto tr47
+			}
+		default:
+			goto tr43
 		}
 		goto st0
 	st_out:
-	_test_eof14:
-		(ps.state) = 14
+	_test_eof15:
+		(ps.state) = 15
 		goto _test_eof
 	_test_eof1:
 		(ps.state) = 1
-		goto _test_eof
-	_test_eof15:
-		(ps.state) = 15
 		goto _test_eof
 	_test_eof16:
 		(ps.state) = 16
@@ -4373,14 +4760,14 @@ func (frame *Frame) Parse() {
 	_test_eof18:
 		(ps.state) = 18
 		goto _test_eof
+	_test_eof19:
+		(ps.state) = 19
+		goto _test_eof
 	_test_eof2:
 		(ps.state) = 2
 		goto _test_eof
 	_test_eof3:
 		(ps.state) = 3
-		goto _test_eof
-	_test_eof19:
-		(ps.state) = 19
 		goto _test_eof
 	_test_eof20:
 		(ps.state) = 20
@@ -4388,23 +4775,26 @@ func (frame *Frame) Parse() {
 	_test_eof21:
 		(ps.state) = 21
 		goto _test_eof
+	_test_eof22:
+		(ps.state) = 22
+		goto _test_eof
 	_test_eof4:
 		(ps.state) = 4
 		goto _test_eof
 	_test_eof5:
 		(ps.state) = 5
 		goto _test_eof
-	_test_eof22:
-		(ps.state) = 22
+	_test_eof23:
+		(ps.state) = 23
 		goto _test_eof
 	_test_eof6:
 		(ps.state) = 6
 		goto _test_eof
-	_test_eof23:
-		(ps.state) = 23
-		goto _test_eof
 	_test_eof24:
 		(ps.state) = 24
+		goto _test_eof
+	_test_eof25:
+		(ps.state) = 25
 		goto _test_eof
 	_test_eof7:
 		(ps.state) = 7
@@ -4418,8 +4808,8 @@ func (frame *Frame) Parse() {
 	_test_eof10:
 		(ps.state) = 10
 		goto _test_eof
-	_test_eof25:
-		(ps.state) = 25
+	_test_eof26:
+		(ps.state) = 26
 		goto _test_eof
 	_test_eof11:
 		(ps.state) = 11
@@ -4427,11 +4817,11 @@ func (frame *Frame) Parse() {
 	_test_eof12:
 		(ps.state) = 12
 		goto _test_eof
-	_test_eof26:
-		(ps.state) = 26
-		goto _test_eof
 	_test_eof27:
 		(ps.state) = 27
+		goto _test_eof
+	_test_eof13:
+		(ps.state) = 13
 		goto _test_eof
 	_test_eof28:
 		(ps.state) = 28
@@ -4442,11 +4832,11 @@ func (frame *Frame) Parse() {
 	_test_eof30:
 		(ps.state) = 30
 		goto _test_eof
-	_test_eof13:
-		(ps.state) = 13
-		goto _test_eof
 	_test_eof31:
 		(ps.state) = 31
+		goto _test_eof
+	_test_eof14:
+		(ps.state) = 14
 		goto _test_eof
 	_test_eof32:
 		(ps.state) = 32
@@ -4463,157 +4853,194 @@ func (frame *Frame) Parse() {
 	_test_eof36:
 		(ps.state) = 36
 		goto _test_eof
+	_test_eof37:
+		(ps.state) = 37
+		goto _test_eof
 
 	_test_eof:
 		{
 		}
 		if p == eof {
 			switch ps.state {
-			case 15:
-//line ragel/../ragel/base-grammar.rl:136
+			case 16:
+//line ./op-grammar.rl:124
+
+				frame.position++
+
+			case 21:
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+				frame.position++
+
+			case 17, 18, 19, 37:
+//line ./op-grammar.rl:32
+
+				atm++
+
+//line ./op-grammar.rl:128
+
+//line ./op-grammar.rl:124
+
 				frame.position++
 
 			case 20:
-//line ragel/../ragel/base-grammar.rl:113
-//line ragel/../ragel/base-grammar.rl:136
-				frame.position++
+//line ./op-grammar.rl:41
 
-			case 16, 17, 18, 36:
-//line ragel/../ragel/base-grammar.rl:32
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 19:
-//line ragel/../ragel/base-grammar.rl:40
+			case 34:
+//line ././uuid-grammar.rl:34
+
+//line ./op-grammar.rl:32
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 33:
-//line ragel/../ragel/./uuid-grammar.rl:34
+			case 32, 33:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:136
-				frame.position++
+//line ./op-grammar.rl:124
 
-			case 31, 32:
-//line ragel/../ragel/./uuid-grammar.rl:37
-
-//line ragel/../ragel/base-grammar.rl:32
-				atm++
-
-//line ragel/../ragel/base-grammar.rl:140
-
-//line ragel/../ragel/base-grammar.rl:136
-				frame.position++
-
-			case 22:
-//line ragel/../ragel/base-grammar.rl:55
-				atoms[atm].set2(ORIGIN, 31, ATOM_INT)
-
-//line ragel/../ragel/base-grammar.rl:40
-				atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:136
-				frame.position++
-
-			case 25, 26:
-//line ragel/../ragel/base-grammar.rl:84
-				atoms[atm].set2(ORIGIN, 31, ATOM_FLOAT)
-
-//line ragel/../ragel/base-grammar.rl:40
-				atm++
-
-//line ragel/../ragel/base-grammar.rl:113
-
-//line ragel/../ragel/base-grammar.rl:136
 				frame.position++
 
 			case 23:
-//line ragel/../ragel/base-grammar.rl:103
-				atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:60
 
-//line ragel/../ragel/base-grammar.rl:40
+				atoms[atm][1] |= ((uint64)(ATOM_INT)) << 62
+
+//line ./op-grammar.rl:41
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 34, 35:
-//line ragel/../ragel/./uuid-grammar.rl:34
+			case 26, 27:
+//line ./op-grammar.rl:69
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+				atoms[atm].setTill(p)
+				atoms[atm].parseValue(frame.Body)
+
+//line ./op-grammar.rl:41
+
+				atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+				frame.position++
+
+			case 24:
+//line ./op-grammar.rl:91
+
+				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
+				atm++
+
+//line ./op-grammar.rl:101
+
+//line ./op-grammar.rl:124
+
+				frame.position++
+
+			case 35, 36:
+//line ././uuid-grammar.rl:34
+
+//line ././uuid-grammar.rl:51
+
 				atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:32
+//line ./op-grammar.rl:32
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:140
+//line ./op-grammar.rl:128
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 28:
-//line ragel/../ragel/./uuid-grammar.rl:34
+			case 29:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/base-grammar.rl:103
-				atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 24, 27:
-//line ragel/../ragel/./uuid-grammar.rl:37
+			case 25, 28:
+//line ././uuid-grammar.rl:37
 
-//line ragel/../ragel/base-grammar.rl:103
-				atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-			case 29, 30:
-//line ragel/../ragel/./uuid-grammar.rl:34
+			case 30, 31:
+//line ././uuid-grammar.rl:34
 
-//line ragel/../ragel/./uuid-grammar.rl:50
+//line ././uuid-grammar.rl:51
+
 				atoms[atm][1] = UUID_NAME_FLAG
 
-//line ragel/../ragel/base-grammar.rl:103
-				atoms[atm].set2(ORIGIN, 31, ATOM_UUID)
+//line ./op-grammar.rl:91
 
-//line ragel/../ragel/base-grammar.rl:40
+				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
+
+//line ./op-grammar.rl:41
+
 				atm++
 
-//line ragel/../ragel/base-grammar.rl:113
+//line ./op-grammar.rl:101
 
-//line ragel/../ragel/base-grammar.rl:136
+//line ./op-grammar.rl:124
+
 				frame.position++
 
-//line go/parser.go:4922
+//line parser.go:4920
 			}
 		}
 
@@ -4622,11 +5049,9 @@ func (frame *Frame) Parse() {
 		}
 	}
 
-//line ragel/go-parser.rl:69
+//line dfa.rl:67
 
-	ps.atm, ps.hlf, ps.dgt = atm, hlf, dgt
-	ps.pos = p
-	frame.atoms = atoms
+	ps.atm, ps.hlf, ps.dgt, ps.pos, frame.atoms = atm, hlf, dgt, p, atoms
 
 	switch {
 	case ps.state == RON_error:
@@ -4645,7 +5070,7 @@ func (frame *Frame) Parse() {
 		}
 	}
 
-	//fmt.Println("omits", frame.IsComplete(), frame.term!=TERM_REDUCED,  ps.omitted, frame.Parser.state)
+	//fmt.Println("omits", frame.IsComplete(), frame.term!=TERM_REDUCED,  ps.omitted, frame.Parser.state, ps.pos)
 	if frame.IsComplete() && frame.term != TERM_REDUCED && ps.omitted != 0 {
 		for u := uint(0); u < 4; u++ {
 			if ps.omitted&(1<<u) != 0 {
@@ -4653,33 +5078,34 @@ func (frame *Frame) Parse() {
 			}
 		}
 	}
-
 }
 
 func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
-//line ragel/go-parser.rl:107
-//line go/parser.go:4970
+//line dfa.rl:102
+
+//line parser.go:4965
 	const UUID_start int = 1
 	const UUID_first_final int = 2
 	const UUID_error int = 0
 
 	const UUID_en_main int = 1
 
-//line ragel/go-parser.rl:108
+//line dfa.rl:103
+
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	_ = eof
 
-	atm, hlf, dgt := 0, VALUE, 0
+	atm, hlf, dgt := 0, 0, 0
 
 	atoms := [1]Atom{Atom(ctx_uuid)}
 
-//line go/parser.go:4988
+//line parser.go:4983
 	{
 		cs = UUID_start
 	}
 
-//line go/parser.go:4993
+//line parser.go:4988
 	{
 		if p == pe {
 			goto _test_eof
@@ -4750,18 +5176,23 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		cs = 0
 		goto _out
 	tr0:
-//line ragel/../ragel/uuid-grammar.rl:5
+//line ./uuid-grammar.rl:5
 
-//line ragel/../ragel/uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[data[p]])
+//line ./uuid-grammar.rl:45
+
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[data[p]])) << 60
 
 		goto st2
 	tr8:
-//line ragel/../ragel/uuid-grammar.rl:34
-//line ragel/../ragel/uuid-grammar.rl:45
-		hlf = ORIGIN
-		atoms[atm].reset4(ORIGIN, 15, ABC[data[p]])
+//line ./uuid-grammar.rl:34
+
+//line ./uuid-grammar.rl:45
+
+		hlf = 1
+		atoms[atm][1] &= INT60_FULL
+		atoms[atm][1] |= ((uint64)(ABC[data[p]])) << 60
 
 		goto st2
 	st2:
@@ -4769,7 +5200,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line go/parser.go:5088
+//line parser.go:5085
 		switch data[p] {
 		case 91:
 			goto tr4
@@ -4803,18 +5234,21 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr4:
-//line ragel/../ragel/uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
+//line ./uuid-grammar.rl:29
 
-//line ragel/../ragel/uuid-grammar.rl:9
+		dgt = 0
+		hlf = 1
+
+//line ./uuid-grammar.rl:9
+
 		dgt = int(ABC[data[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st3
 	tr6:
-//line ragel/../ragel/uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[data[p]])
+//line ./uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -4826,20 +5260,24 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 		goto st3
 	tr7:
-//line ragel/../ragel/uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
+//line ./uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
 		dgt--
 
 		goto st3
 	tr9:
-//line ragel/../ragel/uuid-grammar.rl:34
-//line ragel/../ragel/uuid-grammar.rl:29
-		dgt = 0
-		hlf = ORIGIN
+//line ./uuid-grammar.rl:34
 
-//line ragel/../ragel/uuid-grammar.rl:9
+//line ./uuid-grammar.rl:29
+
+		dgt = 0
+		hlf = 1
+
+//line ./uuid-grammar.rl:9
+
 		dgt = int(ABC[data[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st3
 	st3:
@@ -4847,7 +5285,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line go/parser.go:5170
+//line parser.go:5167
 		switch data[p] {
 		case 95:
 			goto tr6
@@ -4868,15 +5306,18 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr5:
-//line ragel/../ragel/uuid-grammar.rl:29
+//line ./uuid-grammar.rl:29
+
 		dgt = 0
-		hlf = ORIGIN
+		hlf = 1
 
-//line ragel/../ragel/uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
+//line ./uuid-grammar.rl:22
 
-//line ragel/../ragel/uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[data[p]])
+		atoms[atm][hlf] &= INT60_FLAGS
+
+//line ./uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -4892,7 +5333,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line go/parser.go:5214
+//line parser.go:5211
 		switch data[p] {
 		case 47:
 			goto tr7
@@ -4915,18 +5356,20 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr2:
-//line ragel/../ragel/uuid-grammar.rl:5
+//line ./uuid-grammar.rl:5
 
-//line ragel/../ragel/uuid-grammar.rl:26
+//line ./uuid-grammar.rl:26
 
-//line ragel/../ragel/uuid-grammar.rl:9
+//line ./uuid-grammar.rl:9
+
 		dgt = int(ABC[data[p]]) + 4
-		atoms[atm].trim6(hlf, dgt)
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
 		goto st5
 	tr10:
-//line ragel/../ragel/uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[data[p]])
+//line ./uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -4942,7 +5385,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line go/parser.go:5264
+//line parser.go:5261
 		switch data[p] {
 		case 43:
 			goto tr8
@@ -4985,15 +5428,17 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr3:
-//line ragel/../ragel/uuid-grammar.rl:5
+//line ./uuid-grammar.rl:5
 
-//line ragel/../ragel/uuid-grammar.rl:26
+//line ./uuid-grammar.rl:26
 
-//line ragel/../ragel/uuid-grammar.rl:22
-		atoms[atm].trim6(hlf, 0)
+//line ./uuid-grammar.rl:22
 
-//line ragel/../ragel/uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[data[p]])
+		atoms[atm][hlf] &= INT60_FLAGS
+
+//line ./uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -5009,7 +5454,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof6
 		}
 	st_case_6:
-//line go/parser.go:5331
+//line parser.go:5328
 		switch data[p] {
 		case 43:
 			goto tr8
@@ -5054,8 +5499,9 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 		goto st0
 	tr12:
-//line ragel/../ragel/uuid-grammar.rl:14
-		atoms[atm].set6(hlf, dgt, ABC[data[p]])
+//line ./uuid-grammar.rl:14
+
+		atoms[atm][hlf] |= ((uint64)(ABC[data[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
 		if dgt > 10 {
 			{
@@ -5067,8 +5513,9 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 
 		goto st7
 	tr11:
-//line ragel/../ragel/uuid-grammar.rl:40
-		atoms[atm].init64(VALUE, atoms[atm].get6(hlf, 0))
+//line ./uuid-grammar.rl:40
+
+		atoms[atm][hlf] <<= 6
 		dgt--
 
 		goto st7
@@ -5077,7 +5524,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 			goto _test_eof7
 		}
 	st_case_7:
-//line go/parser.go:5397
+//line parser.go:5394
 		switch data[p] {
 		case 43:
 			goto tr8
@@ -5145,17 +5592,19 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		if p == eof {
 			switch cs {
 			case 5:
-//line ragel/../ragel/uuid-grammar.rl:34
+//line ./uuid-grammar.rl:34
 
 			case 3, 4:
-//line ragel/../ragel/uuid-grammar.rl:37
+//line ./uuid-grammar.rl:37
 
 			case 6, 7:
-//line ragel/../ragel/uuid-grammar.rl:34
-//line ragel/../ragel/uuid-grammar.rl:50
+//line ./uuid-grammar.rl:34
+
+//line ./uuid-grammar.rl:51
+
 				atoms[atm][1] = UUID_NAME_FLAG
 
-//line go/parser.go:5466
+//line parser.go:5463
 			}
 		}
 
@@ -5164,7 +5613,7 @@ func (ctx_uuid UUID) Parse(data []byte) (UUID, error) {
 		}
 	}
 
-//line ragel/go-parser.rl:123
+//line dfa.rl:118
 
 	if cs < UUID_first_final || dgt > 10 {
 		return ERROR_UUID, errors.New(fmt.Sprintf("parse error at pos %d", p))

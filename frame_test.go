@@ -116,6 +116,7 @@ func TestFrame_Split2(t *testing.T) {
 func TestFrame_Empties(t *testing.T) {
 	head := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
 	next := ParseFrameString("*lww #obj @)4+UserAlice ?\n* # @ !\n")
+
 	next.Next()
 	if head.Type() != next.Type() || head.Object() != next.Object() || head.Event() != next.Event() || head.Ref() != next.Ref() {
 		t.Fail()
@@ -123,6 +124,6 @@ func TestFrame_Empties(t *testing.T) {
 	}
 	if next.Term() != TERM_HEADER {
 		t.Fail()
-		t.Log("incorrect term")
+		t.Logf("incorrect term: %v != %v", next.Term(), TERM_HEADER)
 	}
 }
