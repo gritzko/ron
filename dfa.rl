@@ -9,10 +9,15 @@ import "errors"
 %% variable data frame.Body;
 %% variable cs ps.state;
 
-// The parser reached end-of-input (in block mode) or
-// the closing dot (in streaming mode) successfully.
-// The rest of the input is frame.Rest()
-const RON_FULL_STOP = -1;
+const (
+    // The parser reached end-of-input (in block mode) or
+    // the closing dot (in streaming mode) successfully.
+    // The rest of the input is frame.Rest()
+    RON_FULL_STOP     = -1
+    RON_OPEN uint64   = 1919905842 // https://play.golang.org/p/vo74Pf-DKh2
+    RON_CLOSED uint64 = 1919905330
+    opFlag uint64     = 3 << 62
+)
 
 
 // Parse consumes one op from data[], unless the buffer ends earlier.
@@ -58,6 +63,12 @@ func (frame *Frame) Parse() {
 
     atm, hlf, dgt, p, atoms := ps.atm, ps.hlf, ps.dgt, ps.pos, frame.atoms;
 
+    frame.descriptor[VALUE] = RON_CLOSED // ?
+    frame.descriptor[ORIGIN] = 0
+
+    frame.descriptor.setType(opFlag)
+    frame.descriptor.setFrom(p)
+
 	%%{
 
         include FRAME "./op-grammar.rl";
@@ -65,6 +76,9 @@ func (frame *Frame) Parse() {
 
 	    write exec;
 	}%%
+
+    frame.descriptor.setTill(p)
+    frame.descriptor[VALUE] |= uint64(len(atoms)) << 32
 
     ps.atm, ps.hlf, ps.dgt, ps.pos, frame.atoms = atm, hlf, dgt, p, atoms;
 

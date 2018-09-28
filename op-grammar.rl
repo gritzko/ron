@@ -43,22 +43,8 @@
     }
 
     action int_atom_start {
-    }
-
-    action int_sign {
-        if (fc=='-') {
-            atoms[atm][1] |= 1;
-        }
-    }
-
-    action int_digit {
-        atoms[atm][0] *= 10;
-        atoms[atm][0] += (uint64)(fc-'0');
-        // TODO max size for int/float/string
-    }
-
-    action int_atom_end {
-        atoms[atm][1] |= ((uint64)(ATOM_INT))<<62;
+        atoms[atm].setIntType()
+        atoms[atm].setFrom(p)
     }
 
     action float_atom_start {
@@ -66,18 +52,14 @@
         atoms[atm].setFrom(p)
     }
     
-    action float_atom_end {
+    action string_atom_start {
+        atoms[atm].setStringType()
+        atoms[atm].setFrom(p)
+    }
+
+    action scalar_atom_end {
         atoms[atm].setTill(p)
         atoms[atm].parseValue(frame.Body)
-    }
-
-    action string_atom_start {
-        atoms[atm][0] = ((uint64)(p))<<32;
-    }
-
-    action string_atom_end {
-        atoms[atm][0] |= uint64(p);
-        atoms[atm][1] = ((uint64)(ATOM_STRING))<<62;
     }
 
     action uuid_atom_start {
@@ -139,10 +121,10 @@
     SPEC_UUID = QUANT space* REDEF? (UUID space*)? %spec_uuid_end ;
 
     # 64-bit signed integer 
-    INT_ATOM = ([\-+]? @int_sign ( digit @int_digit )+ ) %int_atom_end >int_atom_start;
+    INT_ATOM = ([\-+]? digit+ ) >int_atom_start %scalar_atom_end;
 
     # 64-bit (double) float 
-    FLOAT_ATOM = ( [\-+]? [0-9]+ ("." | ([eE] [\-+]?)) [0-9]+ ([eE] [\-+]? digit+ )? ) >float_atom_start %float_atom_end;
+    FLOAT_ATOM = ( [\-+]? [0-9]+ ("." | ([eE] [\-+]?)) [0-9]+ ([eE] [\-+]? digit+ )? ) >float_atom_start %scalar_atom_end;
 
     UUID_ATOM = UUID >uuid_atom_start %uuid_atom_end;
 
@@ -150,7 +132,7 @@
     UNIESC = "\\u" [0-9a-fA-F]{4};
     ESC = "\\" [^\n\r];
     CHAR = [^"'\n\r\\];
-    STRING_ATOM = (UNIESC|ESC|CHAR)* %string_atom_end >string_atom_start;
+    STRING_ATOM = (UNIESC|ESC|CHAR)* %scalar_atom_end >string_atom_start;
 
     # an atom (int, float, string or UUID) 
     ATOM = (
