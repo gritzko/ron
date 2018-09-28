@@ -59,7 +59,8 @@ type Frame struct {
 	_atoms [DEFAULT_ATOMS_ALLOC]Atom
 	atoms  []Atom
 	// Op terminator (see OP_TERM)
-	term int
+	term       int
+	descriptor Atom
 	// Frame body, raw bytes.
 	Body []byte
 }
