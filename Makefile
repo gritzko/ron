@@ -5,6 +5,7 @@ all: generate
 
 generate:
 	node ./transclude.js sep2bits.txt *.go
-	ragel -G2 -e -L -Z dfa.rl -o parser.go
-	sed -i '' '/^\/\/line.*$$/d' parser.go
+	ragel -G2 -e -L -Z dfa.rl -o .parser.go
+	grep -v '^\/\/line ' .parser.go > parser.go
+	rm .parser.go
 	go fmt

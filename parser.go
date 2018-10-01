@@ -3,11 +3,11 @@ package ron
 import "fmt"
 import "errors"
 
-const RON_start int = 14
-const RON_first_final int = 14
+const RON_start int = 13
+const RON_first_final int = 13
 const RON_error int = 0
 
-const RON_en_main int = 14
+const RON_en_main int = 13
 
 const (
 	// The parser reached end-of-input (in block mode) or
@@ -80,42 +80,42 @@ func (frame *Frame) Parse() {
 
 	_again:
 		switch ps.state {
-		case 14:
-			goto st14
+		case 13:
+			goto st13
 		case 0:
 			goto st0
 		case 1:
 			goto st1
+		case 14:
+			goto st14
 		case 15:
 			goto st15
 		case 16:
 			goto st16
 		case 17:
 			goto st17
-		case 18:
-			goto st18
 		case 2:
 			goto st2
 		case 3:
 			goto st3
+		case 18:
+			goto st18
 		case 19:
 			goto st19
 		case 20:
 			goto st20
-		case 21:
-			goto st21
 		case 4:
 			goto st4
 		case 5:
 			goto st5
-		case 22:
-			goto st22
+		case 21:
+			goto st21
 		case 6:
 			goto st6
+		case 22:
+			goto st22
 		case 23:
 			goto st23
-		case 24:
-			goto st24
 		case 7:
 			goto st7
 		case 8:
@@ -124,22 +124,22 @@ func (frame *Frame) Parse() {
 			goto st9
 		case 10:
 			goto st10
-		case 25:
-			goto st25
+		case 24:
+			goto st24
 		case 11:
 			goto st11
-		case 12:
-			goto st12
+		case 25:
+			goto st25
 		case 26:
 			goto st26
 		case 27:
 			goto st27
 		case 28:
 			goto st28
+		case 12:
+			goto st12
 		case 29:
 			goto st29
-		case 13:
-			goto st13
 		case 30:
 			goto st30
 		case 31:
@@ -150,8 +150,6 @@ func (frame *Frame) Parse() {
 			goto st33
 		case 34:
 			goto st34
-		case 35:
-			goto st35
 		}
 
 		if p++; p == pe {
@@ -159,42 +157,42 @@ func (frame *Frame) Parse() {
 		}
 	_resume:
 		switch ps.state {
-		case 14:
-			goto st_case_14
+		case 13:
+			goto st_case_13
 		case 0:
 			goto st_case_0
 		case 1:
 			goto st_case_1
+		case 14:
+			goto st_case_14
 		case 15:
 			goto st_case_15
 		case 16:
 			goto st_case_16
 		case 17:
 			goto st_case_17
-		case 18:
-			goto st_case_18
 		case 2:
 			goto st_case_2
 		case 3:
 			goto st_case_3
+		case 18:
+			goto st_case_18
 		case 19:
 			goto st_case_19
 		case 20:
 			goto st_case_20
-		case 21:
-			goto st_case_21
 		case 4:
 			goto st_case_4
 		case 5:
 			goto st_case_5
-		case 22:
-			goto st_case_22
+		case 21:
+			goto st_case_21
 		case 6:
 			goto st_case_6
+		case 22:
+			goto st_case_22
 		case 23:
 			goto st_case_23
-		case 24:
-			goto st_case_24
 		case 7:
 			goto st_case_7
 		case 8:
@@ -203,22 +201,22 @@ func (frame *Frame) Parse() {
 			goto st_case_9
 		case 10:
 			goto st_case_10
-		case 25:
-			goto st_case_25
+		case 24:
+			goto st_case_24
 		case 11:
 			goto st_case_11
-		case 12:
-			goto st_case_12
+		case 25:
+			goto st_case_25
 		case 26:
 			goto st_case_26
 		case 27:
 			goto st_case_27
 		case 28:
 			goto st_case_28
+		case 12:
+			goto st_case_12
 		case 29:
 			goto st_case_29
-		case 13:
-			goto st_case_13
 		case 30:
 			goto st_case_30
 		case 31:
@@ -229,15 +227,13 @@ func (frame *Frame) Parse() {
 			goto st_case_33
 		case 34:
 			goto st_case_34
-		case 35:
-			goto st_case_35
 		}
 		goto st_out
-	st14:
+	st13:
 		if p++; p == pe {
-			goto _test_eof14
+			goto _test_eof13
 		}
-	st_case_14:
+	st_case_13:
 		switch (frame.Body)[p] {
 		case 32:
 			goto st1
@@ -276,7 +272,7 @@ func (frame *Frame) Parse() {
 	st0:
 		(ps.state) = 0
 		goto _out
-	tr151:
+	tr150:
 
 		atm++
 
@@ -321,7 +317,7 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	tr2:
-		(ps.state) = 15
+		(ps.state) = 14
 
 		hlf = VALUE
 		if p > frame.Parser.off && frame.position != -1 {
@@ -344,7 +340,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr32:
-		(ps.state) = 15
+		(ps.state) = 14
 
 		frame.position++
 
@@ -374,19 +370,19 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
+		goto st14
 	tr55:
 
 		atm++
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
+		goto st14
 	tr63:
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
+		goto st14
 	tr71:
 
 		atoms[atm].setTill(p)
@@ -396,7 +392,7 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
+		goto st14
 	tr79:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
@@ -405,7 +401,7 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
+		goto st14
 	tr89:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
@@ -414,8 +410,8 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	tr100:
+		goto st14
+	tr99:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -423,8 +419,8 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	tr111:
+		goto st14
+	tr110:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -434,22 +430,22 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	tr121:
+		goto st14
+	tr120:
 
 		atm++
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	tr131:
+		goto st14
+	tr130:
 
 		atm++
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	tr142:
+		goto st14
+	tr141:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -457,15 +453,15 @@ func (frame *Frame) Parse() {
 
 		frame.term = int(ABC[(frame.Body)[p]])
 
-		goto st15
-	st15:
+		goto st14
+	st14:
 		if p++; p == pe {
-			goto _test_eof15
+			goto _test_eof14
 		}
-	st_case_15:
+	st_case_14:
 		switch (frame.Body)[p] {
 		case 32:
-			goto st15
+			goto st14
 		case 33:
 			goto tr32
 		case 35:
@@ -494,11 +490,11 @@ func (frame *Frame) Parse() {
 			goto tr38
 		}
 		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st15
+			goto st14
 		}
 		goto st0
 	tr3:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		hlf = VALUE
 		if p > frame.Parser.off && frame.position != -1 {
@@ -538,7 +534,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr33:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		frame.position++
 
@@ -580,7 +576,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr41:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		atm++
 
@@ -603,7 +599,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr56:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		atm++
 
@@ -647,7 +643,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr64:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		frame.position++
 
@@ -689,7 +685,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr72:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		atoms[atm].setTill(p)
 		atoms[atm].parseValue(frame.Body)
@@ -736,7 +732,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr80:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -782,7 +778,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr90:
-		(ps.state) = 16
+		(ps.state) = 15
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -827,8 +823,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr101:
-		(ps.state) = 16
+	tr100:
+		(ps.state) = 15
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -873,8 +869,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr112:
-		(ps.state) = 16
+	tr111:
+		(ps.state) = 15
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -921,8 +917,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr122:
-		(ps.state) = 16
+	tr121:
+		(ps.state) = 15
 
 		atm++
 
@@ -944,8 +940,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr132:
-		(ps.state) = 16
+	tr131:
+		(ps.state) = 15
 
 		atm++
 
@@ -967,8 +963,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr143:
-		(ps.state) = 16
+	tr142:
+		(ps.state) = 15
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -992,14 +988,14 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	st16:
+	st15:
 		if p++; p == pe {
-			goto _test_eof16
+			goto _test_eof15
 		}
-	st_case_16:
+	st_case_15:
 		switch (frame.Body)[p] {
 		case 32:
-			goto st16
+			goto st15
 		case 33:
 			goto tr40
 		case 35:
@@ -1044,7 +1040,7 @@ func (frame *Frame) Parse() {
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto st16
+					goto st15
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
@@ -1076,22 +1072,22 @@ func (frame *Frame) Parse() {
 		atoms[atm][1] &= INT60_FULL
 		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
-		goto st17
-	tr133:
+		goto st16
+	tr132:
 
 		hlf = 1
 		atoms[atm][1] &= INT60_FULL
 		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
-		goto st17
-	st17:
+		goto st16
+	st16:
 		if p++; p == pe {
-			goto _test_eof17
+			goto _test_eof16
 		}
-	st_case_17:
+	st_case_16:
 		switch (frame.Body)[p] {
 		case 32:
-			goto st18
+			goto st17
 		case 33:
 			goto tr40
 		case 35:
@@ -1139,7 +1135,7 @@ func (frame *Frame) Parse() {
 					goto tr52
 				}
 			case (frame.Body)[p] >= 9:
-				goto st18
+				goto st17
 			}
 		case (frame.Body)[p] > 57:
 			switch {
@@ -1154,25 +1150,25 @@ func (frame *Frame) Parse() {
 			goto tr53
 		}
 		goto st0
-	tr120:
+	tr119:
 
-		goto st18
-	tr130:
+		goto st17
+	tr129:
 
-		goto st18
-	tr141:
+		goto st17
+	tr140:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
-		goto st18
-	st18:
+		goto st17
+	st17:
 		if p++; p == pe {
-			goto _test_eof18
+			goto _test_eof17
 		}
-	st_case_18:
+	st_case_17:
 		switch (frame.Body)[p] {
 		case 32:
-			goto st18
+			goto st17
 		case 33:
 			goto tr40
 		case 35:
@@ -1201,7 +1197,7 @@ func (frame *Frame) Parse() {
 			goto tr49
 		}
 		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st18
+			goto st17
 		}
 		goto st0
 	tr4:
@@ -1319,7 +1315,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr103:
+	tr102:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -1329,7 +1325,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr113:
+	tr112:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1341,7 +1337,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr123:
+	tr122:
 
 		atm++
 
@@ -1353,7 +1349,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr134:
+	tr133:
 
 		atm++
 
@@ -1365,7 +1361,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st2
-	tr144:
+	tr143:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1418,7 +1414,7 @@ func (frame *Frame) Parse() {
 		case 39:
 			goto tr12
 		case 92:
-			goto st13
+			goto st12
 		}
 		goto st3
 	tr9:
@@ -1429,18 +1425,18 @@ func (frame *Frame) Parse() {
 		atoms[atm].setTill(p)
 		atoms[atm].parseValue(frame.Body)
 
-		goto st19
+		goto st18
 	tr12:
 
 		atoms[atm].setTill(p)
 		atoms[atm].parseValue(frame.Body)
 
-		goto st19
-	st19:
+		goto st18
+	st18:
 		if p++; p == pe {
-			goto _test_eof19
+			goto _test_eof18
 		}
-	st_case_19:
+	st_case_18:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr54
@@ -1479,7 +1475,7 @@ func (frame *Frame) Parse() {
 
 		atm++
 
-		goto st20
+		goto st19
 	tr70:
 
 		atoms[atm].setTill(p)
@@ -1487,29 +1483,29 @@ func (frame *Frame) Parse() {
 
 		atm++
 
-		goto st20
+		goto st19
 	tr78:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
 		atm++
 
-		goto st20
+		goto st19
 	tr88:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
 		atm++
 
-		goto st20
-	tr99:
+		goto st19
+	tr98:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
 		atm++
 
-		goto st20
-	tr110:
+		goto st19
+	tr109:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1517,15 +1513,15 @@ func (frame *Frame) Parse() {
 
 		atm++
 
-		goto st20
-	st20:
+		goto st19
+	st19:
 		if p++; p == pe {
-			goto _test_eof20
+			goto _test_eof19
 		}
-	st_case_20:
+	st_case_19:
 		switch (frame.Body)[p] {
 		case 32:
-			goto st20
+			goto st19
 		case 33:
 			goto tr63
 		case 35:
@@ -1554,11 +1550,11 @@ func (frame *Frame) Parse() {
 			goto tr69
 		}
 		if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-			goto st20
+			goto st19
 		}
 		goto st0
 	tr30:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		(ps.state) = (RON_FULL_STOP)
 		{
@@ -1568,7 +1564,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr35:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		frame.position++
 
@@ -1580,7 +1576,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr45:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		atm++
 
@@ -1594,7 +1590,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr58:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		atm++
 
@@ -1608,7 +1604,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr66:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		frame.position++
 
@@ -1620,7 +1616,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr74:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		atoms[atm].setTill(p)
 		atoms[atm].parseValue(frame.Body)
@@ -1637,7 +1633,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr83:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -1653,7 +1649,7 @@ func (frame *Frame) Parse() {
 
 		goto _again
 	tr92:
-		(ps.state) = 21
+		(ps.state) = 20
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -1668,8 +1664,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr105:
-		(ps.state) = 21
+	tr104:
+		(ps.state) = 20
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -1684,8 +1680,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr114:
-		(ps.state) = 21
+	tr113:
+		(ps.state) = 20
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1702,8 +1698,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr124:
-		(ps.state) = 21
+	tr123:
+		(ps.state) = 20
 
 		atm++
 
@@ -1716,8 +1712,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr136:
-		(ps.state) = 21
+	tr135:
+		(ps.state) = 20
 
 		atm++
 
@@ -1730,8 +1726,8 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	tr145:
-		(ps.state) = 21
+	tr144:
+		(ps.state) = 20
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1746,11 +1742,11 @@ func (frame *Frame) Parse() {
 		}
 
 		goto _again
-	st21:
+	st20:
 		if p++; p == pe {
-			goto _test_eof21
+			goto _test_eof20
 		}
-	st_case_21:
+	st_case_20:
 		goto st0
 	tr5:
 		(ps.state) = 4
@@ -1867,7 +1863,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr107:
+	tr106:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -1877,7 +1873,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr117:
+	tr116:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1889,7 +1885,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr126:
+	tr125:
 
 		atm++
 
@@ -1901,7 +1897,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr138:
+	tr137:
 
 		atm++
 
@@ -1913,7 +1909,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st4
-	tr148:
+	tr147:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -1961,7 +1957,7 @@ func (frame *Frame) Parse() {
 		}
 	st_case_5:
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto st22
+			goto st21
 		}
 		goto st0
 	tr16:
@@ -1969,12 +1965,12 @@ func (frame *Frame) Parse() {
 		atoms[atm].setIntType()
 		atoms[atm].setFrom(p)
 
-		goto st22
-	st22:
+		goto st21
+	st21:
 		if p++; p == pe {
-			goto _test_eof22
+			goto _test_eof21
 		}
-	st_case_22:
+	st_case_21:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr70
@@ -2008,7 +2004,7 @@ func (frame *Frame) Parse() {
 		switch {
 		case (frame.Body)[p] > 13:
 			if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-				goto st22
+				goto st21
 			}
 		case (frame.Body)[p] >= 9:
 			goto tr70
@@ -2129,7 +2125,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr108:
+	tr107:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -2139,7 +2135,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr118:
+	tr117:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -2151,7 +2147,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr127:
+	tr126:
 
 		atm++
 
@@ -2163,7 +2159,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr139:
+	tr138:
 
 		atm++
 
@@ -2175,7 +2171,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st6
-	tr149:
+	tr148:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -2253,19 +2249,19 @@ func (frame *Frame) Parse() {
 		atoms[atm][1] &= INT60_FULL
 		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
-		goto st23
-	tr102:
+		goto st22
+	tr101:
 
 		hlf = 1
 		atoms[atm][1] &= INT60_FULL
 		atoms[atm][1] |= ((uint64)(ABC[(frame.Body)[p]])) << 60
 
-		goto st23
-	st23:
+		goto st22
+	st22:
 		if p++; p == pe {
-			goto _test_eof23
+			goto _test_eof22
 		}
-	st_case_23:
+	st_case_22:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr78
@@ -2339,7 +2335,7 @@ func (frame *Frame) Parse() {
 		dgt = int(ABC[(frame.Body)[p]]) + 4
 		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
-		goto st24
+		goto st23
 	tr93:
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
@@ -2347,19 +2343,19 @@ func (frame *Frame) Parse() {
 		if dgt > 10 {
 			{
 				p++
-				(ps.state) = 24
+				(ps.state) = 23
 				goto _out
 			}
 		}
 
-		goto st24
-	tr98:
+		goto st23
+	tr97:
 
 		atoms[atm][hlf] <<= 6
 		dgt--
 
-		goto st24
-	tr104:
+		goto st23
+	tr103:
 
 		dgt = 0
 		hlf = 1
@@ -2367,12 +2363,12 @@ func (frame *Frame) Parse() {
 		dgt = int(ABC[(frame.Body)[p]]) + 4
 		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
-		goto st24
-	st24:
+		goto st23
+	st23:
 		if p++; p == pe {
-			goto _test_eof24
+			goto _test_eof23
 		}
-	st_case_24:
+	st_case_23:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr88
@@ -2540,7 +2536,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr109:
+	tr108:
 
 		atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -2550,7 +2546,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr119:
+	tr118:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -2562,7 +2558,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr128:
+	tr127:
 
 		atm++
 
@@ -2574,7 +2570,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr140:
+	tr139:
 
 		atm++
 
@@ -2586,7 +2582,7 @@ func (frame *Frame) Parse() {
 		atoms = append(atoms, Atom{})
 
 		goto st7
-	tr150:
+	tr149:
 
 		atoms[atm][1] = UUID_NAME_FLAG
 
@@ -2652,9 +2648,9 @@ func (frame *Frame) Parse() {
 		case 46:
 			goto st10
 		case 69:
-			goto st12
+			goto st11
 		case 101:
-			goto st12
+			goto st11
 		}
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
 			goto st9
@@ -2666,14 +2662,14 @@ func (frame *Frame) Parse() {
 		}
 	st_case_10:
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto st25
+			goto st24
 		}
 		goto st0
-	st25:
+	st24:
 		if p++; p == pe {
-			goto _test_eof25
+			goto _test_eof24
 		}
-	st_case_25:
+	st_case_24:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr70
@@ -2711,7 +2707,7 @@ func (frame *Frame) Parse() {
 		switch {
 		case (frame.Body)[p] > 13:
 			if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-				goto st25
+				goto st24
 			}
 		case (frame.Body)[p] >= 9:
 			goto tr70
@@ -2729,22 +2725,7 @@ func (frame *Frame) Parse() {
 			goto st5
 		}
 		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto st22
-		}
-		goto st0
-	st12:
-		if p++; p == pe {
-			goto _test_eof12
-		}
-	st_case_12:
-		switch (frame.Body)[p] {
-		case 43:
-			goto st10
-		case 45:
-			goto st10
-		}
-		if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-			goto st25
+			goto st21
 		}
 		goto st0
 	tr84:
@@ -2759,17 +2740,17 @@ func (frame *Frame) Parse() {
 		if dgt > 10 {
 			{
 				p++
-				(ps.state) = 26
+				(ps.state) = 25
 				goto _out
 			}
 		}
 
-		goto st26
-	st26:
+		goto st25
+	st25:
 		if p++; p == pe {
-			goto _test_eof26
+			goto _test_eof25
 		}
-	st_case_26:
+	st_case_25:
 		switch (frame.Body)[p] {
 		case 32:
 			goto tr88
@@ -2786,7 +2767,7 @@ func (frame *Frame) Parse() {
 		case 46:
 			goto tr92
 		case 47:
-			goto tr98
+			goto tr97
 		case 58:
 			goto tr90
 		case 59:
@@ -2835,8 +2816,107 @@ func (frame *Frame) Parse() {
 		dgt = int(ABC[(frame.Body)[p]]) + 4
 		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
-		goto st27
-	tr106:
+		goto st26
+	tr105:
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
+			{
+				p++
+				(ps.state) = 26
+				goto _out
+			}
+		}
+
+		goto st26
+	st26:
+		if p++; p == pe {
+			goto _test_eof26
+		}
+	st_case_26:
+		switch (frame.Body)[p] {
+		case 32:
+			goto tr98
+		case 33:
+			goto tr99
+		case 35:
+			goto tr100
+		case 39:
+			goto tr102
+		case 42:
+			goto tr100
+		case 44:
+			goto tr99
+		case 46:
+			goto tr104
+		case 58:
+			goto tr100
+		case 59:
+			goto tr99
+		case 61:
+			goto tr106
+		case 62:
+			goto tr107
+		case 63:
+			goto tr99
+		case 64:
+			goto tr100
+		case 91:
+			goto tr103
+		case 93:
+			goto tr103
+		case 94:
+			goto tr108
+		case 95:
+			goto tr105
+		case 123:
+			goto tr103
+		case 125:
+			goto tr103
+		case 126:
+			goto tr105
+		}
+		switch {
+		case (frame.Body)[p] < 43:
+			switch {
+			case (frame.Body)[p] < 36:
+				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+					goto tr98
+				}
+			case (frame.Body)[p] > 37:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr103
+				}
+			default:
+				goto tr101
+			}
+		case (frame.Body)[p] > 45:
+			switch {
+			case (frame.Body)[p] < 65:
+				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+					goto tr105
+				}
+			case (frame.Body)[p] > 90:
+				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
+					goto tr105
+				}
+			default:
+				goto tr105
+			}
+		default:
+			goto tr101
+		}
+		goto st0
+	tr21:
+
+		if atm == 4 {
+			atoms[atm] = atoms[SPEC_OBJECT]
+		} else if atoms[atm-1].Type() == ATOM_UUID {
+			atoms[atm] = atoms[atm-1]
+		}
+
+		atoms[atm][hlf] &= INT60_FLAGS
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -2856,86 +2936,80 @@ func (frame *Frame) Parse() {
 	st_case_27:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr99
-		case 33:
-			goto tr100
-		case 35:
-			goto tr101
-		case 39:
-			goto tr103
-		case 42:
-			goto tr101
-		case 44:
-			goto tr100
-		case 46:
-			goto tr105
-		case 58:
-			goto tr101
-		case 59:
-			goto tr100
-		case 61:
-			goto tr107
-		case 62:
-			goto tr108
-		case 63:
-			goto tr100
-		case 64:
-			goto tr101
-		case 91:
-			goto tr104
-		case 93:
-			goto tr104
-		case 94:
 			goto tr109
+		case 33:
+			goto tr110
+		case 35:
+			goto tr111
+		case 39:
+			goto tr112
+		case 42:
+			goto tr111
+		case 44:
+			goto tr110
+		case 46:
+			goto tr113
+		case 47:
+			goto tr114
+		case 58:
+			goto tr111
+		case 59:
+			goto tr110
+		case 61:
+			goto tr116
+		case 62:
+			goto tr117
+		case 63:
+			goto tr110
+		case 64:
+			goto tr111
+		case 91:
+			goto tr103
+		case 93:
+			goto tr103
+		case 94:
+			goto tr118
 		case 95:
-			goto tr106
+			goto tr115
 		case 123:
-			goto tr104
+			goto tr103
 		case 125:
-			goto tr104
+			goto tr103
 		case 126:
-			goto tr106
+			goto tr115
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr99
+					goto tr109
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr104
+					goto tr103
 				}
 			default:
-				goto tr102
+				goto tr101
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr106
+					goto tr115
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr106
+					goto tr115
 				}
 			default:
-				goto tr106
+				goto tr115
 			}
 		default:
-			goto tr102
+			goto tr101
 		}
 		goto st0
-	tr21:
-
-		if atm == 4 {
-			atoms[atm] = atoms[SPEC_OBJECT]
-		} else if atoms[atm-1].Type() == ATOM_UUID {
-			atoms[atm] = atoms[atm-1]
-		}
-
-		atoms[atm][hlf] &= INT60_FLAGS
+	tr115:
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -2948,6 +3022,12 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st28
+	tr114:
+
+		atoms[atm][hlf] <<= 6
+		dgt--
+
+		goto st28
 	st28:
 		if p++; p == pe {
 			goto _test_eof28
@@ -2955,174 +3035,75 @@ func (frame *Frame) Parse() {
 	st_case_28:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr110
+			goto tr109
 		case 33:
-			goto tr111
+			goto tr110
 		case 35:
-			goto tr112
-		case 39:
-			goto tr113
-		case 42:
-			goto tr112
-		case 44:
 			goto tr111
+		case 39:
+			goto tr112
+		case 42:
+			goto tr111
+		case 44:
+			goto tr110
 		case 46:
-			goto tr114
-		case 47:
+			goto tr113
+		case 58:
+			goto tr111
+		case 59:
+			goto tr110
+		case 61:
+			goto tr116
+		case 62:
+			goto tr117
+		case 63:
+			goto tr110
+		case 64:
+			goto tr111
+		case 91:
+			goto tr103
+		case 93:
+			goto tr103
+		case 94:
+			goto tr118
+		case 95:
 			goto tr115
-		case 58:
-			goto tr112
-		case 59:
-			goto tr111
-		case 61:
-			goto tr117
-		case 62:
-			goto tr118
-		case 63:
-			goto tr111
-		case 64:
-			goto tr112
-		case 91:
-			goto tr104
-		case 93:
-			goto tr104
-		case 94:
-			goto tr119
-		case 95:
-			goto tr116
 		case 123:
-			goto tr104
+			goto tr103
 		case 125:
-			goto tr104
+			goto tr103
 		case 126:
-			goto tr116
+			goto tr115
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr110
+					goto tr109
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr104
+					goto tr103
 				}
 			default:
-				goto tr102
+				goto tr101
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr116
+					goto tr115
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr116
+					goto tr115
 				}
 			default:
-				goto tr116
+				goto tr115
 			}
 		default:
-			goto tr102
-		}
-		goto st0
-	tr116:
-
-		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
-		dgt++
-		if dgt > 10 {
-			{
-				p++
-				(ps.state) = 29
-				goto _out
-			}
-		}
-
-		goto st29
-	tr115:
-
-		atoms[atm][hlf] <<= 6
-		dgt--
-
-		goto st29
-	st29:
-		if p++; p == pe {
-			goto _test_eof29
-		}
-	st_case_29:
-		switch (frame.Body)[p] {
-		case 32:
-			goto tr110
-		case 33:
-			goto tr111
-		case 35:
-			goto tr112
-		case 39:
-			goto tr113
-		case 42:
-			goto tr112
-		case 44:
-			goto tr111
-		case 46:
-			goto tr114
-		case 58:
-			goto tr112
-		case 59:
-			goto tr111
-		case 61:
-			goto tr117
-		case 62:
-			goto tr118
-		case 63:
-			goto tr111
-		case 64:
-			goto tr112
-		case 91:
-			goto tr104
-		case 93:
-			goto tr104
-		case 94:
-			goto tr119
-		case 95:
-			goto tr116
-		case 123:
-			goto tr104
-		case 125:
-			goto tr104
-		case 126:
-			goto tr116
-		}
-		switch {
-		case (frame.Body)[p] < 43:
-			switch {
-			case (frame.Body)[p] < 36:
-				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr110
-				}
-			case (frame.Body)[p] > 37:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr104
-				}
-			default:
-				goto tr102
-			}
-		case (frame.Body)[p] > 45:
-			switch {
-			case (frame.Body)[p] < 65:
-				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr116
-				}
-			case (frame.Body)[p] > 90:
-				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr116
-				}
-			default:
-				goto tr116
-			}
-		default:
-			goto tr102
+			goto tr101
 		}
 		goto st0
 	tr10:
@@ -3130,12 +3111,12 @@ func (frame *Frame) Parse() {
 		atoms[atm].setStringType()
 		atoms[atm].setFrom(p)
 
-		goto st13
-	st13:
+		goto st12
+	st12:
 		if p++; p == pe {
-			goto _test_eof13
+			goto _test_eof12
 		}
-	st_case_13:
+	st_case_12:
 		switch (frame.Body)[p] {
 		case 10:
 			goto st0
@@ -3151,8 +3132,98 @@ func (frame *Frame) Parse() {
 		dgt = int(ABC[(frame.Body)[p]]) + 4
 		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
-		goto st30
-	tr125:
+		goto st29
+	tr124:
+
+		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
+		dgt++
+		if dgt > 10 {
+			{
+				p++
+				(ps.state) = 29
+				goto _out
+			}
+		}
+
+		goto st29
+	tr128:
+
+		atoms[atm][hlf] <<= 6
+		dgt--
+
+		goto st29
+	tr134:
+
+		dgt = 0
+		hlf = 1
+
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
+
+		goto st29
+	st29:
+		if p++; p == pe {
+			goto _test_eof29
+		}
+	st_case_29:
+		switch (frame.Body)[p] {
+		case 32:
+			goto tr119
+		case 33:
+			goto tr120
+		case 35:
+			goto tr121
+		case 39:
+			goto tr122
+		case 42:
+			goto tr121
+		case 44:
+			goto tr120
+		case 46:
+			goto tr123
+		case 58:
+			goto tr121
+		case 59:
+			goto tr120
+		case 61:
+			goto tr125
+		case 62:
+			goto tr126
+		case 63:
+			goto tr120
+		case 64:
+			goto tr121
+		case 94:
+			goto tr127
+		case 95:
+			goto tr124
+		case 126:
+			goto tr124
+		}
+		switch {
+		case (frame.Body)[p] < 48:
+			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+				goto tr119
+			}
+		case (frame.Body)[p] > 57:
+			switch {
+			case (frame.Body)[p] > 90:
+				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
+					goto tr124
+				}
+			case (frame.Body)[p] >= 65:
+				goto tr124
+			}
+		default:
+			goto tr124
+		}
+		goto st0
+	tr53:
+
+		dgt = 0
+		hlf = 1
+
+		atoms[atm][hlf] &= INT60_FLAGS
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -3165,21 +3236,6 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st30
-	tr129:
-
-		atoms[atm][hlf] <<= 6
-		dgt--
-
-		goto st30
-	tr135:
-
-		dgt = 0
-		hlf = 1
-
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
-
-		goto st30
 	st30:
 		if p++; p == pe {
 			goto _test_eof30
@@ -3187,62 +3243,65 @@ func (frame *Frame) Parse() {
 	st_case_30:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr120
+			goto tr119
 		case 33:
-			goto tr121
+			goto tr120
 		case 35:
-			goto tr122
+			goto tr121
 		case 39:
-			goto tr123
+			goto tr122
 		case 42:
-			goto tr122
+			goto tr121
 		case 44:
-			goto tr121
+			goto tr120
 		case 46:
-			goto tr124
-		case 58:
-			goto tr122
-		case 59:
-			goto tr121
-		case 61:
-			goto tr126
-		case 62:
-			goto tr127
-		case 63:
-			goto tr121
-		case 64:
-			goto tr122
-		case 94:
+			goto tr123
+		case 47:
 			goto tr128
+		case 58:
+			goto tr121
+		case 59:
+			goto tr120
+		case 61:
+			goto tr125
+		case 62:
+			goto tr126
+		case 63:
+			goto tr120
+		case 64:
+			goto tr121
+		case 94:
+			goto tr127
 		case 95:
-			goto tr125
+			goto tr124
 		case 126:
-			goto tr125
+			goto tr124
 		}
 		switch {
 		case (frame.Body)[p] < 48:
 			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr120
+				goto tr119
 			}
 		case (frame.Body)[p] > 57:
 			switch {
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr125
+					goto tr124
 				}
 			case (frame.Body)[p] >= 65:
-				goto tr125
+				goto tr124
 			}
 		default:
-			goto tr125
+			goto tr124
 		}
 		goto st0
-	tr53:
+	tr44:
 
-		dgt = 0
-		hlf = 1
+		dgt = int(ABC[(frame.Body)[p]]) + 4
+		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
 
-		atoms[atm][hlf] &= INT60_FLAGS
+		goto st31
+	tr136:
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -3262,65 +3321,80 @@ func (frame *Frame) Parse() {
 	st_case_31:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr120
-		case 33:
-			goto tr121
-		case 35:
-			goto tr122
-		case 39:
-			goto tr123
-		case 42:
-			goto tr122
-		case 44:
-			goto tr121
-		case 46:
-			goto tr124
-		case 47:
 			goto tr129
+		case 33:
+			goto tr130
+		case 35:
+			goto tr131
+		case 39:
+			goto tr133
+		case 42:
+			goto tr131
+		case 44:
+			goto tr130
+		case 46:
+			goto tr135
 		case 58:
-			goto tr122
+			goto tr131
 		case 59:
-			goto tr121
+			goto tr130
 		case 61:
-			goto tr126
+			goto tr137
 		case 62:
-			goto tr127
+			goto tr138
 		case 63:
-			goto tr121
+			goto tr130
 		case 64:
-			goto tr122
+			goto tr131
+		case 91:
+			goto tr134
+		case 93:
+			goto tr134
 		case 94:
-			goto tr128
+			goto tr139
 		case 95:
-			goto tr125
+			goto tr136
+		case 123:
+			goto tr134
+		case 125:
+			goto tr134
 		case 126:
-			goto tr125
+			goto tr136
 		}
 		switch {
-		case (frame.Body)[p] < 48:
-			if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-				goto tr120
-			}
-		case (frame.Body)[p] > 57:
+		case (frame.Body)[p] < 43:
 			switch {
+			case (frame.Body)[p] < 36:
+				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
+					goto tr129
+				}
+			case (frame.Body)[p] > 37:
+				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
+					goto tr134
+				}
+			default:
+				goto tr132
+			}
+		case (frame.Body)[p] > 45:
+			switch {
+			case (frame.Body)[p] < 65:
+				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
+					goto tr136
+				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr125
+					goto tr136
 				}
-			case (frame.Body)[p] >= 65:
-				goto tr125
+			default:
+				goto tr136
 			}
 		default:
-			goto tr125
+			goto tr132
 		}
 		goto st0
-	tr44:
+	tr46:
 
-		dgt = int(ABC[(frame.Body)[p]]) + 4
-		atoms[atm][hlf] &= INT60_FLAGS | PREFIX_MASKS[dgt]
-
-		goto st32
-	tr137:
+		atoms[atm][hlf] &= INT60_FLAGS
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -3340,80 +3414,80 @@ func (frame *Frame) Parse() {
 	st_case_32:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr130
-		case 33:
-			goto tr131
-		case 35:
-			goto tr132
-		case 39:
-			goto tr134
-		case 42:
-			goto tr132
-		case 44:
-			goto tr131
-		case 46:
-			goto tr136
-		case 58:
-			goto tr132
-		case 59:
-			goto tr131
-		case 61:
-			goto tr138
-		case 62:
-			goto tr139
-		case 63:
-			goto tr131
-		case 64:
-			goto tr132
-		case 91:
-			goto tr135
-		case 93:
-			goto tr135
-		case 94:
 			goto tr140
+		case 33:
+			goto tr141
+		case 35:
+			goto tr142
+		case 39:
+			goto tr143
+		case 42:
+			goto tr142
+		case 44:
+			goto tr141
+		case 46:
+			goto tr144
+		case 47:
+			goto tr145
+		case 58:
+			goto tr142
+		case 59:
+			goto tr141
+		case 61:
+			goto tr147
+		case 62:
+			goto tr148
+		case 63:
+			goto tr141
+		case 64:
+			goto tr142
+		case 91:
+			goto tr134
+		case 93:
+			goto tr134
+		case 94:
+			goto tr149
 		case 95:
-			goto tr137
+			goto tr146
 		case 123:
-			goto tr135
+			goto tr134
 		case 125:
-			goto tr135
+			goto tr134
 		case 126:
-			goto tr137
+			goto tr146
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr130
+					goto tr140
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr135
+					goto tr134
 				}
 			default:
-				goto tr133
+				goto tr132
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr137
+					goto tr146
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr137
+					goto tr146
 				}
 			default:
-				goto tr137
+				goto tr146
 			}
 		default:
-			goto tr133
+			goto tr132
 		}
 		goto st0
-	tr46:
-
-		atoms[atm][hlf] &= INT60_FLAGS
+	tr146:
 
 		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
 		dgt++
@@ -3426,6 +3500,12 @@ func (frame *Frame) Parse() {
 		}
 
 		goto st33
+	tr145:
+
+		atoms[atm][hlf] <<= 6
+		dgt--
+
+		goto st33
 	st33:
 		if p++; p == pe {
 			goto _test_eof33
@@ -3433,96 +3513,82 @@ func (frame *Frame) Parse() {
 	st_case_33:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr141
+			goto tr140
 		case 33:
-			goto tr142
+			goto tr141
 		case 35:
-			goto tr143
+			goto tr142
 		case 39:
-			goto tr144
+			goto tr143
 		case 42:
-			goto tr143
+			goto tr142
 		case 44:
-			goto tr142
+			goto tr141
 		case 46:
-			goto tr145
-		case 47:
-			goto tr146
+			goto tr144
 		case 58:
-			goto tr143
+			goto tr142
 		case 59:
-			goto tr142
+			goto tr141
 		case 61:
-			goto tr148
+			goto tr147
 		case 62:
-			goto tr149
+			goto tr148
 		case 63:
-			goto tr142
+			goto tr141
 		case 64:
-			goto tr143
+			goto tr142
 		case 91:
-			goto tr135
+			goto tr134
 		case 93:
-			goto tr135
+			goto tr134
 		case 94:
-			goto tr150
+			goto tr149
 		case 95:
-			goto tr147
+			goto tr146
 		case 123:
-			goto tr135
+			goto tr134
 		case 125:
-			goto tr135
+			goto tr134
 		case 126:
-			goto tr147
+			goto tr146
 		}
 		switch {
 		case (frame.Body)[p] < 43:
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr141
+					goto tr140
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr135
+					goto tr134
 				}
 			default:
-				goto tr133
+				goto tr132
 			}
 		case (frame.Body)[p] > 45:
 			switch {
 			case (frame.Body)[p] < 65:
 				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr147
+					goto tr146
 				}
 			case (frame.Body)[p] > 90:
 				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr147
+					goto tr146
 				}
 			default:
-				goto tr147
+				goto tr146
 			}
 		default:
-			goto tr133
+			goto tr132
 		}
 		goto st0
-	tr147:
+	tr50:
 
-		atoms[atm][hlf] |= ((uint64)(ABC[(frame.Body)[p]])) << DIGIT_OFFSETS[dgt]
-		dgt++
-		if dgt > 10 {
-			{
-				p++
-				(ps.state) = 34
-				goto _out
-			}
+		if atm > 0 {
+			atoms[atm] = atoms[atm-1]
 		}
-
-		goto st34
-	tr146:
-
-		atoms[atm][hlf] <<= 6
-		dgt--
 
 		goto st34
 	st34:
@@ -3532,92 +3598,7 @@ func (frame *Frame) Parse() {
 	st_case_34:
 		switch (frame.Body)[p] {
 		case 32:
-			goto tr141
-		case 33:
-			goto tr142
-		case 35:
-			goto tr143
-		case 39:
-			goto tr144
-		case 42:
-			goto tr143
-		case 44:
-			goto tr142
-		case 46:
-			goto tr145
-		case 58:
-			goto tr143
-		case 59:
-			goto tr142
-		case 61:
-			goto tr148
-		case 62:
-			goto tr149
-		case 63:
-			goto tr142
-		case 64:
-			goto tr143
-		case 91:
-			goto tr135
-		case 93:
-			goto tr135
-		case 94:
 			goto tr150
-		case 95:
-			goto tr147
-		case 123:
-			goto tr135
-		case 125:
-			goto tr135
-		case 126:
-			goto tr147
-		}
-		switch {
-		case (frame.Body)[p] < 43:
-			switch {
-			case (frame.Body)[p] < 36:
-				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr141
-				}
-			case (frame.Body)[p] > 37:
-				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
-					goto tr135
-				}
-			default:
-				goto tr133
-			}
-		case (frame.Body)[p] > 45:
-			switch {
-			case (frame.Body)[p] < 65:
-				if 48 <= (frame.Body)[p] && (frame.Body)[p] <= 57 {
-					goto tr147
-				}
-			case (frame.Body)[p] > 90:
-				if 97 <= (frame.Body)[p] && (frame.Body)[p] <= 122 {
-					goto tr147
-				}
-			default:
-				goto tr147
-			}
-		default:
-			goto tr133
-		}
-		goto st0
-	tr50:
-
-		if atm > 0 {
-			atoms[atm] = atoms[atm-1]
-		}
-
-		goto st35
-	st35:
-		if p++; p == pe {
-			goto _test_eof35
-		}
-	st_case_35:
-		switch (frame.Body)[p] {
-		case 32:
-			goto tr151
 		case 33:
 			goto tr40
 		case 35:
@@ -3662,7 +3643,7 @@ func (frame *Frame) Parse() {
 			switch {
 			case (frame.Body)[p] < 36:
 				if 9 <= (frame.Body)[p] && (frame.Body)[p] <= 13 {
-					goto tr151
+					goto tr150
 				}
 			case (frame.Body)[p] > 37:
 				if 40 <= (frame.Body)[p] && (frame.Body)[p] <= 41 {
@@ -3689,11 +3670,14 @@ func (frame *Frame) Parse() {
 		}
 		goto st0
 	st_out:
-	_test_eof14:
-		(ps.state) = 14
+	_test_eof13:
+		(ps.state) = 13
 		goto _test_eof
 	_test_eof1:
 		(ps.state) = 1
+		goto _test_eof
+	_test_eof14:
+		(ps.state) = 14
 		goto _test_eof
 	_test_eof15:
 		(ps.state) = 15
@@ -3704,14 +3688,14 @@ func (frame *Frame) Parse() {
 	_test_eof17:
 		(ps.state) = 17
 		goto _test_eof
-	_test_eof18:
-		(ps.state) = 18
-		goto _test_eof
 	_test_eof2:
 		(ps.state) = 2
 		goto _test_eof
 	_test_eof3:
 		(ps.state) = 3
+		goto _test_eof
+	_test_eof18:
+		(ps.state) = 18
 		goto _test_eof
 	_test_eof19:
 		(ps.state) = 19
@@ -3719,26 +3703,23 @@ func (frame *Frame) Parse() {
 	_test_eof20:
 		(ps.state) = 20
 		goto _test_eof
-	_test_eof21:
-		(ps.state) = 21
-		goto _test_eof
 	_test_eof4:
 		(ps.state) = 4
 		goto _test_eof
 	_test_eof5:
 		(ps.state) = 5
 		goto _test_eof
-	_test_eof22:
-		(ps.state) = 22
+	_test_eof21:
+		(ps.state) = 21
 		goto _test_eof
 	_test_eof6:
 		(ps.state) = 6
 		goto _test_eof
+	_test_eof22:
+		(ps.state) = 22
+		goto _test_eof
 	_test_eof23:
 		(ps.state) = 23
-		goto _test_eof
-	_test_eof24:
-		(ps.state) = 24
 		goto _test_eof
 	_test_eof7:
 		(ps.state) = 7
@@ -3752,14 +3733,14 @@ func (frame *Frame) Parse() {
 	_test_eof10:
 		(ps.state) = 10
 		goto _test_eof
-	_test_eof25:
-		(ps.state) = 25
+	_test_eof24:
+		(ps.state) = 24
 		goto _test_eof
 	_test_eof11:
 		(ps.state) = 11
 		goto _test_eof
-	_test_eof12:
-		(ps.state) = 12
+	_test_eof25:
+		(ps.state) = 25
 		goto _test_eof
 	_test_eof26:
 		(ps.state) = 26
@@ -3770,11 +3751,11 @@ func (frame *Frame) Parse() {
 	_test_eof28:
 		(ps.state) = 28
 		goto _test_eof
+	_test_eof12:
+		(ps.state) = 12
+		goto _test_eof
 	_test_eof29:
 		(ps.state) = 29
-		goto _test_eof
-	_test_eof13:
-		(ps.state) = 13
 		goto _test_eof
 	_test_eof30:
 		(ps.state) = 30
@@ -3791,48 +3772,45 @@ func (frame *Frame) Parse() {
 	_test_eof34:
 		(ps.state) = 34
 		goto _test_eof
-	_test_eof35:
-		(ps.state) = 35
-		goto _test_eof
 
 	_test_eof:
 		{
 		}
 		if p == eof {
 			switch ps.state {
-			case 15:
-
-				frame.position++
-
-			case 20:
-
-				frame.position++
-
-			case 16, 17, 18, 35:
-
-				atm++
+			case 14:
 
 				frame.position++
 
 			case 19:
 
-				atm++
-
 				frame.position++
 
-			case 32:
-
-				atm++
-
-				frame.position++
-
-			case 30, 31:
+			case 15, 16, 17, 34:
 
 				atm++
 
 				frame.position++
 
-			case 22, 25:
+			case 18:
+
+				atm++
+
+				frame.position++
+
+			case 31:
+
+				atm++
+
+				frame.position++
+
+			case 29, 30:
+
+				atm++
+
+				frame.position++
+
+			case 21, 24:
 
 				atoms[atm].setTill(p)
 				atoms[atm].parseValue(frame.Body)
@@ -3841,7 +3819,7 @@ func (frame *Frame) Parse() {
 
 				frame.position++
 
-			case 23:
+			case 22:
 
 				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -3849,7 +3827,7 @@ func (frame *Frame) Parse() {
 
 				frame.position++
 
-			case 33, 34:
+			case 32, 33:
 
 				atoms[atm][1] = UUID_NAME_FLAG
 
@@ -3857,7 +3835,7 @@ func (frame *Frame) Parse() {
 
 				frame.position++
 
-			case 27:
+			case 26:
 
 				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -3865,7 +3843,7 @@ func (frame *Frame) Parse() {
 
 				frame.position++
 
-			case 24, 26:
+			case 23, 25:
 
 				atoms[atm][1] |= ((uint64)(ATOM_UUID)) << 62
 
@@ -3873,7 +3851,7 @@ func (frame *Frame) Parse() {
 
 				frame.position++
 
-			case 28, 29:
+			case 27, 28:
 
 				atoms[atm][1] = UUID_NAME_FLAG
 

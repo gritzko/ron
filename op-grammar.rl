@@ -124,7 +124,7 @@
     INT_ATOM = ([\-+]? digit+ ) >int_atom_start %scalar_atom_end;
 
     # 64-bit (double) float 
-    FLOAT_ATOM = ( [\-+]? [0-9]+ ("." | ([eE] [\-+]?)) [0-9]+ ([eE] [\-+]? digit+ )? ) >float_atom_start %scalar_atom_end;
+    FLOAT_ATOM = ( [\-+]? digit+ ("." digit+ ([eE] [\-+]? digit+)? | [eE] [\-+]? digit+ ) ) >float_atom_start %scalar_atom_end;
 
     UUID_ATOM = UUID >uuid_atom_start %uuid_atom_end;
 
