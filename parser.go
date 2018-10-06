@@ -1395,7 +1395,7 @@ func (frame *Frame) Parse() {
 		goto tr8
 	tr8:
 
-		atoms[atm].setStringType()
+		atoms[atm].setType(ATOM_STRING)
 		atoms[atm].setFrom(p)
 
 		goto st3
@@ -1419,7 +1419,7 @@ func (frame *Frame) Parse() {
 		goto st3
 	tr9:
 
-		atoms[atm].setStringType()
+		atoms[atm].setType(ATOM_STRING)
 		atoms[atm].setFrom(p)
 
 		atoms[atm].setTill(p)
@@ -1947,7 +1947,7 @@ func (frame *Frame) Parse() {
 		goto st0
 	tr15:
 
-		atoms[atm].setIntType()
+		atoms[atm].setType(ATOM_INT)
 		atoms[atm].setFrom(p)
 
 		goto st5
@@ -1962,7 +1962,7 @@ func (frame *Frame) Parse() {
 		goto st0
 	tr16:
 
-		atoms[atm].setIntType()
+		atoms[atm].setType(ATOM_INT)
 		atoms[atm].setFrom(p)
 
 		goto st21
@@ -2620,7 +2620,7 @@ func (frame *Frame) Parse() {
 		goto st0
 	tr23:
 
-		atoms[atm].setFloatType()
+		atoms[atm].setType(ATOM_FLOAT)
 		atoms[atm].setFrom(p)
 
 		goto st8
@@ -2635,7 +2635,7 @@ func (frame *Frame) Parse() {
 		goto st0
 	tr24:
 
-		atoms[atm].setFloatType()
+		atoms[atm].setType(ATOM_FLOAT)
 		atoms[atm].setFrom(p)
 
 		goto st9
@@ -3108,7 +3108,7 @@ func (frame *Frame) Parse() {
 		goto st0
 	tr10:
 
-		atoms[atm].setStringType()
+		atoms[atm].setType(ATOM_STRING)
 		atoms[atm].setFrom(p)
 
 		goto st12

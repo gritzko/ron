@@ -43,17 +43,17 @@
     }
 
     action int_atom_start {
-        atoms[atm].setIntType()
+        atoms[atm].setType(ATOM_INT)
         atoms[atm].setFrom(p)
     }
 
     action float_atom_start {
-        atoms[atm].setFloatType()
+        atoms[atm].setType(ATOM_FLOAT)
         atoms[atm].setFrom(p)
     }
     
     action string_atom_start {
-        atoms[atm].setStringType()
+        atoms[atm].setType(ATOM_STRING)
         atoms[atm].setFrom(p)
     }
 
