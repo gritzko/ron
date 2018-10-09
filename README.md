@@ -13,8 +13,9 @@ Table of Contents
       * [The math](#the-math)
       * [Acknowledgements](#acknowledgements)
       * [History](#history)
+      * [Build status](#build-status)
 
-# Swarm Replicated Object Notation 2.0.1 [![Build Status][badge]][travis]
+# Swarm Replicated Object Notation 2.0.1
 
 Swarm Replicated Object Notation is a format for *distributed live data*.  RON's
 focus is on continuous data synchronization.  Every RON *object* may naturally
@@ -585,6 +586,14 @@ Use Swarm RON!
 * 2017 Oct: streaming parser
 * 2017 Oct: binary encoding
 
+## Build status
+
+| Package             | Build status         |
+|---------------------|----------------------|
+| `gritzko/ron`       | [![RON][1]][travis]  | 
+| `gritzko/ron/rdt`   | [![CRDTs][1]][travis]| 
+
+
 [2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
 [super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
 [opbased]: http://haslab.uminho.pt/sites/default/files/ashoker/files/opbaseddais14.pdf
@@ -608,5 +617,7 @@ Use Swarm RON!
 [2problems]: https://martinfowler.com/bliki/TwoHardThings.html
 [lsmt]: https://en.wikipedia.org/wiki/Log-structured_merge-tree
 [zigzag]: https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
-[badge]: https://travis-ci.com/gritzko/ron.svg?branch=master
+
 [travis]: https://travis-ci.com/gritzko/ron
+[1]: https://travis-matrix-badges.herokuapp.com/repos/gritzko/ron/branches/master/1
+[2]: https://travis-matrix-badges.herokuapp.com/repos/gritzko/ron/branches/master/2
