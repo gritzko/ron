@@ -14,7 +14,7 @@ Table of Contents
       * [Acknowledgements](#acknowledgements)
       * [History](#history)
 
-# Swarm Replicated Object Notation 2.0.1 #
+# Swarm Replicated Object Notation 2.0.1 [![Build Status][badge]][travis]
 
 Swarm Replicated Object Notation is a format for *distributed live data*.  RON's
 focus is on continuous data synchronization.  Every RON *object* may naturally
@@ -608,3 +608,5 @@ Use Swarm RON!
 [2problems]: https://martinfowler.com/bliki/TwoHardThings.html
 [lsmt]: https://en.wikipedia.org/wiki/Log-structured_merge-tree
 [zigzag]: https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
+[badge]: https://travis-ci.com/gritzko/ron.svg?branch=master
+[travis]: https://travis-ci.com/gritzko/ron
