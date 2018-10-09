@@ -1,23 +1,29 @@
 package ron
 
 import (
+	"math"
 	"strconv"
-	"unsafe"
 )
 
 const (
-	int_atom_flags           = uint64(4|ATOM_INT) << 60
-	float_atom_flags         = uint64(4|ATOM_FLOAT) << 60
-	string_atom_flags        = uint64(4|ATOM_STRING) << 60
-	int30Full         uint64 = (1 << 30) - 1
+	int_atom_flags    = uint64(4|ATOM_INT) << 60
+	float_atom_flags  = uint64(4|ATOM_FLOAT) << 60
+	string_atom_flags = uint64(4|ATOM_STRING) << 60
+	int30Full         = uint64(1<<30) - 1
 )
 
 func NewIntegerAtom(i int64) Atom {
-	return Atom{*(*uint64)(unsafe.Pointer(&i)), int_atom_flags}
+	a := Atom{0, int_atom_flags}
+	if i < 0 {
+		a[VALUE] = uint64(-i) | 1<<63
+	} else {
+		a[VALUE] = uint64(i)
+	}
+	return a
 }
 
 func NewFloatAtom(f float64) Atom {
-	return Atom{*(*uint64)(unsafe.Pointer(&f)), float_atom_flags}
+	return Atom{math.Float64bits(f), float_atom_flags}
 }
 
 func (frame Frame) Count() int {
@@ -37,7 +43,11 @@ func (a Atom) Type() uint {
 }
 
 func (a Atom) Integer() int64 {
-	return *(*int64)(unsafe.Pointer(&a[VALUE]))
+	if a[VALUE]&(1<<63) != 0 {
+		return -int64(a[VALUE])
+	} else {
+		return int64(a[VALUE])
+	}
 }
 
 func (a Atom) IsUUID() bool {
@@ -54,7 +64,7 @@ func (a Atom) UUID() UUID {
 // Overall, floats are NOT commutative. Any floating arithmetic
 // is highly discouraged inside CRDT type implementations.
 func (a Atom) Float() float64 {
-	return *(*float64)(unsafe.Pointer(&a[VALUE]))
+	return math.Float64frombits(a[VALUE])
 }
 
 func (a *Atom) setType(t uint64) {
@@ -77,14 +87,16 @@ func (a *Atom) parseValue(b []byte) {
 	case t == ATOM_FLOAT:
 		f, err := strconv.ParseFloat(a.getSource(b), 64)
 		if err == nil {
-			// hijack existing bits layout
-			a[VALUE] = *(*uint64)(unsafe.Pointer(&f))
+			a[VALUE] = math.Float64bits(f)
 		}
 	case t == ATOM_INT:
 		i, err := strconv.ParseInt(a.getSource(b), 10, 64)
 		if err == nil {
-			// hijack existing bits layout
-			a[VALUE] = *(*uint64)(unsafe.Pointer(&i))
+			if i < 0 {
+				a[VALUE] = uint64(-i) | 1<<63
+			} else {
+				a[VALUE] = uint64(i)
+			}
 		}
 	case t == ATOM_STRING:
 		// TODO: save short strings in a VALUE slot for advanced optimizations
