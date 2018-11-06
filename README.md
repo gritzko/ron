@@ -534,6 +534,8 @@ other lengths are optional).
 
 * **C++**
   * [swarmcpp](https://github.com/gritzko/swarmcpp)
+* **Elixir**
+  * [ronex](https://github.com/flanfly/ronex)
 * **Go**
   * [ron](https://github.com/gritzko/ron)
 * **Haskell**
