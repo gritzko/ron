@@ -132,10 +132,14 @@ four UUID types:
 
     These UUIDs are:
 
-    1. data type UUID, e.g. `lww` a last-write-wins object,
-    2. object UUID `1TUAQ+gritzko`,
-    3. event UUID `1TUAQ+gritzko` and
-    4. location/reference UUID, e.g. `bar`.
+    1.  data type UUID, e.g. `lww` a last-write-wins object,
+        which is used by the Swarm platform to select reducer function to reduce ops;
+    2.  object UUID `1TUAQ+gritzko`,
+        which is used by the Swarm platform to group ops for reduce (along with location);
+    3.  event UUID `1TUAQ+gritzko`,
+        which is used by the Swarm platform to sort ops for reduce;
+    4.  location/reference UUID, e.g. `bar`,
+        which is used by the Swarm platform to group ops for reduce (along with object UUID).
 
     Other atoms (any number, any type) form the op's value. Op atoms types are:
 
